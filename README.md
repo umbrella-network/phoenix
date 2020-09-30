@@ -73,20 +73,11 @@ Deploy in the following order:
 
 ## TODO
 
-- [ ] Validator Rewards [link](https://github.com/umbrella-network/phoenix/pull/1/files#r496632272)
+- [ ] Validator Rewards
+  - [link](https://github.com/umbrella-network/phoenix/pull/1/files#r496632272)
 - [ ] Robust Leader Selection 
   - [link](https://github.com/umbrella-network/phoenix/pull/1/files#r496607598)
   - [link](https://github.com/umbrella-network/phoenix/pull/1/files#r495886523)
-
-# Project Name
-Project Description
-
-### Column Name
-- [ ] Task title ~3d #type @name yyyy-mm-dd  
-  - [ ] Sub-task or description  
-
-### Completed Column ✓
-- [x] Completed task title  
 
 ## Licensed under MIT.
 
