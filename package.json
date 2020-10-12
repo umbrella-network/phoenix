@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "compile": "npx buidler compile",
     "test": "./node_modules/.bin/solidity-coverage"
   },
   "repository": {

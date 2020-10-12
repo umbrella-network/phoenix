@@ -3,7 +3,9 @@ pragma solidity ^0.6.8;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract ValidatorRegistry is Ownable {
+import "./interfaces/IValidatorRegistry.sol";
+
+contract ValidatorRegistry is IValidatorRegistry, Ownable {
   event LogValidatorRegistered(
     address id
   );
@@ -17,11 +19,11 @@ contract ValidatorRegistry is Ownable {
     string location;
   }
 
-  mapping(address => Validator) public validators;
+  mapping(address => Validator) override public validators;
 
-  address[] public addresses;
+  address[] override public addresses;
 
-  function create(address _id, string memory _location) public onlyOwner {
+  function create(address _id, string calldata _location) override external onlyOwner {
     Validator storage validator = validators[_id];
 
     require(validator.id == address(0x0));
@@ -34,7 +36,7 @@ contract ValidatorRegistry is Ownable {
     LogValidatorRegistered(validator.id);
   }
 
-  function update(address _id, string memory _location) public onlyOwner {
+  function update(address _id, string calldata _location) override external onlyOwner {
     Validator storage validator = validators[_id];
 
     require(validator.id != address(0x0));
@@ -44,7 +46,7 @@ contract ValidatorRegistry is Ownable {
     LogValidatorUpdated(validator.id);
   }
 
-  function getNumberOfValidators() public view returns (uint256) {
+  function getNumberOfValidators() override external view returns (uint256) {
     return addresses.length;
   }
 }
