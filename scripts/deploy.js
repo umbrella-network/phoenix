@@ -28,8 +28,11 @@ async function main() {
     validator = config.validators[index];
     id = await accounts[index].getAddress();
     validatorRegistry.create(id, validator.location);
-    console.log('Added validator number ' + index + ' with address ' + id + ' at location ' + validator.location);
+    console.log("Added validator number " + index + " with address " + id + " at location " + validator.location);
   }
+
+  const leader = await chain.getLeaderAddress();
+  console.log("leader: " + leader);
 }
 
 main()
