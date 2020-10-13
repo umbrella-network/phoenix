@@ -32,7 +32,7 @@ async function main() {
   }
 
   const leader = await chain.getLeaderAddress();
-  console.log("leader: " + leader);
+  console.log("Current leader: " + leader);
 }
 
 main()

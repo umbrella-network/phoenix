@@ -51,7 +51,7 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 
 2. Deploy to localhost
 
-`npx buidler run ./scripts/deploy.js`
+`npx buidler run ./scripts/deploy.js --network localhost`
 
 ## Deploy
 
