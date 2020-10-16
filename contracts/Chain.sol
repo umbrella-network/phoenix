@@ -83,6 +83,11 @@ contract Chain is ReentrancyGuard {
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
   function getLeaderAddress() public view returns (address) {
     uint256 numberOfValidators = validatorRegistry.getNumberOfValidators();
+
+    if (numberOfValidators == 0) {
+      return address(0x0);
+    }
+
     uint256 blockHeight = getBlockHeight();
     uint256 index = uint256(blockHeight.mod(numberOfValidators));
     address leader = validatorRegistry.addresses(index);

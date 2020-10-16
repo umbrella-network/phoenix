@@ -47,7 +47,7 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 
 1. Start Ganache
 
-`npx ganache-cli --blockTime 23`
+`npx ganache-cli --blockTime 23` or `npx buidler node`
 
 2. Deploy to localhost
 

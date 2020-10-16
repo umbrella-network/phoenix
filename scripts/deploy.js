@@ -27,7 +27,7 @@ async function main() {
   for (let index = 0; index < config.validators.length; index++) {
     validator = config.validators[index];
     id = await accounts[index].getAddress();
-    validatorRegistry.create(id, validator.location);
+    await validatorRegistry.create(id, validator.location);
     console.log("Added validator number " + index + " with address " + id + " at location " + validator.location);
   }
 
