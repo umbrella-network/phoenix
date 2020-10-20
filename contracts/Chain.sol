@@ -20,6 +20,7 @@ contract Chain is ReentrancyGuard {
     uint256 staked;
     uint256 power;
     mapping(address => uint256) votes;
+    mapping(bytes32 => bytes32) data;
   }
 
   mapping (uint256 => Block) public blocks;
@@ -39,6 +40,8 @@ contract Chain is ReentrancyGuard {
 
   function submit(
     bytes32 _root,
+    bytes32[] memory _keys,
+    bytes32[] memory _values,
     uint8[] memory _v,
     bytes32[] memory _r,
     bytes32[] memory _s
@@ -46,15 +49,22 @@ contract Chain is ReentrancyGuard {
     uint256 blockHeight = getBlockHeight();
     address leaderAddress = getLeaderAddress();
 
-    require(msg.sender == leaderAddress, "sender is not the leader");
+    bytes32 affidavit = keccak256(abi.encodePacked(blockHeight, _root));
 
-    bytes32 header = keccak256(abi.encodePacked(blockHeight, _root));
+    require(msg.sender == leaderAddress, "sender is not the leader");
+    require(_keys.length == _values.length, "numbers of keys and values not the same");
+
+    for (uint256 i = 0; i < _keys.length; i = i.add(1)) {
+      blocks[blockHeight].data[_keys[i]] = _values[i];
+      affidavit = keccak256(abi.encodePacked(affidavit, _keys[i], _values[i]));
+    }
+
     uint256 staked = stakingBank.totalSupply();
     uint256 power = 0;
     uint256 minimum = staked.mul(66); 
 
     for (uint256 i = 0; i < _v.length; i = i.add(1)) {
-      address signer = ecrecover(header, _v[i], _r[i], _s[i]);
+      address signer = ecrecover(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
       require(balance > 0, "validator does not have positive balance");
