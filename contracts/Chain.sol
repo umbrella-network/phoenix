@@ -19,11 +19,16 @@ contract Chain is ReentrancyGuard {
     address minter;
     uint256 staked;
     uint256 power;
+    address[] voters;
+    uint256 anchor;
+    uint256 timestamp;
     mapping(address => uint256) votes;
     mapping(bytes32 => bytes32) data;
   }
 
   mapping (uint256 => Block) public blocks;
+
+  event LogMint(address indexed minter, uint256 blockHeight, uint256 anchor);
 
   constructor(
     address _registryAddress,
@@ -45,23 +50,25 @@ contract Chain is ReentrancyGuard {
     uint8[] memory _v,
     bytes32[] memory _r,
     bytes32[] memory _s
-  ) public nonReentrant {
+  ) public nonReentrant returns (bool) {
     uint256 blockHeight = getBlockHeight();
     address leaderAddress = getLeaderAddress();
 
-    bytes32 affidavit = keccak256(abi.encodePacked(blockHeight, _root));
+    bytes memory testimony = abi.encodePacked(blockHeight, _root);
 
     require(msg.sender == leaderAddress, "sender is not the leader");
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
     for (uint256 i = 0; i < _keys.length; i = i.add(1)) {
       blocks[blockHeight].data[_keys[i]] = _values[i];
-      affidavit = keccak256(abi.encodePacked(affidavit, _keys[i], _values[i]));
+      testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
 
     uint256 staked = stakingBank.totalSupply();
     uint256 power = 0;
     uint256 minimum = staked.mul(66); 
+
+    bytes32 affidavit = keccak256(testimony);
 
     for (uint256 i = 0; i < _v.length; i = i.add(1)) {
       address signer = ecrecover(affidavit, _v[i], _r[i], _s[i]);
@@ -69,6 +76,8 @@ contract Chain is ReentrancyGuard {
 
       require(balance > 0, "validator does not have positive balance");
       require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
+
+      blocks[blockHeight].voters.push(signer);
 
       blocks[blockHeight].votes[signer] = balance;
       power = power.add(balance);
@@ -84,6 +93,12 @@ contract Chain is ReentrancyGuard {
     blocks[blockHeight].minter = leaderAddress;
     blocks[blockHeight].staked = staked;
     blocks[blockHeight].power = power;
+    blocks[blockHeight].anchor = block.number;
+    blocks[blockHeight].timestamp = block.timestamp;
+
+    emit LogMint(msg.sender, blockHeight, block.number);
+
+    return true;
   }
 
   function getBlockHeight() public view returns (uint256) {
