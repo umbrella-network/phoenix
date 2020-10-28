@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - initial version
 - contracts interfaces
+- first class chain data
 
 ### Changed
 - `StakingBank` to be `ERC20` compatible
