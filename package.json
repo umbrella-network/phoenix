@@ -8,7 +8,14 @@
   },
   "scripts": {
     "compile": "npx buidler compile",
-    "test": "./node_modules/.bin/solidity-coverage"
+    "test": "./node_modules/.bin/solidity-coverage",
+    "deploy-poc:local": "npx buidler run --network localhost ./scripts/deploy.js",
+    "deploy-poc": "npx buidler run ./scripts/deploy.js",
+    "flatten:token": "npx truffle-flattener ./contracts/Token.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > _token.sol",
+    "flatten:validator": "npx truffle-flattener ./contracts/ValidatorRegistry.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > _validatorRegistry.sol",
+    "flatten:chain": "npx truffle-flattener ./contracts/Chain.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > _chain.sol",
+    "flatten:bank": "npx truffle-flattener ./contracts/StakingBank.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > _stakingBank.sol",
+    "flatten:all": "npm run flatten:token && npm run flatten:validator && npm run flatten:chain && npm run flatten:bank"
   },
   "repository": {
     "type": "git",
