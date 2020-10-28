@@ -25,10 +25,15 @@ async function main() {
   const accounts = await ethers.getSigners();
 
   for (let index = 0; index < config.validators.length; index++) {
-    validator = config.validators[index];
-    id = await accounts[index].getAddress();
+    const validator = config.validators[index];
+    const id = await accounts[index].getAddress()
     await validatorRegistry.create(id, validator.location);
     console.log("Added validator number " + index + " with address " + id + " at location " + validator.location);
+
+    await token.approve(stakingBank.address, config.token.totalSupply);
+    await stakingBank.receiveApproval(id, config.token.totalSupply, 0);
+    console.log("validator balance:", (await token.balanceOf(id)).toString());
+    console.log("staked balance:", (await stakingBank.balanceOf(id)).toString());
   }
 
   const leader = await chain.getLeaderAddress();
