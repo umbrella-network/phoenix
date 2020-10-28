@@ -17,6 +17,21 @@ const config = {
         location: 'http://localhost:3000'
       }
     ]
+  },
+  staging: {
+    token: {
+      totalSupply: '1000000000000000000',
+      name: 'Umbrella',
+      symbol: 'UMB'
+    },
+    chain: {
+      interval: 16
+    },
+    validators: [
+      {
+        location: 'http://localhost:3000'
+      }
+    ]
   }
 };
 

@@ -25,10 +25,17 @@ async function main() {
   const accounts = await ethers.getSigners();
 
   for (let index = 0; index < config.validators.length; index++) {
-    validator = config.validators[index];
-    id = await accounts[index].getAddress();
+    const validator = config.validators[index];
+    const validatorWallet = ethers.Wallet.createRandom()
+    const id = await validatorWallet.getAddress()
     await validatorRegistry.create(id, validator.location);
-    console.log("Added validator number " + index + " with address " + id + " at location " + validator.location);
+    console.log("Added validator ", id);
+    console.log("validator PK", validatorWallet.privateKey);
+    console.log("validator number " + index + " at location " + validator.location);
+
+    await token.mintAndStake(id, '2000000000000000000', stakingBank.address);
+    console.log("validator balance:", (await token.balanceOf(id)).toString());
+    console.log("staked balance:", (await stakingBank.balanceOf(id)).toString());
   }
 
   const leader = await chain.getLeaderAddress();

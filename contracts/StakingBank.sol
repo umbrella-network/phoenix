@@ -31,6 +31,10 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard {
     registry = IValidatorRegistry(_registryAddress);
   }
 
+  function setToken(IERC20 _token) external {
+    token = _token;
+  }
+
   function receiveApproval(
     address _from,
     uint256 _value,
