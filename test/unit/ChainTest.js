@@ -36,16 +36,23 @@ async function fixture([owner, validator], provider) {
   }
 }
 
-const leafHash = data => ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(['string'], [data]))
+const hashData = data => ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(['string'], [data.toString()]))
 const hash2buffer = hash => Buffer.from(hash.slice(2), 'hex')
 
-const leafHash1 = leafHash('eth-usd=1234')
-const leafHash2 = leafHash('btc-usd=5678')
+const inputs = {}
 
-const inputs = [hash2buffer(leafHash1), hash2buffer(leafHash2)]
-const depth = Math.ceil(Math.log2(inputs.length)) + 1
+const keys = [
+  'eth-eur', 'btc-eur', 'war-eur', 'ltc-eur', 'uni-eur',
+  'eth-usd', 'btc-usd', 'war-usd', 'ltc-usd', 'uni-usd',
+]
+
+keys.forEach((k, i) => {
+  inputs[hashData(k)] = hash2buffer(hashData(i))
+})
+
+const depth = Math.ceil(Math.log2(Object.keys(inputs).length)) + 1
 const tree = new SparseMerkleTree(inputs, depth)
-const root = tree.getRoot()
+const root = tree.getHexRoot()
 
 const prepareData = async (signer, blockHeight, root) => {
   const testimony = ethers.utils.defaultAbiCoder.encode(['uint256', 'bytes32'], [blockHeight, root])
