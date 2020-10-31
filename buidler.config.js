@@ -1,4 +1,7 @@
 usePlugin("@nomiclabs/buidler-waffle");
+usePlugin('@nomiclabs/buidler-ethers');
+usePlugin("@nomiclabs/buidler-web3");
+usePlugin('@nomiclabs/buidler-truffle5'); // uses and exposes web3 via buidler-web3 plugin
 
 task("accounts", "Prints the list of accounts", async () => {
   const accounts = await ethers.getSigners();
@@ -9,6 +12,9 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 module.exports = {
+  networks: {
+    buidlerevm: {},
+  },
   solc: {
     version: "0.6.8",
   },

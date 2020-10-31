@@ -14,6 +14,8 @@ contract Chain is ReentrancyGuard {
   IStakingBank stakingBank;
   uint256 interval;
 
+  bytes constant ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
+
   struct Block {
     bytes32 root;
     address minter;
@@ -43,6 +45,11 @@ contract Chain is ReentrancyGuard {
     interval = _interval;
   }
 
+  function recoverSigner(bytes32 affidavit, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {
+    bytes32 hash = keccak256(abi.encodePacked(ETH_PREFIX, affidavit));
+    return ecrecover(hash, _v, _r, _s);
+  }
+
   function submit(
     bytes32 _root,
     bytes32[] memory _keys,
@@ -59,7 +66,7 @@ contract Chain is ReentrancyGuard {
     require(msg.sender == leaderAddress, "sender is not the leader");
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
-    for (uint256 i = 0; i < _keys.length; i = i.add(1)) {
+    for (uint256 i = 0; i < _keys.length; i++) {
       blocks[blockHeight].data[_keys[i]] = _values[i];
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
@@ -70,8 +77,8 @@ contract Chain is ReentrancyGuard {
 
     bytes32 affidavit = keccak256(testimony);
 
-    for (uint256 i = 0; i < _v.length; i = i.add(1)) {
-      address signer = ecrecover(affidavit, _v[i], _r[i], _s[i]);
+    for (uint256 i = 0; i < _v.length; i++) {
+      address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
       require(balance > 0, "validator does not have positive balance");
