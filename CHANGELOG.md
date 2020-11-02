@@ -12,3 +12,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - `StakingBank` to be `ERC20` compatible
+- make Chain states: `validatorRegistry`, `stakingBank`, `interval` to be public

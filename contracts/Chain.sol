@@ -10,9 +10,9 @@ import "./interfaces/IValidatorRegistry.sol";
 contract Chain is ReentrancyGuard {
   using SafeMath for uint256;
 
-  IValidatorRegistry validatorRegistry;
-  IStakingBank stakingBank;
-  uint256 interval;
+  IValidatorRegistry public validatorRegistry;
+  IStakingBank public stakingBank;
+  uint256 public interval;
 
   bytes constant ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
 

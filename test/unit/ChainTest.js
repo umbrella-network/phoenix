@@ -14,6 +14,8 @@ const Token = require('../../artifacts/Token')
 
 use(waffleChai)
 
+const interval = 100
+
 async function fixture([owner, validator], provider) {
   const token = await deployMockContract(owner, Token.abi)
   const validatorRegistry = await deployMockContract(owner, ValidatorRegistry.abi)
@@ -23,7 +25,7 @@ async function fixture([owner, validator], provider) {
   const contract = await contractFactory.deploy(
     validatorRegistry.address,
     stakingBank.address,
-    100
+    interval
   )
 
   return {
@@ -80,6 +82,20 @@ describe('Chain', () => {
     ({
       owner, validator, token, validatorRegistry, stakingBank, contract
     } = await loadFixture(fixture))
+  })
+
+  describe('when deployed', () => {
+    it('expect to have validatorRegistry', async () => {
+      expect(await contract.validatorRegistry()).to.eq(validatorRegistry.address)
+    })
+
+    it('expect to have stakingBank', async () => {
+      expect(await contract.stakingBank()).to.eq(stakingBank.address)
+    })
+
+    it('expect to have interval', async () => {
+      expect(await contract.interval()).to.eq(interval)
+    })
   })
 
   describe('recoverSigner()', () => {
