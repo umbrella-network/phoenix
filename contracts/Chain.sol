@@ -73,7 +73,7 @@ contract Chain is ReentrancyGuard {
 
     uint256 staked = stakingBank.totalSupply();
     uint256 power = 0;
-    uint256 minimum = staked.mul(66); 
+    uint256 minimum = staked.mul(66);
 
     bytes32 affidavit = keccak256(testimony);
 

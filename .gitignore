@@ -8,6 +8,7 @@ node_modules/
 .openzeppelin/.session
 
 node_modules
+.env*
 
 #Buidler files
 cache
