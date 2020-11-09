@@ -13,6 +13,7 @@
     "local-minter": "npx buidler run --network localhost ./scripts/minter.js",
     "block-listener": "npx buidler run --network localhost scripts/block-listener.js",
     "deploy-poc:local": "npx buidler run --network localhost ./scripts/deploy.js",
+    "deploy-poc:staging": "NODE_ENV=staging npx buidler run --network kovan ./scripts/deploy.js",
     "deploy-poc": "npx buidler run ./scripts/deploy.js",
     "flatten:token": "npx truffle-flattener ./contracts/Token.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > _token.sol",
     "flatten:validator": "npx truffle-flattener ./contracts/ValidatorRegistry.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > _validatorRegistry.sol",

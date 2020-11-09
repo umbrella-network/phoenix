@@ -1,4 +1,5 @@
-require('custom-env').env()
+require('custom-env').env();
+const { INFURA_ID, STAGING_PK } = process.env;
 
 usePlugin("@nomiclabs/buidler-waffle");
 usePlugin('@nomiclabs/buidler-ethers');
@@ -20,6 +21,12 @@ module.exports = {
     },
     localhost: {
       blockGasLimit: 80000000
+    },
+    kovan: {
+      url: `https://kovan.infura.io/v3/${INFURA_ID}`,
+      accounts: STAGING_PK ? [STAGING_PK] : [],
+      chainId: 42,
+      gasPrice: 1000000000
     },
   },
   solc: {
