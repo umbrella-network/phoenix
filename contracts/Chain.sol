@@ -135,7 +135,7 @@ contract Chain is ReentrancyGuard {
     return MerkleProof.verify(_proof, _root, _leaf);
   }
 
-  function leafHash(bytes memory _key, bytes memory _value) public pure returns (bytes32) {
+  function hashLeaf(bytes memory _key, bytes memory _value) public pure returns (bytes32) {
     return keccak256(abi.encodePacked(_key, _value));
   }
 
@@ -145,7 +145,7 @@ contract Chain is ReentrancyGuard {
     bytes memory _key,
     bytes memory _value
   ) public view returns (bool) {
-    return verifyProof(_proof, blocks[_blockHeight].root, leafHash(_key, _value));
+    return verifyProof(_proof, blocks[_blockHeight].root, hashLeaf(_key, _value));
   }
 
   function bytesToBytes32Array(

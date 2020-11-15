@@ -23,13 +23,13 @@ describe('Tree', () => {
     );
   });
 
-  describe('leafHash()', () => {
+  describe('hashLeaf()', () => {
     it('expect to return hashed leaf', async () => {
       const tree = new SortedMerkleTree({});
       const k = helpers.string2buffer('etc-usd');
       const v = helpers.intToBuffer(1234567890);
 
-      expect(await contract.leafHash(k, v)).to.eq(tree.leafHash(k, v));
+      expect(await contract.hashLeaf(k, v)).to.eq(tree.hashLeaf(k, v));
     });
   });
 
