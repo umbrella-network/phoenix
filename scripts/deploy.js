@@ -19,7 +19,7 @@ const waitForTx = async txHash => {
     return;
   }
 
-  console.log('waiting for tx to be minted...', txHash);
+  console.log('waiting for tx to be mined...', txHash);
   await provider.waitForTransaction(txHash);
 };
 

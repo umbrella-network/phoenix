@@ -16,7 +16,7 @@ async function main() {
     chain.blocks(blockHeight.toString()).then(console.log);
   });
 
-  console.log('watching for minted blocks...');
+  console.log('watching for mined blocks...');
 }
 
 main().then();
