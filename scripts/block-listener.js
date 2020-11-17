@@ -19,4 +19,4 @@ async function main() {
   console.log('watching for mined blocks...');
 }
 
-main().then();
+main().then().catch(console.log);
