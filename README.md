@@ -3,7 +3,7 @@ A delegated proof-of-stake contract for minting sidechain blocks.
 
 ## Overview
 Each block is signed by a set of validators.
-A minimum stake quorum must be achieved in order for a sidechain block to be minted.
+A minimum stake quorum must be achieved in order for a sidechain block to be mined.
 
 ## Prerequisites
 

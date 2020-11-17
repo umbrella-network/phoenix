@@ -3,6 +3,7 @@ pragma solidity ^0.6.8;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 
 import "./interfaces/IStakingBank.sol";
 import "./interfaces/IValidatorRegistry.sol";
@@ -124,5 +125,67 @@ contract Chain is ReentrancyGuard {
     uint256 index = uint256(blockHeight.mod(numberOfValidators));
     address leader = validatorRegistry.addresses(index);
     return leader;
+  }
+
+  function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public view returns (bool) {
+    if (_root == bytes32(0)) {
+      return false;
+    }
+
+    return MerkleProof.verify(_proof, _root, _leaf);
+  }
+
+  function hashLeaf(bytes memory _key, bytes memory _value) public pure returns (bytes32) {
+    return keccak256(abi.encodePacked(_key, _value));
+  }
+
+  function verifyProofForBlock(
+    uint256 _blockHeight,
+    bytes32[] memory _proof,
+    bytes memory _key,
+    bytes memory _value
+  ) public view returns (bool) {
+    return verifyProof(_proof, blocks[_blockHeight].root, hashLeaf(_key, _value));
+  }
+
+  function bytesToBytes32Array(
+    bytes memory _data,
+    uint256 _offset,
+    uint256 _items
+  ) public pure returns (bytes32[] memory) {
+    bytes32[] memory dataList = new bytes32[](_items);
+
+    for (uint256 i = 0; i < _items; i++) {
+      bytes32 temp;
+      uint256 idx = (i + 1 + _offset) * 32;
+
+      assembly {
+        temp := mload(add(_data, idx))
+      }
+
+      dataList[i] = temp;
+    }
+
+    return (dataList);
+  }
+
+  function verifyProofs(
+    uint256[] memory _blockHeights,
+    bytes memory _proofs,
+    uint256[] memory _proofItemsCounter,
+    bytes32[] memory _leaves
+  ) public view returns (bool[] memory results) {
+    results = new bool[](_leaves.length);
+    uint256 offset = 0;
+
+    for (uint256 i = 0; i < _leaves.length; i++) {
+      results[i] = verifyProof(
+          bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]),
+          blocks[_blockHeights[i]].root,
+          _leaves[i]
+      );
+
+      offset += _proofItemsCounter[i];
+    }
   }
 }
