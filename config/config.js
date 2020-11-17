@@ -23,11 +23,11 @@ const config = {
       symbol: 'UMB'
     },
     chain: {
-      interval: 2
+      interval: 6
     },
     validators: [
       {
-        location: 'http://localhost:3000'
+        location: 'http://ae883a71637d7493fad1b62f09469eff-1487985040.us-east-2.elb.amazonaws.com'
       }
     ]
   }
