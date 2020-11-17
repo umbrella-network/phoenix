@@ -20,7 +20,14 @@ const waitForTx = async txHash => {
   }
 
   console.log('waiting for tx to be mined...', txHash);
-  await provider.waitForTransaction(txHash);
+  const receipt = await provider.waitForTransaction(txHash);
+
+  if (receipt.status !== 1) {
+    console.log(receipt);
+    throw Error('rejected tx');
+  }
+
+  console.log('...success');
 };
 
 async function main() {
@@ -61,8 +68,14 @@ async function main() {
   console.log('token transfered to validator:', config.token.totalSupply);
 
   if (['buidlerevm', 'localhost'].includes(bre.network.name)) {
-    tx = await owner.sendTransaction({to: id, value: ethers.utils.parseEther('50.0')});
-    await waitForTx(tx.hash);
+    const balance = await validatorWallet.getBalance();
+
+    if (balance.eq(0)) {
+      console.log('sending ETH to validator');
+      const ownerBalance = await owner.getBalance();
+      tx = await owner.sendTransaction({to: id, value: ownerBalance.div(2).toHexString()});
+      await waitForTx(tx.hash);
+    }
   }
 
   // todo - make it work for multiple validators in a future
