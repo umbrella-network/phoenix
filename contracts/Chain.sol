@@ -188,4 +188,20 @@ contract Chain is ReentrancyGuard {
       offset += _proofItemsCounter[i];
     }
   }
+
+  function getBlockVotersCount(uint256 _blockHeight) public view returns (uint256) {
+    return blocks[_blockHeight].voters.length;
+  }
+
+  function getBlockVoters(uint256 _blockHeight) public view returns (address[] memory) {
+    return blocks[_blockHeight].voters;
+  }
+
+  function getBlockVotes(uint256 _blockHeight, address _voter) public view returns (uint256) {
+    return blocks[_blockHeight].votes[_voter];
+  }
+
+  function getBlockData(uint256 _blockHeight, bytes32 _key) public view returns (bytes32) {
+    return blocks[_blockHeight].data[_key];
+  }
 }

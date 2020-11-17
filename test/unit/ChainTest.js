@@ -144,6 +144,25 @@ describe('Chain', () => {
         expect((await contract.blocks(0)).root).to.eq(tree.getHexRoot());
       });
 
+      it('expect to get number of block voters', async () => {
+        expect(await contract.getBlockVotersCount(0)).to.eq(1);
+      });
+
+      it('expect to get block voters', async () => {
+        const voter = await validator.getAddress();
+        expect(await contract.getBlockVoters(0)).to.eql([voter]);
+      });
+
+      it('expect to get block votes', async () => {
+        const voter = await validator.getAddress();
+        expect(await contract.getBlockVotes(0, voter)).to.eq(1000);
+      });
+
+      it('expect to get block data', async () => {
+        const bytes32 = `0x${'0'.repeat(64)}`;
+        expect(await contract.getBlockData(0, bytes32)).to.eq(bytes32);
+      });
+
       describe('verifyProofForBlock()', () => {
         it('expect to validate proof for selected key-value pair', async () => {
           const k = 'btc-usd';
