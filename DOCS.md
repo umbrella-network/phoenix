@@ -142,6 +142,39 @@ contract YourSmartContract  {
 }
 ```
 
-## Smart contract Addresses
+## Manual access
 
-- Kovan: [0xE9774661dBDd82ad2D7d6dae6474e62136926ef8](https://kovan.etherscan.io/address/0xE9774661dBDd82ad2D7d6dae6474e62136926ef8)
+Our block explorer is an interface for API. It allows to get data manually via web browser:
+
+[Block Explorer UI Proofs](http://af71f28c7e2b1430d826550dc6d17ae5-2085089708.us-east-2.elb.amazonaws.com/proofs)
+
+UI gives option tot verify data manually. All you need to do is to copy: 
+- block height
+- proof
+- key bytes
+- value bytes
+
+then go to etherscan (list of contract addresses below), find `verifyProofForBlock` method and query it.
+As a result you will get `true` (if provided data are valid) or `false` (when they are not):
+
+![data verification](./doc/true.png)
+
+## Programmer access
+
+### API
+
+#### Live
+
+Soon
+
+#### Sandbox
+- API url: http://a8f78a3165ded421286b72031d18dcd8-2127105317.us-east-2.elb.amazonaws.com
+
+### Smart contract Addresses
+
+#### Live
+
+Soon
+
+#### Sandbox
+- Kovan test net: [0xE9774661dBDd82ad2D7d6dae6474e62136926ef8](https://kovan.etherscan.io/address/0xE9774661dBDd82ad2D7d6dae6474e62136926ef8)
