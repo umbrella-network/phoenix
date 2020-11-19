@@ -47,7 +47,7 @@ To get a price of asset and be able to prove that the procee is valid we need to
 
 ### Request data from API 
 
-_**developer not: idealy we should use https://swagger.io/**_
+_**developer note: idealy we could use https://swagger.io/ for API docs**_
 
 API is available via GET calls.
 
@@ -121,7 +121,14 @@ Having all necessary data from API send them o your contract and let him made a 
 This could look like this:
 
 ```solidity
-function umbrellaValidation(
+pragma solidity ^0.6.8;
+
+import "./interfaces/IUmbrellaOracle.sol";
+
+contract YourSmartContract  {
+  IUmbrellaOracle umbrella = IUmbrellaOracle(0xE9774661dBDd82ad2D7d6dae6474e62136926ef8);
+
+  function umbrellaValidation(
     uint256 _blockHeight,
     bytes32[] memory _proof,
     bytes memory _key,
@@ -132,6 +139,7 @@ function umbrellaValidation(
     
     // do stuff here ...
   }
+}
 ```
 
 ## Smart contract Addresses
