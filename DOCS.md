@@ -34,13 +34,14 @@ Set of siblings (marked in red) are delivered by Umbrella via layer2 API. Using 
 
 ## Requesting data
 
-Roots are stored on blockchain (Layer 1) in smart contract. Each root represents set of key-value pairs for given time.
+Roots are stored on blockchain (Layer 1) in oracle smart contract. 
+Each root represents set of key-value pairs for given time.
 
-Merkle tree data are stored in Layer 2 and are availabe via API.
+Merkle tree data are stored outside blockchain in Layer 2 and they are availabe via API.
 
-To get a price of asset and be able to prove that the procee is valid we need to execute this steps:
+To get a price of asset and be able to prove that this price is valid one, we need to execute this steps:
 
-- make a call to API and request data and proof for selected key(s)
+- make a call to API and request data for selected key(s)
 - send result to your smart contract
 - your smart contract makes request to Umbrella oracle smart contract and validating the data
 - when data valid, perform operation based on validated data
@@ -51,7 +52,7 @@ _**developer note: idealy we could use https://swagger.io/ for API docs**_
 
 API is available via GET calls.
 
-#### Key-Value request 
+#### Key-Value request from API
 
 To get price of `eth-eur` made a call:
 
@@ -114,9 +115,9 @@ const proof = response['data']['leaves']['proof']
 const blockHeight = response['data']['block']['height']
 ```
 
-### Validation on-chain
+### On-chain Validation 
 
-Having all necessary data from API send them o your contract and let him made a call to Umbrella oracle smart contract.
+Having all necessary data from API send them to your smart contract and let it made a call to Umbrella oracle smart contract.
 
 This could look like this:
 
@@ -159,22 +160,21 @@ As a result you will get `true` (if provided data are valid) or `false` (when th
 
 ![data verification](./doc/true.png)
 
-## Programmer access
 
-### API
+## API URLs
 
-#### Live
+### Live
 
 Soon
 
-#### Sandbox
+### Sandbox
 - API url: http://a8f78a3165ded421286b72031d18dcd8-2127105317.us-east-2.elb.amazonaws.com
 
-### Smart contract Addresses
+## Smart contract Addresses
 
-#### Live
+### Live
 
 Soon
 
-#### Sandbox
+### Sandbox
 - Kovan test net: [0xE9774661dBDd82ad2D7d6dae6474e62136926ef8](https://kovan.etherscan.io/address/0xE9774661dBDd82ad2D7d6dae6474e62136926ef8)
