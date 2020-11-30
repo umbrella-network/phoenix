@@ -69,12 +69,26 @@ describe('Tree', () => {
       'eth-usd', 'btc-usd', 'war-usd', 'ltc-usd', 'uni-usd',
     ];
 
-    keys.forEach(k => {
+    keys.sort().forEach(k => {
       data[k] = helpers.intToBuffer((Math.round(Math.random() * 1000)));
     });
 
+
+
     const tree = new SortedMerkleTree(data);
     console.log(tree);
+
+    it('keys order should not matter', async () => {
+      const dataReverse = {};
+
+      keys.reverse().forEach(k => {
+        dataReverse[k] = data[k];
+      });
+
+      const treeReverse = new SortedMerkleTree(dataReverse);
+
+      expect(tree.getHexRoot()).to.eq(treeReverse.getHexRoot());
+    });
 
     it('expect to validate proof for all keys', async () => {
       const awaits = [];
