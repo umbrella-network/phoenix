@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - first class chain data
 - proof validation on-chain
 - getters for `Chain.blocks`
+- contract registry
  
 ### Changed
 - `StakingBank` to be `ERC20` compatible
