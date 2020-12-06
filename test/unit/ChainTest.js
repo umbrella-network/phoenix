@@ -14,7 +14,7 @@ const Token = require('../../artifacts/Token');
 
 use(waffleChai);
 
-const interval = 100;
+const blockPadding = 100;
 
 async function fixture([owner, validator]) {
   const token = await deployMockContract(owner, Token.abi);
@@ -25,7 +25,7 @@ async function fixture([owner, validator]) {
   const contract = await contractFactory.deploy(
     validatorRegistry.address,
     stakingBank.address,
-    interval
+    blockPadding
   );
 
   return {
@@ -64,7 +64,7 @@ const prepareData = async (signer, blockHeight, root) => {
 };
 
 describe('Chain', () => {
-  let validator, validatorRegistry, stakingBank, contract;
+  let owner, validator, validatorRegistry, stakingBank, contract;
 
   const mockSubmit = async (leader = validator, numberOfValidators = 1, totalSupply = 1000, balance = 1000) => {
     await validatorRegistry.mock.getNumberOfValidators.returns(numberOfValidators);
@@ -74,7 +74,7 @@ describe('Chain', () => {
   };
 
   beforeEach(async () => {
-    ({validator, validatorRegistry, stakingBank, contract} = await loadFixture(fixture));
+    ({owner, validator, validatorRegistry, stakingBank, contract} = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {
@@ -86,8 +86,30 @@ describe('Chain', () => {
       expect(await contract.stakingBank()).to.eq(stakingBank.address);
     });
 
-    it('expect to have interval', async () => {
-      expect(await contract.interval()).to.eq(interval);
+    it('expect to have blockPadding', async () => {
+      expect(await contract.blockPadding()).to.eq(blockPadding);
+    });
+
+    it('expect to have no blocks', async () => {
+      expect(await contract.blocksCount()).to.eq(0);
+    });
+
+    it('expect to blockHeight to be 0', async () => {
+      expect(await contract.getBlockHeight()).to.eq(0);
+    });
+  });
+
+  describe('setBlockPadding()', () => {
+    it('expect to set block padding', async () => {
+      await expect(contract.setBlockPadding(9))
+        .to.emit(contract, 'LogBlockPadding').withArgs(await owner.getAddress(), 9);
+
+      expect(await contract.blockPadding()).to.eq(9);
+    });
+
+    it('expect to throw when call from NOT an owner', async () => {
+      await expect(contract.connect(validator).setBlockPadding(9))
+        .to.revertedWith('revert Ownable: caller is not the owner');
     });
   });
 
@@ -140,6 +162,14 @@ describe('Chain', () => {
         await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
       });
 
+      it('expect to blockHeight NOT change when minimal padding not reached', async () => {
+        expect(await contract.getBlockHeight()).to.eq(0);
+      });
+
+      it('expect to have 1 block', async () => {
+        expect(await contract.blocksCount()).to.eq(1);
+      });
+
       it('expect to save valid root', async () => {
         expect((await contract.blocks(0)).root).to.eq(tree.getHexRoot());
       });
@@ -182,6 +212,41 @@ describe('Chain', () => {
           const result = new Array(keys.length).fill(true);
 
           expect(await contract.verifyProofs(blockHeights, proofs, proofItemsCounter, leaves)).to.eql(result);
+        });
+      });
+
+      describe('when still on the same block height', () => {
+        it('expect submit to be reverted', async () => {
+          await mockSubmit();
+          const {r, s, v} = await prepareData(validator, 0, root);
+          await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s]))
+            .to.revertedWith('revert block already mined for current blockHeight');
+        });
+
+        describe('when minimal padding reached', () => {
+          beforeEach(async () => {
+            await contract.setBlockPadding(0);
+          });
+
+          it('expect to blockHeight to change', async () => {
+            expect(await contract.getBlockHeight()).to.eq(1);
+          });
+
+          describe('when block mined for new block height', () => {
+            beforeEach(async () => {
+              await mockSubmit();
+              const {r, s, v} = await prepareData(validator, 1, root);
+              await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+              await contract.setBlockPadding(100);
+            });
+
+            it('expect to revert when submit again for same block', async () => {
+              await mockSubmit();
+              const {r, s, v} = await prepareData(validator, 1, root);
+              await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s]))
+                .to.revertedWith('revert block already mined for current blockHeight');
+            });
+          });
         });
       });
     });

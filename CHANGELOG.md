@@ -18,3 +18,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - replace sparse merkle tree with sorted merkle tree
 - sort leaves keys in merkle tree
 - use coders from `@umb-network/toolbox` in tests
+- changed how block is mine: use `blockPadding` instead of `interval`
