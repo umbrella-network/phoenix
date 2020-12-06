@@ -4,13 +4,9 @@ const {ContractFactory} = require('ethers');
 const {waffleChai} = require('@ethereum-waffle/chai');
 const {deployMockContract} = require('@ethereum-waffle/mock-contract');
 const {loadFixture} = require('ethereum-waffle');
+const {toBytes32} = require('../../scripts/helpers');
 
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
-
-const toBytes32 = str => {
-  const bytes = Buffer.from(str).toString('hex');
-  return `0x${bytes}${'0'.repeat(64 - bytes.length)}`;
-};
 
 const Registrable = require('../../artifacts/Registrable');
 const Registry = require('../../artifacts/Registry');
