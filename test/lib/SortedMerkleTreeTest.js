@@ -1,9 +1,9 @@
 const {use, expect} = require('chai');
 const {ContractFactory} = require('ethers');
 const {waffleChai} = require('@ethereum-waffle/chai');
+const {LeafKeyCoder, LeafValueCoder, LeafType} = require('@umb-network/toolbox');
 
 const SortedMerkleTree = require('../../lib/SortedMerkleTree');
-const helpers = require('../utils/helpers');
 
 const Chain = require('../../artifacts/Chain');
 
@@ -26,8 +26,8 @@ describe('Tree', () => {
   describe('hashLeaf()', () => {
     it('expect to return hashed leaf', async () => {
       const tree = new SortedMerkleTree({});
-      const k = helpers.string2buffer('etc-usd');
-      const v = helpers.intToBuffer(1234567890);
+      const k = LeafKeyCoder.encode('etc-usd');
+      const v = LeafValueCoder.encode(1234567890, LeafType.TYPE_INTEGER);
 
       expect(await contract.hashLeaf(k, v)).to.eq(tree.hashLeaf(k, v));
     });
@@ -35,15 +35,15 @@ describe('Tree', () => {
 
   describe('getHexRoot()', () => {
     it('expect to have different root for different data', async () => {
-      const tree1 = new SortedMerkleTree({'a': helpers.intToBuffer(1)});
-      const tree2 = new SortedMerkleTree({'a': helpers.intToBuffer(2)});
+      const tree1 = new SortedMerkleTree({'a': LeafValueCoder.encode(1, LeafType.TYPE_INTEGER)});
+      const tree2 = new SortedMerkleTree({'a': LeafValueCoder.encode(2, LeafType.TYPE_INTEGER)});
       expect(tree1.getHexRoot()).not.to.eq(tree2.getHexRoot());
     });
   });
 
   describe('with one element', () => {
     const key = 'eth-usd';
-    const data = {[key]: helpers.intToBuffer(123)};
+    const data = {[key]: LeafValueCoder.encode(123, LeafType.TYPE_INTEGER)};
     const tree = new SortedMerkleTree(data);
 
     it('expect leaf === tree', async () => {
@@ -70,10 +70,8 @@ describe('Tree', () => {
     ];
 
     keys.sort().forEach(k => {
-      data[k] = helpers.intToBuffer((Math.round(Math.random() * 1000)));
+      data[k] = LeafValueCoder.encode(Math.round(Math.random() * 1000), LeafType.TYPE_INTEGER);
     });
-
-
 
     const tree = new SortedMerkleTree(data);
     console.log(tree);

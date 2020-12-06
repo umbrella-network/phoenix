@@ -3,9 +3,9 @@ const {ContractFactory} = require('ethers');
 const {waffleChai} = require('@ethereum-waffle/chai');
 const {deployMockContract} = require('@ethereum-waffle/mock-contract');
 const {loadFixture} = require('ethereum-waffle');
+const {LeafKeyCoder, LeafValueCoder, LeafType} = require('@umb-network/toolbox');
 
 const SortedMerkleTree = require('../../lib/SortedMerkleTree');
-const helpers = require('../utils/helpers');
 
 const Chain = require('../../artifacts/Chain');
 const ValidatorRegistry = require('../../artifacts/ValidatorRegistry');
@@ -46,7 +46,7 @@ const keys = [
 ];
 
 keys.forEach((k, i) => {
-  inputs[k] = helpers.intToBuffer(i + 1);
+  inputs[k] = LeafValueCoder.encode(i + 1, LeafType.TYPE_INTEGER);
 });
 
 const tree = new SortedMerkleTree(inputs);
@@ -169,7 +169,7 @@ describe('Chain', () => {
           const v = inputs[k];
           const proof = tree.getProofForKey(k);
 
-          expect(await contract.verifyProofForBlock(0, proof, helpers.string2buffer(k), v)).to.be.true;
+          expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
         });
       });
 
