@@ -8,7 +8,7 @@ const config = {
       symbol: 'UMB'
     },
     chain: {
-      interval: 16
+      blockPadding: 16
     },
     validators: [
       {
@@ -23,7 +23,7 @@ const config = {
       symbol: 'UMB'
     },
     chain: {
-      interval: 6
+      blockPadding: 6
     },
     validators: [
       {

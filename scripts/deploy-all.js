@@ -35,7 +35,7 @@ exports.deployAll = async () => {
   console.log('StakingBank deployed to:', stakingBank.address);
 
   const ChainContract = await ethers.getContractFactory('Chain');
-  const chain = await ChainContract.deploy(validatorRegistry.address, stakingBank.address, config.chain.interval);
+  const chain = await ChainContract.deploy(validatorRegistry.address, stakingBank.address, config.chain.blockPadding);
   await chain.deployed();
   console.log('Chain deployed to:', chain.address);
 
