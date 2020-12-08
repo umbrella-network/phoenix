@@ -4,16 +4,19 @@ pragma solidity ^0.6.8;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./interfaces/IStakingBank.sol";
 import "./interfaces/IValidatorRegistry.sol";
 
-contract Chain is ReentrancyGuard {
+contract Chain is ReentrancyGuard, Ownable {
   using SafeMath for uint256;
+
+  // ========== STATE VARIABLES ========== //
 
   IValidatorRegistry public validatorRegistry;
   IStakingBank public stakingBank;
-  uint256 public interval;
+  uint256 public blockPadding;
 
   bytes constant ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
 
@@ -29,26 +32,29 @@ contract Chain is ReentrancyGuard {
     mapping(bytes32 => bytes32) data;
   }
 
-  mapping (uint256 => Block) public blocks;
+  mapping(uint256 => Block) public blocks;
+  uint256 public blocksCount;
 
-  event LogMint(address indexed minter, uint256 blockHeight, uint256 anchor);
+  // ========== CONSTRUCTOR ========== //
 
   constructor(
     address _registryAddress,
     address _bankAddress,
-    uint256 _interval
+    uint256 _blockPadding
   ) public {
     require(_registryAddress != address(0x0), "_registryAddress is missing");
     require(_bankAddress != address(0x0), "_bankAddress is missing");
 
     validatorRegistry = IValidatorRegistry(_registryAddress);
     stakingBank = IStakingBank(_bankAddress);
-    interval = _interval;
+    blockPadding = _blockPadding;
   }
 
-  function recoverSigner(bytes32 affidavit, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {
-    bytes32 hash = keccak256(abi.encodePacked(ETH_PREFIX, affidavit));
-    return ecrecover(hash, _v, _r, _s);
+  // ========== MUTATIVE FUNCTIONS ========== //
+
+  function setBlockPadding(uint256 _blockPadding) external onlyOwner {
+    blockPadding = _blockPadding;
+    emit LogBlockPadding(msg.sender, _blockPadding);
   }
 
   function submit(
@@ -60,6 +66,8 @@ contract Chain is ReentrancyGuard {
     bytes32[] memory _s
   ) public nonReentrant returns (bool) {
     uint256 blockHeight = getBlockHeight();
+    require(blocks[blockHeight].anchor == 0, "block already mined for current blockHeight");
+
     address leaderAddress = getLeaderAddress();
 
     bytes memory testimony = abi.encodePacked(blockHeight, _root);
@@ -82,7 +90,7 @@ contract Chain is ReentrancyGuard {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
-      require(balance > 0, "validator does not have positive balance");
+      require(balance > 0, "validator doesn't have balance OR submit for wrong blockHeight OR invalid signature");
       require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
 
       blocks[blockHeight].voters.push(signer);
@@ -104,13 +112,32 @@ contract Chain is ReentrancyGuard {
     blocks[blockHeight].anchor = block.number;
     blocks[blockHeight].timestamp = block.timestamp;
 
+    blocksCount++;
+
     emit LogMint(msg.sender, blockHeight, block.number);
 
     return true;
   }
 
+  // ========== VIEWS ========== //
+
+  function recoverSigner(bytes32 affidavit, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {
+    bytes32 hash = keccak256(abi.encodePacked(ETH_PREFIX, affidavit));
+    return ecrecover(hash, _v, _r, _s);
+  }
+
   function getBlockHeight() public view returns (uint256) {
-    return block.number.div(uint256(interval));
+    uint _blocksCount = blocksCount;
+
+    if (_blocksCount == 0) {
+      return 0;
+    }
+
+    if (blocks[_blocksCount - 1].anchor + blockPadding < block.number) {
+      return _blocksCount;
+    }
+
+    return _blocksCount - 1;
   }
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
@@ -180,9 +207,9 @@ contract Chain is ReentrancyGuard {
 
     for (uint256 i = 0; i < _leaves.length; i++) {
       results[i] = verifyProof(
-          bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]),
-          blocks[_blockHeights[i]].root,
-          _leaves[i]
+        bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]),
+        blocks[_blockHeights[i]].root,
+        _leaves[i]
       );
 
       offset += _proofItemsCounter[i];
@@ -204,4 +231,9 @@ contract Chain is ReentrancyGuard {
   function getBlockData(uint256 _blockHeight, bytes32 _key) public view returns (bytes32) {
     return blocks[_blockHeight].data[_key];
   }
+
+  // ========== EVENTS ========== //
+
+  event LogMint(address indexed minter, uint256 blockHeight, uint256 anchor);
+  event LogBlockPadding(address indexed executor, uint256 blockPadding);
 }
