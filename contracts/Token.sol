@@ -10,4 +10,8 @@ contract Token is ERC20 {
     uint256 _initialSupply) public ERC20(_name, _symbol) {
     _mint(msg.sender, _initialSupply);
   }
+
+  function getName() external pure returns (bytes32) {
+    return 'UMB';
+  }
 }

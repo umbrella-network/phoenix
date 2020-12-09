@@ -1,8 +1,8 @@
 require('custom-env').env();
 
-const {deployAll} = require('./deploy-all');
+const {deployAllContracts} = require('./deployers/contracts');
 
-deployAll()
+deployAllContracts('', true)
   .then(() => process.exit(0))
   .catch(error => {
     console.error(error);

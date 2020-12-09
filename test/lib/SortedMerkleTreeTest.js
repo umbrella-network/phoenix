@@ -16,11 +16,7 @@ describe('Tree', () => {
     const [owner] = await ethers.getSigners();
     const contractFactory = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
-    contract = await contractFactory.deploy(
-      '0x0000000000000000000000000000000000000001',
-      '0x0000000000000000000000000000000000000002',
-      1
-    );
+    contract = await contractFactory.deploy('0x0000000000000000000000000000000000000001', 1);
   });
 
   describe('hashLeaf()', () => {

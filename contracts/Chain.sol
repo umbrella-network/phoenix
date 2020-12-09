@@ -9,13 +9,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IStakingBank.sol";
 import "./interfaces/IValidatorRegistry.sol";
 
-contract Chain is ReentrancyGuard, Ownable {
+import "./extensions/Registrable.sol";
+
+contract Chain is ReentrancyGuard, Registrable, Ownable {
   using SafeMath for uint256;
 
   // ========== STATE VARIABLES ========== //
 
-  IValidatorRegistry public validatorRegistry;
-  IStakingBank public stakingBank;
   uint256 public blockPadding;
 
   bytes constant ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
@@ -37,16 +37,7 @@ contract Chain is ReentrancyGuard, Ownable {
 
   // ========== CONSTRUCTOR ========== //
 
-  constructor(
-    address _registryAddress,
-    address _bankAddress,
-    uint256 _blockPadding
-  ) public {
-    require(_registryAddress != address(0x0), "_registryAddress is missing");
-    require(_bankAddress != address(0x0), "_bankAddress is missing");
-
-    validatorRegistry = IValidatorRegistry(_registryAddress);
-    stakingBank = IStakingBank(_bankAddress);
+  constructor(address _contractRegistry, uint256 _blockPadding) public Registrable(_contractRegistry) {
     blockPadding = _blockPadding;
   }
 
@@ -80,6 +71,7 @@ contract Chain is ReentrancyGuard, Ownable {
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
 
+    IStakingBank stakingBank = stakingBankContract();
     uint256 staked = stakingBank.totalSupply();
     uint256 power = 0;
     uint256 minimum = staked.mul(66);
@@ -121,6 +113,10 @@ contract Chain is ReentrancyGuard, Ownable {
 
   // ========== VIEWS ========== //
 
+  function getName() override external pure returns (bytes32) {
+    return 'Chain';
+  }
+
   function recoverSigner(bytes32 affidavit, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {
     bytes32 hash = keccak256(abi.encodePacked(ETH_PREFIX, affidavit));
     return ecrecover(hash, _v, _r, _s);
@@ -142,6 +138,7 @@ contract Chain is ReentrancyGuard, Ownable {
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
   function getLeaderAddress() public view returns (address) {
+    IValidatorRegistry validatorRegistry = validatorRegistryContract();
     uint256 numberOfValidators = validatorRegistry.getNumberOfValidators();
 
     if (numberOfValidators == 0) {
@@ -154,7 +151,7 @@ contract Chain is ReentrancyGuard, Ownable {
     return leader;
   }
 
-  function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public view returns (bool) {
+  function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
     if (_root == bytes32(0)) {
       return false;
     }

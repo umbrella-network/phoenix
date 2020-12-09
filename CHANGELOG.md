@@ -11,9 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - first class chain data
 - proof validation on-chain
 - getters for `Chain.blocks`
-- contract registry:
-  - staging/kovan: 0xEEBeb97735aBDfB87f19Ac9756F438940cf14b5C
- 
+
 ### Changed
 - `StakingBank` to be `ERC20` compatible
 - make Chain states: `validatorRegistry`, `stakingBank`, `interval` to be public
