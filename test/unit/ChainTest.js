@@ -7,10 +7,12 @@ const {LeafKeyCoder, LeafValueCoder, LeafType} = require('@umb-network/toolbox')
 
 const SortedMerkleTree = require('../../lib/SortedMerkleTree');
 
+const Registry = require('../../artifacts/Registry');
 const Chain = require('../../artifacts/Chain');
 const ValidatorRegistry = require('../../artifacts/ValidatorRegistry');
 const StakingBank = require('../../artifacts/StakingBank');
 const Token = require('../../artifacts/Token');
+const {toBytes32} = require('../../scripts/helpers');
 
 use(waffleChai);
 
@@ -18,20 +20,18 @@ const blockPadding = 100;
 
 async function fixture([owner, validator]) {
   const token = await deployMockContract(owner, Token.abi);
+  const contractRegistry = await deployMockContract(owner, Registry.abi);
   const validatorRegistry = await deployMockContract(owner, ValidatorRegistry.abi);
   const stakingBank = await deployMockContract(owner, StakingBank.abi);
   const contractFactory = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
-  const contract = await contractFactory.deploy(
-    validatorRegistry.address,
-    stakingBank.address,
-    blockPadding
-  );
+  const contract = await contractFactory.deploy(contractRegistry.address, blockPadding);
 
   return {
     owner,
     validator,
     token,
+    contractRegistry,
     validatorRegistry,
     stakingBank,
     contract
@@ -64,28 +64,22 @@ const prepareData = async (signer, blockHeight, root) => {
 };
 
 describe('Chain', () => {
-  let owner, validator, validatorRegistry, stakingBank, contract;
+  let owner, validator, contractRegistry, validatorRegistry, stakingBank, contract;
 
   const mockSubmit = async (leader = validator, numberOfValidators = 1, totalSupply = 1000, balance = 1000) => {
+    await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('ValidatorRegistry')).returns(validatorRegistry.address);
     await validatorRegistry.mock.getNumberOfValidators.returns(numberOfValidators);
     await validatorRegistry.mock.addresses.returns(leader.address);
+    await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
     await stakingBank.mock.totalSupply.returns(totalSupply);
     await stakingBank.mock.balanceOf.withArgs(leader.address).returns(balance);
   };
 
   beforeEach(async () => {
-    ({owner, validator, validatorRegistry, stakingBank, contract} = await loadFixture(fixture));
+    ({owner, validator, contractRegistry, validatorRegistry, stakingBank, contract} = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {
-    it('expect to have validatorRegistry', async () => {
-      expect(await contract.validatorRegistry()).to.eq(validatorRegistry.address);
-    });
-
-    it('expect to have stakingBank', async () => {
-      expect(await contract.stakingBank()).to.eq(stakingBank.address);
-    });
-
     it('expect to have blockPadding', async () => {
       expect(await contract.blockPadding()).to.eq(blockPadding);
     });

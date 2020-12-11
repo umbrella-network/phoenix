@@ -5,6 +5,8 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 import "./interfaces/IValidatorRegistry.sol";
 
+import "./extensions/Registrable.sol";
+
 contract ValidatorRegistry is IValidatorRegistry, Ownable {
   event LogValidatorRegistered(
     address id

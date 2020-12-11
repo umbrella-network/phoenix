@@ -2,13 +2,16 @@ const env = process.env.NODE_ENV || 'development';
 
 const config = {
   development: {
+    contractRegistry: {
+      address: '0x3619DbE27d7c1e7E91aA738697Ae7Bc5FC3eACA5'
+    },
     token: {
       totalSupply: '1000000000000000000',
       name: 'Umbrella',
       symbol: 'UMB'
     },
     chain: {
-      interval: 16
+      blockPadding: 6
     },
     validators: [
       {
@@ -17,13 +20,16 @@ const config = {
     ]
   },
   staging: {
+    contractRegistry: {
+      address: '0x622c7725a8D1103E44F89341A6358A0e811Df0a5'
+    },
     token: {
       totalSupply: '1000000000000000000',
       name: 'Umbrella',
       symbol: 'UMB'
     },
     chain: {
-      interval: 6
+      blockPadding: 6
     },
     validators: [
       {

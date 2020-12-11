@@ -1,14 +1,16 @@
 const bre = require('@nomiclabs/buidler');
 const web3 = bre.web3;
-
-const currentProvider = new web3.providers.HttpProvider('http://localhost:8545');
-const provider = new ethers.providers.Web3Provider(currentProvider);
 const Chain = require('../artifacts/Chain');
 
-async function main() {
-  const chain = new ethers.Contract(process.env.CHAIN_ADDRESS, Chain.abi, provider);
+const {CHAIN_CONTRACT_ADDRESS} = process.env;
 
-  console.log('interval:', (await chain.interval()).toString());
+async function main() {
+  const currentProvider = new web3.providers.HttpProvider('http://localhost:8545');
+  const provider = new ethers.providers.Web3Provider(currentProvider);
+
+  const chain = new bre.ethers.Contract(CHAIN_CONTRACT_ADDRESS, Chain.abi, provider);
+
+  console.log('blockPadding:', (await chain.blockPadding()).toString());
   console.log('blockHeight:', (await chain.getBlockHeight()).toString());
 
   chain.on('LogMint', (sender, blockHeight, blockNumber) => {
