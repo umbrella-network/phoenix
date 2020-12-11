@@ -225,7 +225,13 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocks[_blockHeight].votes[_voter];
   }
 
-  function getBlockFCD(uint256 _blockHeight, bytes32[] memory _keys) public view returns (uint256[] memory data) {
+  function getSingleNumericData(uint256 _blockHeight, bytes32 _key) public view returns (uint256) {
+    return blocks[_blockHeight].numericFCD[_key];
+  }
+
+  function getMultipleNumericData(
+    uint256 _blockHeight, bytes32[] memory _keys
+  ) public view returns (uint256[] memory data) {
     data = new uint256[](_keys.length);
 
     for (uint i=0; i<_keys.length; i++) {

@@ -197,7 +197,7 @@ describe('Chain', () => {
 
         it('expect to get FCD', async () => {
           const bytes32 = `0x${'0'.repeat(64)}`;
-          expect(await contract.getBlockFCD(0, [bytes32])).to.eql([BigNumber.from(0)]);
+          expect(await contract.getMultipleNumericData(0, [bytes32])).to.eql([BigNumber.from(0)]);
         });
 
         describe('verifyProofForBlock()', () => {
@@ -272,8 +272,9 @@ describe('Chain', () => {
             .to.emit(contract, 'LogMint');
         });
 
-        it('expect to get FCD', async () => {
-          expect(await contract.getBlockFCD(0, [fcdKeys[0]])).to.eql([BigNumber.from(fcdValues[0])]);
+        it('expect to get First Class Data', async () => {
+          expect(await contract.getMultipleNumericData(0, [fcdKeys[0]])).to.eql([BigNumber.from(fcdValues[0])]);
+          expect(await contract.getSingleNumericData(0, fcdKeys[0])).to.eql(BigNumber.from(fcdValues[0]));
         });
 
         it('expect to validate proof for selected key-value pair', async () => {
