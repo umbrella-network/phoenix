@@ -10,6 +10,7 @@
     "compile": "npx buidler compile",
     "node": "buidler node",
     "test": "buidler test",
+    "gas": "npx buidler run --network localhost ./scripts/gas-calculator.js",
     "local-minter": "npx buidler run --network localhost ./scripts/minter.js",
     "block-listener": "npx buidler run --network localhost scripts/block-listener.js",
     "deploy:registry": "npx buidler run --network localhost scripts/deploy-registry.js",

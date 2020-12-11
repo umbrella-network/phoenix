@@ -1,12 +1,12 @@
 require('custom-env').env();
 const { INFURA_ID, STAGING_PK } = process.env;
 
-usePlugin("@nomiclabs/buidler-waffle");
+usePlugin('@nomiclabs/buidler-waffle');
 usePlugin('@nomiclabs/buidler-ethers');
-usePlugin("@nomiclabs/buidler-web3");
+usePlugin('@nomiclabs/buidler-web3');
 usePlugin('@nomiclabs/buidler-truffle5'); // uses and exposes web3 via buidler-web3 plugin
 
-task("accounts", "Prints the list of accounts", async () => {
+task('accounts', 'Prints the list of accounts', async () => {
   const accounts = await ethers.getSigners();
 
   for (const account of accounts) {

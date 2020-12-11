@@ -48,6 +48,23 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     emit LogBlockPadding(msg.sender, _blockPadding);
   }
 
+  function createTestimony(
+    bytes32 _root,
+    bytes32[] memory _keys,
+    bytes32[] memory _values
+  ) public view returns (bytes memory) {
+    require(_keys.length == _values.length, "numbers of keys and values not the same");
+
+    uint256 blockHeight = getBlockHeight();
+    bytes memory testimony = abi.encodePacked(blockHeight, _root);
+
+    for (uint256 i = 0; i < _keys.length; i++) {
+      testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
+    }
+
+    return testimony;
+  }
+
   function submit(
     bytes32 _root,
     bytes32[] memory _keys,
@@ -231,6 +248,10 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     for (uint i=0; i<_keys.length; i++) {
       data[i] = blocks[_blockHeight].numericFCD[_keys[i]];
     }
+  }
+
+  function getBlockFCDone(uint256 _blockHeight, bytes32 _key) public view returns (uint256) {
+    return blocks[_blockHeight].numericFCD[_key];
   }
 
   // ========== EVENTS ========== //
