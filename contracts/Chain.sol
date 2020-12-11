@@ -29,7 +29,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 anchor;
     uint256 timestamp;
     mapping(address => uint256) votes;
-    mapping(bytes32 => bytes32) data;
+    mapping(bytes32 => uint256) numericFCD;
   }
 
   mapping(uint256 => Block) public blocks;
@@ -51,7 +51,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   function submit(
     bytes32 _root,
     bytes32[] memory _keys,
-    bytes32[] memory _values,
+    uint256[] memory _values,
     uint8[] memory _v,
     bytes32[] memory _r,
     bytes32[] memory _s
@@ -67,7 +67,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
     for (uint256 i = 0; i < _keys.length; i++) {
-      blocks[blockHeight].data[_keys[i]] = _values[i];
+      blocks[blockHeight].numericFCD[_keys[i]] = _values[i];
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
 
@@ -225,8 +225,12 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocks[_blockHeight].votes[_voter];
   }
 
-  function getBlockData(uint256 _blockHeight, bytes32 _key) public view returns (bytes32) {
-    return blocks[_blockHeight].data[_key];
+  function getBlockFCD(uint256 _blockHeight, bytes32[] memory _keys) public view returns (uint256[] memory data) {
+    data = new uint256[](_keys.length);
+
+    for (uint i=0; i<_keys.length; i++) {
+      data[i] = blocks[_blockHeight].numericFCD[_keys[i]];
+    }
   }
 
   // ========== EVENTS ========== //

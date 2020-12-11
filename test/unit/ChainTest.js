@@ -1,5 +1,5 @@
 const {use, expect} = require('chai');
-const {ContractFactory} = require('ethers');
+const {ContractFactory, BigNumber} = require('ethers');
 const {waffleChai} = require('@ethereum-waffle/chai');
 const {deployMockContract} = require('@ethereum-waffle/mock-contract');
 const {loadFixture} = require('ethereum-waffle');
@@ -52,8 +52,13 @@ keys.forEach((k, i) => {
 const tree = new SortedMerkleTree(inputs);
 const root = tree.getHexRoot();
 
-const prepareData = async (signer, blockHeight, root) => {
-  const testimony = ethers.utils.defaultAbiCoder.encode(['uint256', 'bytes32'], [blockHeight, root]);
+const prepareData = async (signer, blockHeight, root, fcdKeys = [], fcdValues = []) => {
+  let testimony = ethers.utils.defaultAbiCoder.encode(['uint256', 'bytes32'], [blockHeight, root]);
+
+  for (let i = 0; i < fcdKeys.length; i++) {
+    testimony += ethers.utils.defaultAbiCoder.encode(['bytes32', 'uint256'], [fcdKeys[i], fcdValues[i]]).slice(2);
+  }
+
   const hashForSolidity = ethers.utils.keccak256(testimony);
   const affidavit = ethers.utils.arrayify(hashForSolidity);
 
@@ -76,7 +81,14 @@ describe('Chain', () => {
   };
 
   beforeEach(async () => {
-    ({owner, validator, contractRegistry, validatorRegistry, stakingBank, contract} = await loadFixture(fixture));
+    ({
+      owner,
+      validator,
+      contractRegistry,
+      validatorRegistry,
+      stakingBank,
+      contract
+    } = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {
@@ -132,115 +144,144 @@ describe('Chain', () => {
     });
   });
 
-  describe('submit()', () => {
-    it('expect to mint a block', async () => {
-      await mockSubmit();
-      const {r, s, v} = await prepareData(validator, 0, root);
-
-      await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s])).not.to.be.reverted;
-      console.log(await contract.blocks(0));
-    });
-
-    it('fail when signature do not match', async () => {
-      await mockSubmit();
-      const {r, s, v} = await prepareData(validator, 0, root);
-
-      const differentRoot = '0x00000000000000000000000000000000000000000000000000000000000001';
-      await expect(contract.connect(validator).submit(differentRoot, [], [], [v], [r], [s])).to.be.reverted;
-    });
-
-    describe('when block submitted', () => {
-      beforeEach(async () => {
+  describe('.submit()', () => {
+    describe('without FCD', () => {
+      it('expect to mint a block', async () => {
         await mockSubmit();
         const {r, s, v} = await prepareData(validator, 0, root);
-        await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+
+        await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s])).not.to.be.reverted;
+        console.log(await contract.blocks(0));
       });
 
-      it('expect to blockHeight NOT change when minimal padding not reached', async () => {
-        expect(await contract.getBlockHeight()).to.eq(0);
+      it('fail when signature do not match', async () => {
+        await mockSubmit();
+        const {r, s, v} = await prepareData(validator, 0, root);
+
+        const differentRoot = '0x00000000000000000000000000000000000000000000000000000000000001';
+        await expect(contract.connect(validator).submit(differentRoot, [], [], [v], [r], [s])).to.be.reverted;
       });
 
-      it('expect to have 1 block', async () => {
-        expect(await contract.blocksCount()).to.eq(1);
-      });
+      describe('when block submitted', () => {
+        beforeEach(async () => {
+          await mockSubmit();
+          const {r, s, v} = await prepareData(validator, 0, root);
+          await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+        });
 
-      it('expect to save valid root', async () => {
-        expect((await contract.blocks(0)).root).to.eq(tree.getHexRoot());
-      });
+        it('expect to blockHeight NOT change when minimal padding not reached', async () => {
+          expect(await contract.getBlockHeight()).to.eq(0);
+        });
 
-      it('expect to get number of block voters', async () => {
-        expect(await contract.getBlockVotersCount(0)).to.eq(1);
-      });
+        it('expect to have 1 block', async () => {
+          expect(await contract.blocksCount()).to.eq(1);
+        });
 
-      it('expect to get block voters', async () => {
-        const voter = await validator.getAddress();
-        expect(await contract.getBlockVoters(0)).to.eql([voter]);
-      });
+        it('expect to save valid root', async () => {
+          expect((await contract.blocks(0)).root).to.eq(tree.getHexRoot());
+        });
 
-      it('expect to get block votes', async () => {
-        const voter = await validator.getAddress();
-        expect(await contract.getBlockVotes(0, voter)).to.eq(1000);
-      });
+        it('expect to get number of block voters', async () => {
+          expect(await contract.getBlockVotersCount(0)).to.eq(1);
+        });
 
-      it('expect to get block data', async () => {
-        const bytes32 = `0x${'0'.repeat(64)}`;
-        expect(await contract.getBlockData(0, bytes32)).to.eq(bytes32);
-      });
+        it('expect to get block voters', async () => {
+          const voter = await validator.getAddress();
+          expect(await contract.getBlockVoters(0)).to.eql([voter]);
+        });
 
-      describe('verifyProofForBlock()', () => {
+        it('expect to get block votes', async () => {
+          const voter = await validator.getAddress();
+          expect(await contract.getBlockVotes(0, voter)).to.eq(1000);
+        });
+
+        it('expect to get FCD', async () => {
+          const bytes32 = `0x${'0'.repeat(64)}`;
+          expect(await contract.getBlockFCD(0, [bytes32])).to.eql([BigNumber.from(0)]);
+        });
+
+        describe('verifyProofForBlock()', () => {
+          it('expect to validate proof for selected key-value pair', async () => {
+            const k = 'btc-usd';
+            const v = inputs[k];
+            const proof = tree.getProofForKey(k);
+
+            expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
+          });
+        });
+
+        describe('verifyProofs()', () => {
+          it('expect to validate multiple proofs as once', async () => {
+            const keys = Object.keys(inputs).slice(-3);
+            const blockHeights = new Array(keys.length).fill(0);
+            const {proofs, proofItemsCounter} = tree.getFlatProofsForKeys(keys);
+            const leaves = keys.map(k => tree.getLeafForKey(k));
+            const result = new Array(keys.length).fill(true);
+
+            expect(await contract.verifyProofs(blockHeights, proofs, proofItemsCounter, leaves)).to.eql(result);
+          });
+        });
+
+        describe('when still on the same block height', () => {
+          it('expect submit to be reverted', async () => {
+            await mockSubmit();
+            const {r, s, v} = await prepareData(validator, 0, root);
+            await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s]))
+              .to.revertedWith('revert block already mined for current blockHeight');
+          });
+
+          describe('when minimal padding reached', () => {
+            beforeEach(async () => {
+              await contract.setBlockPadding(0);
+            });
+
+            it('expect to blockHeight to change', async () => {
+              expect(await contract.getBlockHeight()).to.eq(1);
+            });
+
+            describe('when block mined for new block height', () => {
+              beforeEach(async () => {
+                await mockSubmit();
+                const {r, s, v} = await prepareData(validator, 1, root);
+                await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+                await contract.setBlockPadding(100);
+              });
+
+              it('expect to revert when submit again for same block', async () => {
+                await mockSubmit();
+                const {r, s, v} = await prepareData(validator, 1, root);
+                await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s]))
+                  .to.revertedWith('revert block already mined for current blockHeight');
+              });
+            });
+          });
+        });
+      });
+    });
+
+    describe('with FCD', () => {
+      const fcdKeys = [toBytes32('a'), toBytes32('b')];
+      const fcdValues = [1, 2];
+
+      describe('when block submitted', () => {
+        beforeEach(async () => {
+          await mockSubmit();
+          const {r, s, v} = await prepareData(validator, 0, root, fcdKeys, fcdValues);
+
+          await expect(contract.connect(validator).submit(root, fcdKeys, fcdValues, [v], [r], [s]))
+            .to.emit(contract, 'LogMint');
+        });
+
+        it('expect to get FCD', async () => {
+          expect(await contract.getBlockFCD(0, [fcdKeys[0]])).to.eql([BigNumber.from(fcdValues[0])]);
+        });
+
         it('expect to validate proof for selected key-value pair', async () => {
           const k = 'btc-usd';
           const v = inputs[k];
           const proof = tree.getProofForKey(k);
 
           expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
-        });
-      });
-
-      describe('verifyProofs()', () => {
-        it('expect to validate multiple proofs as once', async () => {
-          const keys = Object.keys(inputs).slice(-3);
-          const blockHeights = new Array(keys.length).fill(0);
-          const {proofs, proofItemsCounter} = tree.getFlatProofsForKeys(keys);
-          const leaves = keys.map(k => tree.getLeafForKey(k));
-          const result = new Array(keys.length).fill(true);
-
-          expect(await contract.verifyProofs(blockHeights, proofs, proofItemsCounter, leaves)).to.eql(result);
-        });
-      });
-
-      describe('when still on the same block height', () => {
-        it('expect submit to be reverted', async () => {
-          await mockSubmit();
-          const {r, s, v} = await prepareData(validator, 0, root);
-          await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s]))
-            .to.revertedWith('revert block already mined for current blockHeight');
-        });
-
-        describe('when minimal padding reached', () => {
-          beforeEach(async () => {
-            await contract.setBlockPadding(0);
-          });
-
-          it('expect to blockHeight to change', async () => {
-            expect(await contract.getBlockHeight()).to.eq(1);
-          });
-
-          describe('when block mined for new block height', () => {
-            beforeEach(async () => {
-              await mockSubmit();
-              const {r, s, v} = await prepareData(validator, 1, root);
-              await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
-              await contract.setBlockPadding(100);
-            });
-
-            it('expect to revert when submit again for same block', async () => {
-              await mockSubmit();
-              const {r, s, v} = await prepareData(validator, 1, root);
-              await expect(contract.connect(validator).submit(root, [], [], [v], [r], [s]))
-                .to.revertedWith('revert block already mined for current blockHeight');
-            });
-          });
         });
       });
     });
