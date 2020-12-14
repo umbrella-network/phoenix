@@ -39,8 +39,11 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const token = await TokenContract.deploy(config.token.name, config.token.symbol, config.token.totalSupply);
   await token.deployed();
 
+  let tx;
+
   if (doRegistration) {
-    await contractRegistry.importContracts([token.address]);
+    tx = await contractRegistry.importContracts([token.address]);
+    await waitForTx(tx.hash, provider);
     console.log('Token registered:', await contractRegistry.getAddressByString('UMB'));
   } else {
     console.log('Token deployed to:', token.address);
@@ -51,7 +54,8 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   await validatorRegistry.deployed();
 
   if (doRegistration) {
-    await contractRegistry.importAddresses([toBytes32('ValidatorRegistry')], [validatorRegistry.address]);
+    tx = await contractRegistry.importAddresses([toBytes32('ValidatorRegistry')], [validatorRegistry.address]);
+    await waitForTx(tx.hash, provider);
     console.log('validatorRegistry registered', await contractRegistry.getAddressByString('ValidatorRegistry'));
   } else {
     console.log('ValidatorRegistry deployed to:', validatorRegistry.address);
@@ -62,7 +66,8 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   await stakingBank.deployed();
 
   if (doRegistration) {
-    await contractRegistry.importContracts([stakingBank.address]);
+    tx = await contractRegistry.importContracts([stakingBank.address]);
+    await waitForTx(tx.hash, provider);
     const name = await stakingBank.getName();
     console.log(name);
     console.log('stakingBank registered', await contractRegistry.getAddress(name));
@@ -75,13 +80,14 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   await chain.deployed();
 
   if (doRegistration) {
-    await contractRegistry.importContracts([chain.address]);
+    tx = await contractRegistry.importContracts([chain.address]);
+    await waitForTx(tx.hash, provider);
     console.log('chain registered', await contractRegistry.getAddress(await chain.getName()));
   } else {
     console.log('Chain deployed to:', chain.address);
   }
 
-  let tx = await token.transfer(id, config.token.totalSupply);
+  tx = await token.transfer(id, config.token.totalSupply);
   await waitForTx(tx.hash, provider);
   console.log('token transfered to validator:', config.token.totalSupply);
 

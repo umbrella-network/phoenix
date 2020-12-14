@@ -33,6 +33,24 @@ const config = {
     },
     validators: [
       {
+        location: ''
+      }
+    ]
+  },
+  live: {
+    contractRegistry: {
+      address: '0x4545e91d2e3647808670DD045eA5f4079B436EbC'
+    },
+    token: {
+      totalSupply: '1000000000000000000',
+      name: 'Umbrella',
+      symbol: 'UMB'
+    },
+    chain: {
+      blockPadding: 6
+    },
+    validators: [
+      {
         location: 'http://ae883a71637d7493fad1b62f09469eff-1487985040.us-east-2.elb.amazonaws.com'
       }
     ]

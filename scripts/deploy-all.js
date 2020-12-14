@@ -14,7 +14,7 @@ async function main() {
 
     console.log('...done - local network ready.');
   } else {
-    console.log('setup registry address in config file and run `npm run deploy:contracts:staging`');
+    console.log(`setup registry address in config file and run 'npm run deploy:contracts:${process.env.NODE_ENV}'`);
   }
 
   console.log('Registry:', registry.address);
