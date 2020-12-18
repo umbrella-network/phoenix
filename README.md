@@ -54,7 +54,13 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 2. Deploy to localhost
 
 ```shell script
+npm run deploy:all
+```
 
+If you choose buidler node, then you can use minter for mining blocks:
+
+```shell
+npm run local-minter
 ```
 
 ## Deploy
