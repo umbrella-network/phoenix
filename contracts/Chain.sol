@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "./lib/LeafDecoder.sol";
 import "./interfaces/IStakingBank.sol";
 import "./interfaces/IValidatorRegistry.sol";
 
@@ -13,6 +14,7 @@ import "./extensions/Registrable.sol";
 
 contract Chain is ReentrancyGuard, Registrable, Ownable {
   using SafeMath for uint256;
+  using LeafDecoder for bytes;
 
   // ========== STATE VARIABLES ========== //
 
@@ -211,6 +213,32 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
       offset += _proofItemsCounter[i];
     }
+  }
+
+  function decodeLeafToNumber(bytes memory _leaf) public pure returns (uint) {
+    return _leaf.leafToUint();
+  }
+
+  function decodeLeafToFloat(bytes memory _leaf) public pure returns (uint) {
+    return _leaf.leafTo18DecimalsFloat();
+  }
+
+  function verifyProofForBlockForNumber(
+    uint256 _blockHeight,
+    bytes32[] memory _proof,
+    bytes memory _key,
+    bytes memory _value
+  ) public view returns (bool, uint256) {
+    return (verifyProof(_proof, blocks[_blockHeight].root, hashLeaf(_key, _value)), _value.leafToUint());
+  }
+
+  function verifyProofForBlockForFloat(
+    uint256 _blockHeight,
+    bytes32[] memory _proof,
+    bytes memory _key,
+    bytes memory _value
+  ) public view returns (bool, uint256) {
+    return (verifyProof(_proof, blocks[_blockHeight].root, hashLeaf(_key, _value)), _value.leafTo18DecimalsFloat());
   }
 
   function getBlockVotersCount(uint256 _blockHeight) public view returns (uint256) {

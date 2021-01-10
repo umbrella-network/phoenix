@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - proof validation on-chain
 - getters for `Chain.blocks`
 - numeric first class data
+- helpers functions to decode int and float from leaf bytes
 
 ### Changed
 - `StakingBank` to be `ERC20` compatible
