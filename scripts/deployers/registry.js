@@ -1,22 +1,23 @@
 require('custom-env').env();
+const {ethers} = require('@nomiclabs/buidler');
 
 const {getProvider, isLocalNetwork} = require('../helpers');
 
 let provider = getProvider();
 
 exports.deployContractRegistry = async () => {
-  const {STAGING_PK} = process.env;
+  const {DEPLOYER_PK} = process.env;
 
   let ownerWallet;
 
   if (isLocalNetwork()) {
     [ownerWallet] = await ethers.getSigners();
   } else {
-    if (!STAGING_PK) {
-      throw new Error('please setup STAGING_PK in .env');
+    if (!DEPLOYER_PK) {
+      throw new Error('please setup DEPLOYER_PK in .env');
     }
 
-    ownerWallet = new ethers.Wallet(STAGING_PK, provider);
+    ownerWallet = new ethers.Wallet(DEPLOYER_PK, provider);
   }
 
   const owner = await ownerWallet.getAddress();

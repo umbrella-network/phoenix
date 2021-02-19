@@ -1,10 +1,12 @@
 require('custom-env').env();
+const {ethers} = require('@nomiclabs/buidler');
 
-const config = require('../../config/config');
+const config = require('../../config');
 const Registry = require('../../artifacts/Registry');
 const {toBytes32} = require('../helpers');
 
 const {getProvider, waitForTx, isLocalNetwork} = require('../helpers');
+const {BigNumber} = ethers;
 
 const provider = getProvider();
 
@@ -12,6 +14,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const {VALIDATOR_PK} = process.env;
 
   if (!VALIDATOR_PK) {
+    console.log('random PK', ethers.Wallet.createRandom().privateKey);
     throw new Error('please setup VALIDATOR_PK in .env');
   }
 
@@ -35,6 +38,23 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const validatorWallet = new ethers.Wallet(VALIDATOR_PK, provider);
   const id = await validatorWallet.getAddress();
 
+  const balance = await validatorWallet.getBalance();
+  console.log('validator ETH balance:', balance.toString());
+
+  if (isLocalNetwork()) {
+    if (balance.toString() === '0') {
+      console.log('sending ETH to validator');
+      const ownerBalance = await owner.getBalance();
+      tx = await owner.sendTransaction({to: id, value: ownerBalance.div(2).toHexString()});
+      await waitForTx(tx.hash, provider);
+    }
+  } else {
+    if (balance.lt(BigNumber.from('10000000000000000'))) {
+      throw Error('validator does not have enough ETH');
+    }
+  }
+
+  console.log('deploying test token...');
   const TokenContract = await ethers.getContractFactory('Token');
   const token = await TokenContract.deploy(config.token.name, config.token.symbol, config.token.totalSupply);
   await token.deployed();
@@ -42,6 +62,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   let tx;
 
   if (doRegistration) {
+    console.log('registering test token...');
     tx = await contractRegistry.importContracts([token.address]);
     await waitForTx(tx.hash, provider);
     console.log('Token registered:', await contractRegistry.getAddressByString('UMB'));
@@ -49,6 +70,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
     console.log('Token deployed to:', token.address);
   }
 
+  console.log('deploying ValidatorRegistry...');
   const ValidatorRegistryContract = await ethers.getContractFactory('ValidatorRegistry');
   const validatorRegistry = await ValidatorRegistryContract.deploy();
   await validatorRegistry.deployed();
@@ -61,6 +83,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
     console.log('ValidatorRegistry deployed to:', validatorRegistry.address);
   }
 
+  console.log('deploying StakingBank...');
   const StakingBankContract = await ethers.getContractFactory('StakingBank');
   const stakingBank = await StakingBankContract.deploy(contractRegistryAddress, config.token.name, config.token.symbol);
   await stakingBank.deployed();
@@ -75,6 +98,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
     console.log('StakingBank deployed to:', stakingBank.address);
   }
 
+  console.log('deploying Chain...');
   const ChainContract = await ethers.getContractFactory('Chain');
   const chain = await ChainContract.deploy(contractRegistryAddress, config.chain.blockPadding);
   await chain.deployed();
@@ -89,18 +113,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
 
   tx = await token.transfer(id, config.token.totalSupply);
   await waitForTx(tx.hash, provider);
-  console.log('token transfered to validator:', config.token.totalSupply);
-
-  if (isLocalNetwork()) {
-    const balance = await validatorWallet.getBalance();
-
-    if (balance.eq(0)) {
-      console.log('sending ETH to validator');
-      const ownerBalance = await owner.getBalance();
-      tx = await owner.sendTransaction({to: id, value: ownerBalance.div(2).toHexString()});
-      await waitForTx(tx.hash, provider);
-    }
-  }
+  console.log('token transferred to validator:', config.token.totalSupply);
 
   // todo - make it work for multiple validators in a future
   const validator = config.validators[0];
@@ -111,10 +124,12 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const validatorData = await validatorRegistry.validators(id);
   console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
 
-  tx = await token.connect(validatorWallet).approve(stakingBank.address, config.token.totalSupply);
+  const approval = '100000'; //config.token.totalSupply;
+  tx = await token.connect(validatorWallet).approve(stakingBank.address, approval);
   await waitForTx(tx.hash, provider);
 
-  tx = await stakingBank.receiveApproval(id, config.token.totalSupply, 0);
+  console.log('...receiveApproval...');
+  tx = await stakingBank.receiveApproval(id, approval, 0);
   await waitForTx(tx.hash, provider);
 
   console.log('validator balance:', (await token.balanceOf(id)).toString());

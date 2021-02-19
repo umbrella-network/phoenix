@@ -38,14 +38,15 @@ contract Registry is Ownable {
     return registry[stringToBytes32(_name)];
   }
 
-  function stringToBytes32(string memory source) public pure returns (bytes32 result) {
-    bytes memory tempEmptyStringTest = bytes(source);
+  function stringToBytes32(string memory _string) public pure returns (bytes32 result) {
+    bytes memory tempEmptyStringTest = bytes(_string);
+
     if (tempEmptyStringTest.length == 0) {
       return 0x0;
     }
 
     assembly {
-      result := mload(add(source, 32))
+      result := mload(add(_string, 32))
     }
   }
 
