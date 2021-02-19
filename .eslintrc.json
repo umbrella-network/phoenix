@@ -30,6 +30,8 @@
   "globals": {
     "Buffer": "readonly",
     "ethers": "readonly",
-    "process": "readonly"
+    "process": "readonly",
+    "task": "readonly",
+    "usePlugin": "readonly"
   }
 }

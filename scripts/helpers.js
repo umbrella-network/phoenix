@@ -1,6 +1,5 @@
 require('custom-env').env();
 
-const { INFURA_ID } = process.env;
 const bre = require('@nomiclabs/buidler');
 
 const isLocalNetwork = () => ['buidlerevm', 'localhost'].includes(bre.network.name);
@@ -10,7 +9,7 @@ const getProvider = () => {
     const currentProvider = new bre.web3.providers.HttpProvider('http://localhost:8545');
     return new bre.ethers.providers.Web3Provider(currentProvider);
   } else {
-    return new bre.ethers.providers.JsonRpcProvider(`https://kovan.infura.io/v3/${INFURA_ID}`);
+    return new bre.ethers.providers.JsonRpcProvider(bre.config.networks[bre.network.name].url);
   }
 };
 
