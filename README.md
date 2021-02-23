@@ -39,7 +39,7 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 
 ## Testing
 
-1. `npx buidler test`
+1. `npm run test`
 
 ---
 
@@ -49,7 +49,7 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 
 1. Start Ganache
 
-`npx ganache-cli --blockTime 23` or `npx buidler node`
+`npx ganache-cli --blockTime 23` or `npm run node`
 
 2. Deploy to localhost
 
@@ -57,7 +57,7 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 npm run deploy:all
 ```
 
-If you choose buidler node, then you can use minter for mining blocks:
+If you choose hardhat node, then you can use minter for mining blocks:
 
 ```shell
 npm run local-minter
@@ -65,7 +65,16 @@ npm run local-minter
 
 ## Deploy
 
-Use Remix to deploy.
+### Using scripts
+
+Setup Infura ID in .env and run:
+
+```shell
+npm run deploy:all
+```
+
+### Using Remix
+Use Remix to deploy 
 Use `truffle-flattener` to flatten and make each contract deployable.
 
 Example: 

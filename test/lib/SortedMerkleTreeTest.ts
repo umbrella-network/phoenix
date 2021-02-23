@@ -1,16 +1,18 @@
-const {use, expect} = require('chai');
-const {ContractFactory} = require('ethers');
-const {waffleChai} = require('@ethereum-waffle/chai');
-const {LeafKeyCoder, LeafValueCoder, LeafType} = require('@umb-network/toolbox');
+import {ethers} from 'hardhat';
+import {use, expect} from 'chai';
 
-const SortedMerkleTree = require('../../lib/SortedMerkleTree');
+import {ContractFactory, Contract} from 'ethers';
+import {waffleChai} from '@ethereum-waffle/chai';
+import {LeafKeyCoder, LeafValueCoder, LeafType} from '@umb-network/toolbox';
 
-const Chain = require('../../artifacts/Chain');
+import SortedMerkleTree from '../../lib/SortedMerkleTree';
+
+import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 
 use(waffleChai);
 
 describe('Tree', () => {
-  let contract;
+  let contract: Contract;
 
   before(async () => {
     const [owner] = await ethers.getSigners();
@@ -47,7 +49,7 @@ describe('Tree', () => {
     });
 
     it('expect to validate proof off-chain', async () => {
-      expect(tree.verifyProof(tree.getProofForKey(key))).to.be.true;
+      expect(tree.verifyProof(tree.getProofForKey(key), tree.getHexRoot()!, tree.getLeafForKey(key))).to.be.true;
     });
 
     it('expect to validate proof on-chain', async () => {
@@ -58,7 +60,7 @@ describe('Tree', () => {
   });
 
   describe('with multiple elements', () => {
-    const data = {};
+    const data: Record<string, Buffer> = {};
 
     const keys = [
       'eth-eur', 'btc-eur', 'war-eur', 'ltc-eur', 'uni-eur',
@@ -73,7 +75,7 @@ describe('Tree', () => {
     console.log(tree);
 
     it('keys order should not matter', async () => {
-      const dataReverse = {};
+      const dataReverse: Record<string, Buffer> = {};
 
       keys.reverse().forEach(k => {
         dataReverse[k] = data[k];
@@ -85,13 +87,13 @@ describe('Tree', () => {
     });
 
     it('expect to validate proof for all keys', async () => {
-      const awaits = [];
+      const awaits: any[] = [];
 
       Object.keys(data).forEach(k => {
         const proof = tree.getProofForKey(k);
         const leaf = tree.createLeafHash(k);
 
-        expect(tree.verifyProof(proof, tree.getHexRoot(), leaf)).to.be.true;
+        expect(tree.verifyProof(proof, tree.getHexRoot()!, leaf)).to.be.true;
         awaits.push(contract.verifyProof(proof, tree.getHexRoot(), leaf));
       });
 

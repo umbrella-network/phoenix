@@ -1,8 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.6.8;
 
-import "@nomiclabs/buidler/console.sol";
-
+import "hardhat/console.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IRegistry.sol";
@@ -11,8 +10,6 @@ import "../interfaces/IValidatorRegistry.sol";
 
 abstract contract Registrable {
   IRegistry public contractRegistry;
-
-  function getName() virtual external pure returns (bytes32);
 
   // ========== CONSTRUCTOR ========== //
 
@@ -26,7 +23,7 @@ abstract contract Registrable {
   modifier onlyFromContract(address _msgSender, bytes32 _contractName) {
     require(
       contractRegistry.getAddress(_contractName) == _msgSender,
-        string(abi.encodePacked('caller is not ', _contractName))
+        string(abi.encodePacked("caller is not ", _contractName))
     );
     _;
   }
@@ -38,15 +35,17 @@ abstract contract Registrable {
 
   // ========== VIEWS ========== //
 
+  function getName() virtual external pure returns (bytes32);
+
   function validatorRegistryContract() public view returns (IValidatorRegistry) {
-    return IValidatorRegistry(contractRegistry.requireAndGetAddress('ValidatorRegistry'));
+    return IValidatorRegistry(contractRegistry.requireAndGetAddress("ValidatorRegistry"));
   }
 
   function stakingBankContract() public view returns (IStakingBank) {
-    return IStakingBank(contractRegistry.requireAndGetAddress('StakingBank'));
+    return IStakingBank(contractRegistry.requireAndGetAddress("StakingBank"));
   }
 
-  function tokenContract() withRegistrySetUp public view returns (ERC20) {
-    return ERC20(contractRegistry.requireAndGetAddress('UMB'));
+  function tokenContract() public view withRegistrySetUp returns (ERC20) {
+    return ERC20(contractRegistry.requireAndGetAddress("UMB"));
   }
 }

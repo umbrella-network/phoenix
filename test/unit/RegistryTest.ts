@@ -1,25 +1,23 @@
-const { expect, use } = require('chai');
+import { expect, use } from 'chai';
 
-const {ContractFactory} = require('ethers');
-const {waffleChai} = require('@ethereum-waffle/chai');
-const {deployMockContract} = require('@ethereum-waffle/mock-contract');
-const {loadFixture} = require('ethereum-waffle');
-const {toBytes32} = require('../../scripts/helpers');
+import {ethers, ContractFactory, Contract, Signer} from 'ethers';
+import {waffleChai} from '@ethereum-waffle/chai';
+import {deployMockContract} from '@ethereum-waffle/mock-contract';
+import {loadFixture} from 'ethereum-waffle';
+import {toBytes32} from '../../scripts/helpers';
 
-const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
-
-const Registrable = require('../../artifacts/Registrable');
-const Registry = require('../../artifacts/Registry');
+import Registrable from '../../artifacts/contracts/extensions/Registrable.sol/Registrable.json';
+import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 
 use(waffleChai);
 
-async function fixture([owner]) {
+async function fixture([owner]: Signer[]) {
   const registrable = await deployMockContract(owner, Registrable.abi);
   const contractFactory = new ContractFactory(Registry.abi, Registry.bytecode, owner);
   const contract = await contractFactory.deploy();
 
   return {
-    owner,
+    ownerAddress: await owner.getAddress(),
     registrable,
     contract
   };
@@ -30,15 +28,15 @@ describe('Registry', () => {
   const bName32 = toBytes32('b');
   const registrableName = 'registrable';
 
-  let owner, contract, registrable;
+  let ownerAddress: string, contract: Contract, registrable: Contract;
 
   beforeEach(async () => {
-    ({owner, registrable, contract} = await loadFixture(fixture));
+    ({ownerAddress, registrable, contract} = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {
     it('expect valid owner', async () => {
-      expect(await contract.owner()).to.equal(owner.address);
+      expect(await contract.owner()).to.equal(ownerAddress);
     });
   });
 
@@ -63,16 +61,19 @@ describe('Registry', () => {
     });
 
     it('expect to import single item', async () => {
-      expect(await contract.importAddresses([aName32], [owner.address])).not.throw;
+      expect(await contract.importAddresses([aName32], [ownerAddress])).not.throw;
     });
 
     it('expect to import multiple items', async () => {
-      expect(await contract.importAddresses([aName32, bName32], [owner.address, owner.address])).not.throw;
+      expect(await contract.importAddresses([aName32, bName32], [ownerAddress, ownerAddress])).not.throw;
     });
 
     it('expect to throw when uneven number of inputs', async () => {
-      await expect(contract.importAddresses([aName32, bName32], [owner.address])).to.revertedWith('Input lengths must match');
-      await expect(contract.importAddresses([aName32], [owner.address, owner.address])).to.revertedWith('Input lengths must match');
+      await expect(contract.importAddresses([aName32, bName32], [ownerAddress]))
+        .to.revertedWith('Input lengths must match');
+
+      await expect(contract.importAddresses([aName32], [ownerAddress, ownerAddress]))
+        .to.revertedWith('Input lengths must match');
     });
   });
 
@@ -91,7 +92,7 @@ describe('Registry', () => {
       });
 
       it('expect not to throw when address not exists', async () => {
-        expect(await contract.getAddress(toBytes32('-----'))).to.eq(ZERO_ADDRESS);
+        expect(await contract.getAddress(toBytes32('-----'))).to.eq(ethers.constants.AddressZero);
       });
     });
 
@@ -101,7 +102,8 @@ describe('Registry', () => {
       });
 
       it('expect to throw when address not exists', async () => {
-        await expect(contract.requireAndGetAddress(toBytes32('-----'))).to.be.revertedWith('revert Name not registered: -----');
+        await expect(contract.requireAndGetAddress(toBytes32('-----')))
+          .to.be.revertedWith('revert Name not registered: -----');
       });
     });
   });

@@ -1,30 +1,29 @@
-const {use, expect} = require('chai');
-const {ContractFactory} = require('ethers');
-const {waffleChai} = require('@ethereum-waffle/chai');
-const {loadFixture} = require('ethereum-waffle');
+import {use, expect} from 'chai';
+import {Contract, ContractFactory, Signer} from 'ethers';
+import {waffleChai} from '@ethereum-waffle/chai';
+import {loadFixture} from 'ethereum-waffle';
 
-
-const ValidatorRegistry = require('../../artifacts/ValidatorRegistry');
+import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/ValidatorRegistry.json';
 
 use(waffleChai);
 
-async function fixture([owner, validator]) {
+async function fixture([owner, validator]: Signer[]) {
   const contractFactory = new ContractFactory(ValidatorRegistry.abi, ValidatorRegistry.bytecode, owner);
   const contract = await contractFactory.deploy();
 
   return {
     owner,
-    validator,
+    validatorAddress: await validator.getAddress(),
     contract
   };
 }
 
 
 describe('ValidatorRegistry', () => {
-  let validator, contract;
+  let validatorAddress: string, contract: Contract;
 
   beforeEach(async () => {
-    ({validator, contract} = await loadFixture(fixture));
+    ({validatorAddress, contract} = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {
@@ -35,12 +34,12 @@ describe('ValidatorRegistry', () => {
 
   describe('create()', () => {
     it('expect to creates validators', async () => {
-      await expect(contract.create(validator.address, 'IP')).not.to.be.reverted;
+      await expect(contract.create(validatorAddress, 'IP')).not.to.be.reverted;
     });
 
     describe('when created', () => {
       beforeEach(async () => {
-        await contract.create(validator.address, 'IP');
+        await contract.create(validatorAddress, 'IP');
       });
 
       it('expect to have 1 validator', async () => {
@@ -48,7 +47,7 @@ describe('ValidatorRegistry', () => {
       });
 
       it('expect addresses() to return validator', async () => {
-        expect(await contract.addresses(0)).to.eq(validator.address);
+        expect(await contract.addresses(0)).to.eq(validatorAddress);
       });
     });
   });

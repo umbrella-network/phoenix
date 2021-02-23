@@ -9,6 +9,10 @@ import "./extensions/Registrable.sol";
 contract Registry is Ownable {
   mapping(bytes32 => address) public registry;
 
+  // ========== EVENTS ========== //
+
+  event LogRegistered(address indexed destination, bytes32 name);
+
   // ========== MUTATIVE FUNCTIONS ========== //
 
   function importAddresses(bytes32[] calldata _names, address[] calldata _destinations) external onlyOwner {
@@ -30,6 +34,12 @@ contract Registry is Ownable {
 
   // ========== VIEWS ========== //
 
+  function requireAndGetAddress(bytes32 name) external view returns (address) {
+    address _foundAddress = registry[name];
+    require(_foundAddress != address(0), string(abi.encodePacked("Name not registered: ", name)));
+    return _foundAddress;
+  }
+
   function getAddress(bytes32 _bytes) external view returns (address) {
     return registry[_bytes];
   }
@@ -49,14 +59,4 @@ contract Registry is Ownable {
       result := mload(add(_string, 32))
     }
   }
-
-  function requireAndGetAddress(bytes32 name) external view returns (address) {
-    address _foundAddress = registry[name];
-    require(_foundAddress != address(0), string(abi.encodePacked('Name not registered: ', name)));
-    return _foundAddress;
-  }
-
-  // ========== EVENTS ========== //
-
-  event LogRegistered(address indexed destination, bytes32 name);
 }

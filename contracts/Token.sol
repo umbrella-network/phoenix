@@ -12,6 +12,6 @@ contract Token is ERC20 {
   }
 
   function getName() external pure returns (bytes32) {
-    return 'UMB';
+    return "UMB";
   }
 }

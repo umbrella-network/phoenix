@@ -1,6 +1,6 @@
-require('custom-env').env();
+require('custom-env').env(); // eslint-disable-line
 
-const {deployContractRegistry} = require('./deployers/registry');
+import {deployContractRegistry} from './deployers/registry';
 
 deployContractRegistry()
   .then(() => process.exit(0))

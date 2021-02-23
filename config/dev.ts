@@ -1,4 +1,4 @@
-module.exports = {
+const dev = {
   contractRegistry: {
     address: '0xE62a6C2dF781901E39E1c9E830784dE10787B918'
   },
@@ -16,3 +16,5 @@ module.exports = {
     }
   ]
 };
+
+export default dev;
