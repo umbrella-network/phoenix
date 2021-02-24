@@ -1,6 +1,6 @@
-module.exports = {
+const staging = {
   contractRegistry: {
-    address: ''
+    address: '0x622c7725a8D1103E44F89341A6358A0e811Df0a5'
   },
   token: {
     totalSupply: '1000000000000000000',
@@ -12,7 +12,9 @@ module.exports = {
   },
   validators: [
     {
-      location: 'http://localhost:3000'
+      location: 'https://validator-staging.umb.network'
     }
   ]
 };
+
+export default staging;

@@ -1,11 +1,13 @@
-require('custom-env').env();
-const {ethers} = require('@nomiclabs/buidler');
+import {Contract} from 'ethers';
 
-const {getProvider, isLocalNetwork} = require('../helpers');
+require('custom-env').env(); // eslint-disable-line
+import {ethers} from 'hardhat';
 
-let provider = getProvider();
+import {getProvider, isLocalNetwork} from '../helpers';
 
-exports.deployContractRegistry = async () => {
+const provider = getProvider();
+
+export const deployContractRegistry = async (): Promise<Contract> => {
   const {DEPLOYER_PK} = process.env;
 
   let ownerWallet;

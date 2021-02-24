@@ -1,16 +1,19 @@
-require('custom-env').env();
-const {ethers} = require('@nomiclabs/buidler');
+require('custom-env').env(); // eslint-disable-line
+import {ethers} from 'hardhat';
 
-const config = require('../../config');
-const Registry = require('../../artifacts/Registry');
-const {toBytes32} = require('../helpers');
+import configuration from '../../config';
+import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
+import {getProvider, isLocalNetwork, toBytes32, waitForTx} from '../helpers';
 
-const {getProvider, waitForTx, isLocalNetwork} = require('../helpers');
 const {BigNumber} = ethers;
 
+const config = configuration();
 const provider = getProvider();
 
-exports.deployAllContracts = async (registryAddress = '', doRegistration = false) => {
+export const deployAllContracts = async (
+  registryAddress = '',
+  doRegistration = false
+): Promise<{ chain: any; bank: any; validatorRegistry: any; token: any }> => {
   const {VALIDATOR_PK} = process.env;
 
   if (!VALIDATOR_PK) {
@@ -40,6 +43,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
 
   const balance = await validatorWallet.getBalance();
   console.log('validator ETH balance:', balance.toString());
+  let tx;
 
   if (isLocalNetwork()) {
     if (balance.toString() === '0') {
@@ -59,9 +63,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const token = await TokenContract.deploy(config.token.name, config.token.symbol, config.token.totalSupply);
   await token.deployed();
 
-  let tx;
-
-  if (doRegistration) {
+  if (contractRegistry) {
     console.log('registering test token...');
     tx = await contractRegistry.importContracts([token.address]);
     await waitForTx(tx.hash, provider);
@@ -75,7 +77,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const validatorRegistry = await ValidatorRegistryContract.deploy();
   await validatorRegistry.deployed();
 
-  if (doRegistration) {
+  if (contractRegistry) {
     tx = await contractRegistry.importAddresses([toBytes32('ValidatorRegistry')], [validatorRegistry.address]);
     await waitForTx(tx.hash, provider);
     console.log('validatorRegistry registered', await contractRegistry.getAddressByString('ValidatorRegistry'));
@@ -88,7 +90,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const stakingBank = await StakingBankContract.deploy(contractRegistryAddress, config.token.name, config.token.symbol);
   await stakingBank.deployed();
 
-  if (doRegistration) {
+  if (contractRegistry) {
     tx = await contractRegistry.importContracts([stakingBank.address]);
     await waitForTx(tx.hash, provider);
     const name = await stakingBank.getName();
@@ -103,7 +105,7 @@ exports.deployAllContracts = async (registryAddress = '', doRegistration = false
   const chain = await ChainContract.deploy(contractRegistryAddress, config.chain.blockPadding);
   await chain.deployed();
 
-  if (doRegistration) {
+  if (contractRegistry) {
     tx = await contractRegistry.importContracts([chain.address]);
     await waitForTx(tx.hash, provider);
     console.log('chain registered', await contractRegistry.getAddress(await chain.getName()));

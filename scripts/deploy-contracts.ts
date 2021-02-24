@@ -1,6 +1,6 @@
-require('custom-env').env();
+require('custom-env').env(); // eslint-disable-line
 
-const {deployAllContracts} = require('./deployers/contracts');
+import {deployAllContracts} from './deployers/contracts';
 
 deployAllContracts('', true)
   .then(() => process.exit(0))

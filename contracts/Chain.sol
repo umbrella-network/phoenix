@@ -20,7 +20,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
   uint256 public blockPadding;
 
-  bytes constant ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
+  bytes constant public ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
 
   struct Block {
     bytes32 root;
@@ -84,7 +84,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
-      require(balance > 0, "validator doesn't have balance OR submit for wrong blockHeight OR invalid signature");
+      require(balance > 0, "no balance OR wrong blockHeight OR invalid signature");
       require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
 
       blocks[blockHeight].voters.push(signer);
@@ -116,7 +116,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   // ========== VIEWS ========== //
 
   function getName() override external pure returns (bytes32) {
-    return 'Chain';
+    return "Chain";
   }
 
   function recoverSigner(bytes32 affidavit, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {

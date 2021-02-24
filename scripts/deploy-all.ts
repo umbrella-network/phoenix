@@ -1,8 +1,8 @@
-require('custom-env').env();
+require('custom-env').env(); // eslint-disable-line
 
-const {deployAllContracts} = require('./deployers/contracts');
-const {deployContractRegistry} = require('./deployers/registry');
-const {isLocalNetwork} = require('./helpers');
+import {deployAllContracts} from './deployers/contracts';
+import {deployContractRegistry} from './deployers/registry';
+import {isLocalNetwork} from './helpers';
 
 async function main() {
   const registry = await deployContractRegistry();

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.8;
 
-import "@nomiclabs/buidler/console.sol";
+import "hardhat/console.sol";
 
-import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 import "./interfaces/IERC20Detailed.sol";
 import "./interfaces/IStakingBank.sol";
@@ -20,15 +20,16 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable {
   using SafeMath for uint256;
 
   constructor(address _contractRegistry, string memory _name, string memory _symbol)
+  public
   Registrable(_contractRegistry)
   ERC20(
       string(abi.encodePacked("staked ", _name)),
       string(abi.encodePacked("sb", _symbol))
-    ) public {
+    ) {
   }
 
   function getName() override external pure returns (bytes32) {
-    return 'StakingBank';
+    return "StakingBank";
   }
 
   function receiveApproval(

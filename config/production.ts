@@ -1,4 +1,4 @@
-module.exports = {
+const production = {
   contractRegistry: {
     address: '0xb6B268c122bf6caA5B3Ae4C71443939EdEB0E96f'
   },
@@ -16,3 +16,5 @@ module.exports = {
     }
   ]
 };
+
+export default production;

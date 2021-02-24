@@ -1,27 +1,29 @@
-const bre = require('@nomiclabs/buidler');
-const {ethers} = bre;
-const {use, expect} = require('chai');
-const {ContractFactory, BigNumber} = require('ethers');
-const {waffleChai} = require('@ethereum-waffle/chai');
-const {deployMockContract} = require('@ethereum-waffle/mock-contract');
-const {loadFixture} = require('ethereum-waffle');
-const {LeafKeyCoder, LeafValueCoder, LeafType} = require('@umb-network/toolbox');
+import hre, {ethers} from 'hardhat';
+import {expect, use} from 'chai';
+import {BigNumber, Contract, ContractFactory, Signer} from 'ethers';
+import {waffleChai} from '@ethereum-waffle/chai';
+import {deployMockContract} from '@ethereum-waffle/mock-contract';
 
-const SortedMerkleTree = require('../../lib/SortedMerkleTree');
+import {loadFixture} from 'ethereum-waffle';
+import {LeafKeyCoder, LeafType, LeafValueCoder} from '@umb-network/toolbox';
 
-const Registry = require('../../artifacts/Registry');
-const Chain = require('../../artifacts/Chain');
-const ValidatorRegistry = require('../../artifacts/ValidatorRegistry');
-const StakingBank = require('../../artifacts/StakingBank');
-const Token = require('../../artifacts/Token');
-const {toBytes32} = require('../../scripts/helpers');
-const {toWei} = bre.web3.utils;
+import SortedMerkleTree from '../../lib/SortedMerkleTree';
+
+import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
+import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
+import ValidatorRegistry
+  from '../../artifacts/contracts/ValidatorRegistry.sol/ValidatorRegistry.json';
+import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
+import Token from '../../artifacts/contracts/Token.sol/Token.json';
+import {toBytes32} from '../../scripts/helpers';
+
+const {toWei} = hre.web3.utils;
 
 use(waffleChai);
 
 const blockPadding = 100;
 
-async function fixture([owner, validator]) {
+async function fixture([owner, validator]: Signer[]) {
   const token = await deployMockContract(owner, Token.abi);
   const contractRegistry = await deployMockContract(owner, Registry.abi);
   const validatorRegistry = await deployMockContract(owner, ValidatorRegistry.abi);
@@ -33,6 +35,7 @@ async function fixture([owner, validator]) {
   return {
     owner,
     validator,
+    validatorAddress: await validator.getAddress(),
     token,
     contractRegistry,
     validatorRegistry,
@@ -41,7 +44,7 @@ async function fixture([owner, validator]) {
   };
 }
 
-const inputs = {};
+const inputs: Record<string, Buffer> = {};
 
 const keys = [
   'eth-eur', 'btc-eur', 'war-eur', 'ltc-eur', 'uni-eur',
@@ -55,7 +58,13 @@ keys.forEach((k, i) => {
 const tree = new SortedMerkleTree(inputs);
 const root = tree.getHexRoot();
 
-const prepareData = async (signer, blockHeight, root, fcdKeys = [], fcdValues = []) => {
+const prepareData = async (
+  signer: Signer,
+  blockHeight: number,
+  root: string | null,
+  fcdKeys: string[] = [],
+  fcdValues: number[] = []
+) => {
   let testimony = ethers.utils.defaultAbiCoder.encode(['uint256', 'bytes32'], [blockHeight, root]);
 
   for (let i = 0; i < fcdKeys.length; i++) {
@@ -72,21 +81,31 @@ const prepareData = async (signer, blockHeight, root, fcdKeys = [], fcdValues = 
 };
 
 describe('Chain', () => {
-  let owner, validator, contractRegistry, validatorRegistry, stakingBank, contract;
+  let owner: Signer, validator: Signer, validatorAddress: string,
+    contractRegistry: Contract, validatorRegistry: Contract, stakingBank: Contract,
+    contract: Contract;
 
-  const mockSubmit = async (leader = validator, numberOfValidators = 1, totalSupply = 1000, balance = 1000) => {
-    await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('ValidatorRegistry')).returns(validatorRegistry.address);
+  const mockSubmit = async (
+    leader = validator,
+    numberOfValidators = 1,
+    totalSupply = 1000,
+    balance = 1000
+  ) => {
+    await contractRegistry.mock.requireAndGetAddress
+      .withArgs(toBytes32('ValidatorRegistry')).returns(validatorRegistry.address);
+
     await validatorRegistry.mock.getNumberOfValidators.returns(numberOfValidators);
-    await validatorRegistry.mock.addresses.returns(leader.address);
+    await validatorRegistry.mock.addresses.returns(await leader.getAddress());
     await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
     await stakingBank.mock.totalSupply.returns(totalSupply);
-    await stakingBank.mock.balanceOf.withArgs(leader.address).returns(balance);
+    await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
   beforeEach(async () => {
-    ({
+    return ({
       owner,
       validator,
+      validatorAddress,
       contractRegistry,
       validatorRegistry,
       stakingBank,
@@ -128,8 +147,8 @@ describe('Chain', () => {
 
       const signer = await contract.recoverSigner(hashForSolidity, v, r, s);
 
-      expect(signer).to.eq(validator.address);
-      expect(await ethers.utils.verifyMessage(affidavit, sig)).to.eq(validator.address);
+      expect(signer).to.eq(validatorAddress);
+      expect(await ethers.utils.verifyMessage(affidavit, sig)).to.eq(validatorAddress);
     });
   });
 
@@ -163,16 +182,20 @@ describe('Chain', () => {
 
     describe('throws when', () => {
       it('bytes are empty', async () => {
-        await expect(contract.decodeLeafToNumber('0x00')).to.revertedWith('revert invalid leaf bytes - missing type metadata');
+        await expect(contract.decodeLeafToNumber('0x00'))
+          .to.revertedWith('revert invalid leaf bytes - missing type metadata');
       });
 
       it('missing metadata type marker', async () => {
-        await expect(contract.decodeLeafToNumber('0x1111111111')).to.revertedWith('revert invalid leaf - missing type marker');
+        await expect(contract.decodeLeafToNumber('0x1111111111'))
+          .to.revertedWith('revert invalid leaf - missing type marker');
       });
 
       it('invalid type', async () => {
         const bytes = LeafValueCoder.encode('1', LeafType.TYPE_FLOAT);
-        await expect(contract.decodeLeafToNumber(bytes)).to.revertedWith('revert invalid leaf - invalid type - expect 02:int');
+
+        await expect(contract.decodeLeafToNumber(bytes))
+          .to.revertedWith('revert invalid leaf - invalid type - expect 02:int');
       });
     });
   });
@@ -196,16 +219,20 @@ describe('Chain', () => {
 
     describe('throws when', () => {
       it('bytes are empty', async () => {
-        await expect(contract.decodeLeafToFloat('0x00')).to.revertedWith('revert invalid leaf bytes - missing type metadata');
+        await expect(contract.decodeLeafToFloat('0x00'))
+          .to.revertedWith('revert invalid leaf bytes - missing type metadata');
       });
 
       it('missing metadata type marker', async () => {
-        await expect(contract.decodeLeafToFloat('0x1111111111')).to.revertedWith('revert invalid leaf - missing type marker');
+        await expect(contract.decodeLeafToFloat('0x1111111111'))
+          .to.revertedWith('revert invalid leaf - missing type marker');
       });
 
       it('invalid type', async () => {
         const bytes = LeafValueCoder.encode('1', LeafType.TYPE_INTEGER);
-        await expect(contract.decodeLeafToFloat(bytes)).to.revertedWith('revert invalid leaf - invalid type - expect 03:float');
+
+        await expect(contract.decodeLeafToFloat(bytes))
+          .to.revertedWith('revert invalid leaf - invalid type - expect 03:float');
       });
     });
   });

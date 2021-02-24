@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -37,4 +36,4 @@ jobs:
         npm run lint:sol
     - name: JS Lint
       run: |
-        npm run lint:js
+        npm run lint:ts

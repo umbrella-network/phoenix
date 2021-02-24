@@ -1,6 +1,6 @@
-module.exports = {
+const local = {
   contractRegistry: {
-    address: '0x622c7725a8D1103E44F89341A6358A0e811Df0a5'
+    address: '0x7c2C195CD6D34B8F845992d380aADB2730bB9C6F'
   },
   token: {
     totalSupply: '1000000000000000000',
@@ -12,7 +12,9 @@ module.exports = {
   },
   validators: [
     {
-      location: 'https://validator-staging.umb.network'
+      location: 'http://localhost:3000'
     }
   ]
 };
+
+export default local;
