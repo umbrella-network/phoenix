@@ -1,6 +1,6 @@
 const production = {
   contractRegistry: {
-    address: '0xb6B268c122bf6caA5B3Ae4C71443939EdEB0E96f'
+    address: '0x8d16D5D2859f4c54b226180A46F26D57A4d727A0'
   },
   token: {
     totalSupply: '1000000000000000000000',

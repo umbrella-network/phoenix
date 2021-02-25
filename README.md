@@ -49,7 +49,7 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 
 1. Start Ganache
 
-`npx ganache-cli --blockTime 23` or `npm run node`
+`npx ganache-cli --blockTime 15` or `npm run node`
 
 2. Deploy to localhost
 
@@ -63,30 +63,13 @@ If you choose hardhat node, then you can use minter for mining blocks:
 npm run local-minter
 ```
 
-## Deploy
-
-### Using scripts
+### Live or Test nets
 
 Setup Infura ID in .env and run:
 
 ```shell
-npm run deploy:all
+npm run deploy:all:[dev|staging|production]
 ```
-
-### Using Remix
-Use Remix to deploy 
-Use `truffle-flattener` to flatten and make each contract deployable.
-
-Example: 
-
-`npx truffle-flattener ./contracts/ValidatorRegistry.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' | pbcopy`
-
-Deploy in the following order:
-
-- Token
-- ValidatorRegistry
-- StakingBank
-- Chain
 
 ---
 

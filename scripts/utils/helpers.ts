@@ -6,6 +6,13 @@ import {ethers} from 'ethers';
 import '@nomiclabs/hardhat-web3';
 import {Provider} from '@ethersproject/providers';
 
+export const sleep = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+export const constructorAbi = (types: string[], values: any[]): string => {
+  return ethers.utils.defaultAbiCoder.encode(types, values).replace('0x', '');
+};
 
 export const isLocalNetwork = (): boolean => ['buidlerevm', 'localhost'].includes(hre.network.name);
 

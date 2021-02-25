@@ -1,9 +1,10 @@
-import {Contract} from 'ethers';
-
 require('custom-env').env(); // eslint-disable-line
+
+import {Contract} from 'ethers';
 import {ethers} from 'hardhat';
 
-import {getProvider, isLocalNetwork} from '../helpers';
+import {getProvider, isLocalNetwork} from '../utils/helpers';
+import {verifyContract} from '../utils/verifyContract';
 
 const provider = getProvider();
 
@@ -30,5 +31,7 @@ export const deployContractRegistry = async (): Promise<Contract> => {
   await registry.deployed();
 
   console.log('Registry:', registry.address);
+
+  await verifyContract(registry.address, 'Registry', '');
   return registry;
 };
