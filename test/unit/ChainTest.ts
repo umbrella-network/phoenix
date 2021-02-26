@@ -15,7 +15,7 @@ import ValidatorRegistry
   from '../../artifacts/contracts/ValidatorRegistry.sol/ValidatorRegistry.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
-import {toBytes32} from '../../scripts/helpers';
+import {toBytes32} from '../../scripts/utils/helpers';
 
 const {toWei} = hre.web3.utils;
 

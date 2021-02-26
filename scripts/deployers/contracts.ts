@@ -1,9 +1,11 @@
 require('custom-env').env(); // eslint-disable-line
+
+import {verifyContract} from '../utils/verifyContract';
 import {ethers} from 'hardhat';
 
 import configuration from '../../config';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import {getProvider, isLocalNetwork, toBytes32, waitForTx} from '../helpers';
+import {constructorAbi, getProvider, isLocalNetwork, toBytes32, waitForTx} from '../utils/helpers';
 
 const {BigNumber} = ethers;
 
@@ -54,7 +56,7 @@ export const deployAllContracts = async (
     }
   } else {
     if (balance.lt(BigNumber.from('10000000000000000'))) {
-      throw Error('validator does not have enough ETH');
+      throw Error(`validator ${validatorWallet.address} does not have enough ETH`);
     }
   }
 
@@ -72,6 +74,8 @@ export const deployAllContracts = async (
     console.log('Token deployed to:', token.address);
   }
 
+  await verifyContract(token.address, 'Token', '');
+
   console.log('deploying ValidatorRegistry...');
   const ValidatorRegistryContract = await ethers.getContractFactory('ValidatorRegistry');
   const validatorRegistry = await ValidatorRegistryContract.deploy();
@@ -85,9 +89,15 @@ export const deployAllContracts = async (
     console.log('ValidatorRegistry deployed to:', validatorRegistry.address);
   }
 
+  await verifyContract(validatorRegistry.address, 'ValidatorRegistry', '');
+
   console.log('deploying StakingBank...');
   const StakingBankContract = await ethers.getContractFactory('StakingBank');
-  const stakingBank = await StakingBankContract.deploy(contractRegistryAddress, config.token.name, config.token.symbol);
+
+  const stakingBankArgs = [contractRegistryAddress, config.token.name, config.token.symbol];
+  const stakingBankArgsTypes = ['address', 'string','string'];
+
+  const stakingBank = await StakingBankContract.deploy(...stakingBankArgs);
   await stakingBank.deployed();
 
   if (contractRegistry) {
@@ -100,9 +110,14 @@ export const deployAllContracts = async (
     console.log('StakingBank deployed to:', stakingBank.address);
   }
 
+  await verifyContract(stakingBank.address, 'StakingBank', constructorAbi(stakingBankArgsTypes, stakingBankArgs));
+
   console.log('deploying Chain...');
   const ChainContract = await ethers.getContractFactory('Chain');
-  const chain = await ChainContract.deploy(contractRegistryAddress, config.chain.blockPadding);
+  const chainArgs = [contractRegistryAddress, config.chain.blockPadding];
+  const chainArgsTypes = ['address', 'uint256'];
+
+  const chain = await ChainContract.deploy(...chainArgs);
   await chain.deployed();
 
   if (contractRegistry) {
@@ -112,6 +127,8 @@ export const deployAllContracts = async (
   } else {
     console.log('Chain deployed to:', chain.address);
   }
+
+  // await verifyContract(chain.address, 'Chain', constructorAbi(chainArgsTypes, chainArgs));
 
   tx = await token.transfer(id, config.token.totalSupply);
   await waitForTx(tx.hash, provider);

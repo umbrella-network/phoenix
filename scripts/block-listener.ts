@@ -1,6 +1,6 @@
 import {ethers} from 'hardhat';
 import Chain from '../artifacts/contracts/Chain.sol/Chain.json';
-import {getProvider} from './helpers';
+import {getProvider} from './utils/helpers';
 
 import {BigNumber} from 'ethers';
 import configuration from '../config';

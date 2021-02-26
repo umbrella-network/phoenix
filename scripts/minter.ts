@@ -2,7 +2,7 @@ import hre, {ethers} from 'hardhat';
 import configuration from '../config';
 import Registry from '../artifacts/contracts/Registry.sol/Registry.json';
 import Chain from '../artifacts/contracts/Chain.sol/Chain.json';
-import {getProvider} from './helpers';
+import {getProvider} from './utils/helpers';
 import {Contract} from 'ethers';
 
 const web3 = hre.web3;

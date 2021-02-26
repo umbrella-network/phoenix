@@ -6,7 +6,7 @@ import {loadFixture} from 'ethereum-waffle';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
-import {toBytes32} from '../../scripts/helpers';
+import {toBytes32} from '../../scripts/utils/helpers';
 
 use(waffleChai);
 

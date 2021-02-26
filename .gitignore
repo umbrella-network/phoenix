@@ -15,4 +15,4 @@ cache
 artifacts
 
 vr.sol
-_*\.sol
+flattened_*

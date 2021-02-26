@@ -4,7 +4,7 @@ import {ethers, ContractFactory, Contract, Signer} from 'ethers';
 import {waffleChai} from '@ethereum-waffle/chai';
 import {deployMockContract} from '@ethereum-waffle/mock-contract';
 import {loadFixture} from 'ethereum-waffle';
-import {toBytes32} from '../../scripts/helpers';
+import {toBytes32} from '../../scripts/utils/helpers';
 
 import Registrable from '../../artifacts/contracts/extensions/Registrable.sol/Registrable.json';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
