@@ -9,7 +9,7 @@ const web3 = hre.web3;
 
 const provider = getProvider();
 
-const registry = new hre.ethers.Contract(configuration().contractRegistry.address, Registry.abi, provider);
+const registry = new ethers.Contract(configuration().contractRegistry.address, Registry.abi, provider);
 
 let chain: Contract;
 
@@ -28,16 +28,18 @@ const mineBlock = async () => {
 
 const minting = async (blockTime: string | undefined) => {
   if (!blockTime) {
-    throw Error('please setup .env with `LOCAL_BLOCK_TIME`.');
+    blockTime = '1';
+    console.log('\n➡➡➡➡️ default time for block is set to', blockTime,
+      'You can configure it using LOCAL_BLOCK_TIME in .env.\n');
   }
 
-  chain = new hre.ethers.Contract(await registry.getAddressByString('Chain'), Chain.abi, provider);
+  chain = new ethers.Contract(await registry.getAddressByString('Chain'), Chain.abi, provider);
 
   console.log(`start minting blocks every ${blockTime} sec... CTRL+C to stop`);
   setInterval(mineBlock, parseInt(blockTime, 10) * 1000);
 };
 
-minting(process.env.LOCAL_BLOCK_TIME)
+minting(process.env.LOCAL_BLOCK_TIME as string)
   .then()
   .catch(error => {
     console.error(error);
