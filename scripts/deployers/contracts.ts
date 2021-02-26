@@ -15,7 +15,7 @@ const provider = getProvider();
 export const deployAllContracts = async (
   registryAddress = '',
   doRegistration = false
-): Promise<{ chain: any; bank: any; validatorRegistry: any; token: any }> => {
+): Promise<{ chain: string; bank: string; validatorRegistry: string; token: string }> => {
   const {VALIDATOR_PK} = process.env;
 
   if (!VALIDATOR_PK) {

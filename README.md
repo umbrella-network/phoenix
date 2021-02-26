@@ -47,17 +47,25 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 
 ### Local
 
-1. Start Ganache
+1. Start Ganache or Hardhat
 
-`npx ganache-cli --blockTime 15` or `npm run node`
+- ganache: `npx ganache-cli --blockTime 15`
+- hardhat (recommended): `npm run node`
 
 2. Deploy to localhost
 
 ```shell script
 npm run deploy:all
 ```
+For sidechain deployment you need `VALIDATOR_PK` to be setup in `.env*`.
+If you do not have it the script will throw error, but also generate random PK for you,
+so you can copy it, set into env file and rerun command.
 
-If you choose hardhat node, then you can use minter for mining blocks:
+⚠️⚠️⚠️  
+**NOTE: _N E V E R_  use this keys in mainnet! For mainnet use dedicated wallets to generate PK.**  
+⚠️⚠️⚠️
+
+If you choose hardhat node, then you can use minter for mining blocks - hardhat not minting automatically:
 
 ```shell
 npm run local-minter
@@ -65,11 +73,13 @@ npm run local-minter
 
 ### Live or Test nets
 
-Setup Infura ID in .env and run:
+Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
 
 ```shell
 npm run deploy:all:[dev|staging|production]
 ```
+
+In case of any errors, please read error message. There should be some tips what's need to be fixed.
 
 ---
 
