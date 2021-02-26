@@ -1,0 +1,18 @@
+.DS_Store
+build/
+coverage.json
+coverage/
+node_modules/
+.idea
+
+.openzeppelin/.session
+
+node_modules
+.env*
+
+#Buidler files
+cache
+artifacts
+
+vr.sol
+flattened_*
