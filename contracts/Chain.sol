@@ -35,6 +35,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   mapping(uint256 => Block) public blocks;
+
   uint256 public blocksCount;
 
   // ========== CONSTRUCTOR ========== //
@@ -239,6 +240,34 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     bytes memory _value
   ) public view returns (bool, uint256) {
     return (verifyProof(_proof, blocks[_blockHeight].root, hashLeaf(_key, _value)), _value.leafTo18DecimalsFloat());
+  }
+
+  function isBlockHasConsensus(uint256 _blockHeight) public view returns (bool) {
+    return blocks[_blockHeight].root != 0;
+  }
+
+  function getBlockRoot(uint256 _blockHeight) public view returns (bytes32) {
+    return blocks[_blockHeight].root;
+  }
+
+  function getBlockMinter(uint256 _blockHeight) public view returns (address) {
+    return blocks[_blockHeight].minter;
+  }
+
+  function getBlockStaked(uint256 _blockHeight) public view returns (uint256) {
+    return blocks[_blockHeight].staked;
+  }
+
+  function getBlockPower(uint256 _blockHeight) public view returns (uint256) {
+    return blocks[_blockHeight].power;
+  }
+
+  function getBlockAnchor(uint256 _blockHeight) public view returns (uint256) {
+    return blocks[_blockHeight].anchor;
+  }
+
+  function getBlockTimestamp(uint256 _blockHeight) public view returns (uint256) {
+    return blocks[_blockHeight].timestamp;
   }
 
   function getBlockVotersCount(uint256 _blockHeight) public view returns (uint256) {

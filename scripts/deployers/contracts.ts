@@ -128,7 +128,7 @@ export const deployAllContracts = async (
     console.log('Chain deployed to:', chain.address);
   }
 
-  // await verifyContract(chain.address, 'Chain', constructorAbi(chainArgsTypes, chainArgs));
+  await verifyContract(chain.address, 'Chain', constructorAbi(chainArgsTypes, chainArgs));
 
   tx = await token.transfer(id, config.token.totalSupply);
   await waitForTx(tx.hash, provider);
