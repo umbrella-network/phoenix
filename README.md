@@ -83,6 +83,12 @@ In case of any errors, please read error message. There should be some tips what
 
 ---
 
+### Update contract
+
+```shell
+npx hardhat run --network localhost ./scripts/deploy-chain.ts
+```
+
 ## TODO
 
 - [ ] Validator Rewards
