@@ -11,6 +11,7 @@ const configuration = (environment = env): Config => {
   case 'local':
     return local;
   case 'dev':
+  case 'development':
     return dev;
   case 'production':
     return production;
