@@ -76,12 +76,19 @@ npm run local-minter
 Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
 
 ```shell
-npm run deploy:all:[dev|staging|production]
+npm run flatten:all && npm run deploy:all:[dev|staging|production]
 ```
 
 In case of any errors, please read error message. There should be some tips what's need to be fixed.
 
 ---
+
+### Update contract
+
+```shell
+npm run flatten:all && npx hardhat run --network localhost ./scripts/deploy-chain.ts
+npm run flatten:all && NODE_ENV=development npx hardhat run --network dev ./scripts/deploy-chain.ts
+```
 
 ## TODO
 

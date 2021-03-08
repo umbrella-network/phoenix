@@ -1,6 +1,8 @@
-const dev = {
+import {Config} from './Config';
+
+const dev: Config = {
   contractRegistry: {
-    address: '0xE62a6C2dF781901E39E1c9E830784dE10787B918'
+    address: '0xE4C2B791F6c76e535e71671C4Ab9d2914Ee42A7b'
   },
   token: {
     totalSupply: '1000000000000000000',

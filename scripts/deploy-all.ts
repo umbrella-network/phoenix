@@ -10,8 +10,6 @@ async function main() {
   if (isLocalNetwork()) {
     console.log('registering contracts...');
     await deployAllContracts(registry.address, true);
-    //await registry.importContracts(Object.values(addresses));
-
     console.log('...done - local network ready.');
   } else {
     console.log('\n⚠️⚠️⚠️⚠️⚠️\n',

@@ -4,7 +4,6 @@ import {BigNumber, Contract, ContractFactory, Signer} from 'ethers';
 import {waffleChai} from '@ethereum-waffle/chai';
 import {deployMockContract} from '@ethereum-waffle/mock-contract';
 
-import {loadFixture} from 'ethereum-waffle';
 import {LeafKeyCoder, LeafType, LeafValueCoder} from '@umb-network/toolbox';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
@@ -23,7 +22,8 @@ use(waffleChai);
 
 const blockPadding = 100;
 
-async function fixture([owner, validator]: Signer[]) {
+const setup = async () => {
+  const [owner, validator] = await ethers.getSigners();
   const token = await deployMockContract(owner, Token.abi);
   const contractRegistry = await deployMockContract(owner, Registry.abi);
   const validatorRegistry = await deployMockContract(owner, ValidatorRegistry.abi);
@@ -42,7 +42,7 @@ async function fixture([owner, validator]: Signer[]) {
     stakingBank,
     contract
   };
-}
+};
 
 const inputs: Record<string, Buffer> = {};
 
@@ -110,7 +110,7 @@ describe('Chain', () => {
       validatorRegistry,
       stakingBank,
       contract
-    } = await loadFixture(fixture));
+    } = await setup());
   });
 
   describe('when deployed', () => {
@@ -290,7 +290,10 @@ describe('Chain', () => {
 
         it('expect to get FCD', async () => {
           const bytes32 = `0x${'0'.repeat(64)}`;
-          expect(await contract.getMultipleNumericData(0, [bytes32])).to.eql([BigNumber.from(0)]);
+          const fcds = await contract.getNumericFCDs(0, [bytes32]);
+          console.log(fcds);
+          expect(fcds[0]).to.eql([BigNumber.from(0)]);
+          expect(fcds.timestamp).to.gt(0);
         });
 
         describe('verify Proof', () => {
@@ -381,8 +384,10 @@ describe('Chain', () => {
         });
 
         it('expect to get First Class Data', async () => {
-          expect(await contract.getMultipleNumericData(0, [fcdKeys[0]])).to.eql([BigNumber.from(fcdValues[0])]);
-          expect(await contract.getSingleNumericData(0, fcdKeys[0])).to.eql(BigNumber.from(fcdValues[0]));
+          const fcds = await contract.getNumericFCDs(0, [fcdKeys[0]]);
+          console.log(fcds);
+          expect(fcds[0]).to.eql([BigNumber.from(fcdValues[0])]);
+          expect(fcds.timestamp).to.gt(0);
         });
 
         it('expect to validate proof for selected key-value pair', async () => {

@@ -45,12 +45,6 @@ const config: HardhatUserConfig = {
       chainId: 42,
       gasPrice: 1000000000
     },
-    staging: {
-      url: `https://ropsten.infura.io/v3/${INFURA_ID}`,
-      accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
-      chainId: 3,
-      gasPrice: 1000000000
-    },
     production: {
       url: `https://ropsten.infura.io/v3/${INFURA_ID}`,
       accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
