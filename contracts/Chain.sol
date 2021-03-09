@@ -12,6 +12,7 @@ import "./interfaces/IStakingBank.sol";
 import "./interfaces/IValidatorRegistry.sol";
 
 import "./extensions/Registrable.sol";
+import "./Registry.sol";
 
 contract Chain is ReentrancyGuard, Registrable, Ownable {
   using SafeMath for uint256;
@@ -42,11 +43,19 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   mapping(uint256 => ExtendedBlock) public blocks;
 
   uint256 public blocksCount;
+  uint256 public blocksCountOffset;
 
   // ========== CONSTRUCTOR ========== //
 
   constructor(address _contractRegistry, uint256 _blockPadding) public Registrable(_contractRegistry) {
     blockPadding = _blockPadding;
+
+    Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
+
+    if (address(oldChain) != address(0x0)) {
+      // +1 because it might be situation when tx is already in progress in old contract
+      blocksCountOffset = oldChain.blocksCount() + oldChain.blocksCountOffset() + 1;
+    }
   }
 
   // ========== MUTATIVE FUNCTIONS ========== //
@@ -132,7 +141,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function getBlockHeight() public view returns (uint256) {
-    uint _blocksCount = blocksCount;
+    uint _blocksCount = blocksCount + blocksCountOffset;
 
     if (_blocksCount == 0) {
       return 0;
@@ -143,6 +152,10 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     }
 
     return _blocksCount - 1;
+  }
+
+  function getLatestBlockHeightWithData() public view returns (uint256) {
+    return blocksCount + blocksCountOffset - 1;
   }
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
@@ -307,9 +320,9 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     }
   }
 
-  function getCurrentValue(bytes32 _key) public view returns (uint256 value, uint timestamp) {
+  function getCurrentValue(bytes32 _key) external view returns (uint256 value, uint timestamp) {
     // it will revert when no blocks
-    return getNumericFCD(blocksCount - 1, _key);
+    return getNumericFCD(getLatestBlockHeightWithData(), _key);
   }
 
   // ========== EVENTS ========== //

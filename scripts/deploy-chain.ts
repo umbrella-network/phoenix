@@ -7,6 +7,7 @@ const config = configuration();
 
 const deployAndRegister = async () => {
   const chain = await deployChain(config.contractRegistry.address);
+  console.log('Chain updated:', chain.address);
   await registerContract([chain.address]);
 };
 
