@@ -1,16 +1,22 @@
+import {Config} from './Config';
+
 const env = process.env.NODE_ENV || 'local';
 
 import local from './local';
 import dev from './dev';
-import staging from './staging';
 import production from './production';
 
-const configuration = (environment = env): any => {
+const configuration = (environment = env): Config => {
   switch (environment) {
-  case 'local': return local;
-  case 'dev': return dev;
-  case 'staging': return staging;
-  case 'production': return production;
+  case 'local':
+    return local;
+  case 'dev':
+  case 'development':
+    return dev;
+  case 'production':
+    return production;
+  default:
+    throw Error(`invalid environment: ${environment}`);
   }
 };
 

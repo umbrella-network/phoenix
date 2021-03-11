@@ -1,5 +1,5 @@
 import superagent from 'superagent';
-import {sleep} from './helpers';
+import {isLocalNetwork, sleep} from './helpers';
 import fs from 'fs';
 
 const netName = (): string | undefined => {
@@ -27,15 +27,20 @@ export const verifyContract = async (
   contractname: string,
   constructorArguements: string
 ): Promise<void> => {
+  if (isLocalNetwork()) {
+    return;
+  }
+
   if (!process.env.ETHERSCAN_API) {
     throw Error('missing process.env.ETHERSCAN_API');
   }
 
   console.log('VERIFY CONTRACT', contractname);
-  console.log('API call...');
+  console.log('doing API call...');
   let notok = true;
 
   const network = netName();
+
   if (network === undefined) {
     console.log('NODE_ENV not set....');
     return;
@@ -43,7 +48,7 @@ export const verifyContract = async (
 
   //Submit Source Code for Verification
   while (notok) {
-    console.log('wait 5sec...');
+    console.log('waiting 5sec...');
     await sleep(5000);
 
     const response = await superagent

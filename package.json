@@ -1,6 +1,6 @@
 {
   "name": "phoenix",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A proof-of-stake contract for minting sidechain blocks.",
   "main": "hardhat.config.ts",
   "directories": {
@@ -14,15 +14,12 @@
     "block-listener": "npx hardhat run --network localhost scripts/block-listener.ts",
     "deploy:registry": "npx hardhat run --network localhost scripts/deploy-registry.ts",
     "deploy:registry:dev": "NODE_ENV=dev npx hardhat run --network dev scripts/deploy-registry.ts",
-    "deploy:registry:staging": "NODE_ENV=staging npx hardhat run --network staging scripts/deploy-registry.ts",
     "deploy:registry:production": "NODE_ENV=production npx hardhat run --network production scripts/deploy-registry.ts",
     "deploy:contracts": "npx hardhat run --network localhost scripts/deploy-contracts.ts",
     "deploy:contracts:dev": "NODE_ENV=dev npx hardhat run --network dev scripts/deploy-contracts.ts",
-    "deploy:contracts:staging": "NODE_ENV=staging npx hardhat run --network staging scripts/deploy-contracts.ts",
     "deploy:contracts:production": "NODE_ENV=production npx hardhat run --network production scripts/deploy-contracts.ts",
     "deploy:all": "npx hardhat run --network localhost scripts/deploy-all.ts",
     "deploy:all:dev": "NODE_ENV=dev npx hardhat run --network dev scripts/deploy-all.ts",
-    "deploy:all:staging": "NODE_ENV=staging npx hardhat run --network staging scripts/deploy-all.ts",
     "deploy:all:production": "NODE_ENV=production npx hardhat run --network production scripts/deploy-all.ts",
     "flatten:token": "npx truffle-flattener ./contracts/Token.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > flattened_Token.sol",
     "flatten:validator": "npx truffle-flattener ./contracts/ValidatorRegistry.sol | awk '/SPDX-License-Identifier/&&c++>0 {next} 1' > flattened_ValidatorRegistry.sol",
@@ -48,7 +45,7 @@
     "@ethereum-waffle/chai": "^3.1.1",
     "@ethereum-waffle/mock-contract": "^3.1.1",
     "@ethereum-waffle/provider": "^3.1.1",
-    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-solhint": "2.0.0",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
@@ -69,9 +66,10 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
+    "ethers": "^5.0.32",
     "ethereum-waffle": "^3.2.2",
     "ganache-cli": "^6.12.1",
-    "hardhat": "^2.0.10",
+    "hardhat": "^2.1.1",
     "hardhat-deploy": "^0.7.0-beta.45",
     "hardhat-deploy-ethers": "^0.3.0-beta.7",
     "hardhat-gas-reporter": "^1.0.4",
@@ -84,8 +82,5 @@
     "ts-node": "^9.1.1",
     "typescript": "^4.1.5",
     "web3": "^1.3.0"
-  },
-  "engines": {
-    "node": "10.22.1"
   }
 }

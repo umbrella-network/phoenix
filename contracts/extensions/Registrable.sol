@@ -1,8 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.6.8;
 
-import "hardhat/console.sol";
-
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IRegistry.sol";
 import "../interfaces/IStakingBank.sol";

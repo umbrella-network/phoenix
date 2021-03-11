@@ -2,6 +2,7 @@ require('custom-env').env(); // eslint-disable-line
 
 import {verifyContract} from '../utils/verifyContract';
 import {ethers} from 'hardhat';
+import {Contract} from 'ethers';
 
 import configuration from '../../config';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
@@ -11,6 +12,33 @@ const {BigNumber} = ethers;
 
 const config = configuration();
 const provider = getProvider();
+
+export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
+  console.log('deploying Chain...');
+  const ChainContract = await ethers.getContractFactory('Chain');
+  const chainArgs = [contractRegistryAddress, config.chain.blockPadding];
+  const chainArgsTypes = ['address', 'uint256'];
+
+  const chain = await ChainContract.deploy(...chainArgs);
+  await chain.deployed();
+
+  await verifyContract(chain.address, 'Chain', constructorAbi(chainArgsTypes, chainArgs));
+
+  return chain;
+};
+
+let contractRegistry: Contract;
+
+export const registerContract = async (addresses: string[]): Promise<void> => {
+  if (!contractRegistry) {
+    const [owner] = await ethers.getSigners();
+    contractRegistry = new ethers.Contract(config.contractRegistry.address, Registry.abi, provider).connect(owner);
+  }
+
+  const tx = await contractRegistry.importContracts(addresses);
+  await waitForTx(tx.hash, provider);
+  console.log('contracts registered');
+};
 
 export const deployAllContracts = async (
   registryAddress = '',
@@ -29,7 +57,6 @@ export const deployAllContracts = async (
     throw new Error('contractRegistryAddress is empty');
   } else {
     console.log('CONTRACT REGISTRY ADDRESS:', contractRegistryAddress);
-
   }
 
   let contractRegistry;
@@ -67,8 +94,7 @@ export const deployAllContracts = async (
 
   if (contractRegistry) {
     console.log('registering test token...');
-    tx = await contractRegistry.importContracts([token.address]);
-    await waitForTx(tx.hash, provider);
+    await registerContract([token.address]);
     console.log('Token registered:', await contractRegistry.getAddressByString('UMB'));
   } else {
     console.log('Token deployed to:', token.address);
@@ -95,40 +121,28 @@ export const deployAllContracts = async (
   const StakingBankContract = await ethers.getContractFactory('StakingBank');
 
   const stakingBankArgs = [contractRegistryAddress, config.token.name, config.token.symbol];
-  const stakingBankArgsTypes = ['address', 'string','string'];
+  const stakingBankArgsTypes = ['address', 'string', 'string'];
 
   const stakingBank = await StakingBankContract.deploy(...stakingBankArgs);
   await stakingBank.deployed();
 
   if (contractRegistry) {
-    tx = await contractRegistry.importContracts([stakingBank.address]);
-    await waitForTx(tx.hash, provider);
-    const name = await stakingBank.getName();
-    console.log(name);
-    console.log('stakingBank registered', await contractRegistry.getAddress(name));
+    await registerContract([stakingBank.address]);
+    console.log('stakingBank registered', await contractRegistry.getAddress(await stakingBank.getName()));
   } else {
     console.log('StakingBank deployed to:', stakingBank.address);
   }
 
   await verifyContract(stakingBank.address, 'StakingBank', constructorAbi(stakingBankArgsTypes, stakingBankArgs));
 
-  console.log('deploying Chain...');
-  const ChainContract = await ethers.getContractFactory('Chain');
-  const chainArgs = [contractRegistryAddress, config.chain.blockPadding];
-  const chainArgsTypes = ['address', 'uint256'];
-
-  const chain = await ChainContract.deploy(...chainArgs);
-  await chain.deployed();
+  const chain = await deployChain(contractRegistryAddress);
 
   if (contractRegistry) {
-    tx = await contractRegistry.importContracts([chain.address]);
-    await waitForTx(tx.hash, provider);
+    await registerContract([chain.address]);
     console.log('chain registered', await contractRegistry.getAddress(await chain.getName()));
   } else {
     console.log('Chain deployed to:', chain.address);
   }
-
-  // await verifyContract(chain.address, 'Chain', constructorAbi(chainArgsTypes, chainArgs));
 
   tx = await token.transfer(id, config.token.totalSupply);
   await waitForTx(tx.hash, provider);
