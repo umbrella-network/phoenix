@@ -8,6 +8,9 @@ import {LeafKeyCoder, LeafValueCoder, LeafType} from '@umb-network/toolbox';
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
 
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
+import {deployMockContract} from '@ethereum-waffle/mock-contract';
+import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
+import {toBytes32} from '../../scripts/utils/helpers';
 
 use(waffleChai);
 
@@ -16,9 +19,11 @@ describe('Tree', () => {
 
   before(async () => {
     const [owner] = await ethers.getSigners();
-    const contractFactory = new ContractFactory(Chain.abi, Chain.bytecode, owner);
+    const contractRegistry = await deployMockContract(owner, Registry.abi);
+    const chain = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
-    contract = await contractFactory.deploy('0x0000000000000000000000000000000000000001', 1);
+    await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(ethers.constants.AddressZero);
+    contract = await chain.deploy(contractRegistry.address, 1);
   });
 
   describe('hashLeaf()', () => {

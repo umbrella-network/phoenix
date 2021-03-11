@@ -86,8 +86,9 @@ In case of any errors, please read error message. There should be some tips what
 ### Update contract
 
 ```shell
-npm run flatten:all && npx hardhat run --network localhost ./scripts/deploy-chain.ts
-npm run flatten:all && NODE_ENV=development npx hardhat run --network dev ./scripts/deploy-chain.ts
+hardhat compile && npm run flatten:chain && npx hardhat run --network localhost ./scripts/deploy-chain.ts
+hardhat compile && npm run flatten:chain && NODE_ENV=development npx hardhat run --network dev ./scripts/deploy-chain.ts
+hardhat compile && npm run flatten:chain && NODE_ENV=production npx hardhat run --network production ./scripts/deploy-chain.ts
 ```
 
 ## TODO

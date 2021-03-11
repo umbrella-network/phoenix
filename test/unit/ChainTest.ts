@@ -30,6 +30,7 @@ const setup = async () => {
   const stakingBank = await deployMockContract(owner, StakingBank.abi);
   const contractFactory = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
+  await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(ethers.constants.AddressZero);
   const contract = await contractFactory.deploy(contractRegistry.address, blockPadding);
 
   return {
