@@ -15,6 +15,7 @@ import ValidatorRegistry
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import {toBytes32} from '../../scripts/utils/helpers';
+import {mintBlocks} from "../utils";
 
 const {toWei} = hre.web3.utils;
 
@@ -41,7 +42,8 @@ const setup = async () => {
     contractRegistry,
     validatorRegistry,
     stakingBank,
-    contract
+    contract,
+    contractFactory
   };
 };
 
@@ -84,7 +86,7 @@ const prepareData = async (
 describe('Chain', () => {
   let owner: Signer, validator: Signer, validatorAddress: string,
     contractRegistry: Contract, validatorRegistry: Contract, stakingBank: Contract,
-    contract: Contract;
+    contract: Contract, contractFactory: ContractFactory;
 
   const mockSubmit = async (
     leader = validator,
@@ -110,7 +112,8 @@ describe('Chain', () => {
       contractRegistry,
       validatorRegistry,
       stakingBank,
-      contract
+      contract,
+      contractFactory
     } = await setup());
   });
 
@@ -399,6 +402,39 @@ describe('Chain', () => {
           expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
         });
       });
+    });
+  });
+
+  describe('update/replace contract', () => {
+    let newChain: Contract;
+
+    beforeEach(async () => {
+      await mockSubmit();
+      let {r, s, v} = await prepareData(validator, 0, root);
+      await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+
+      await mintBlocks(blockPadding);
+
+      await mockSubmit();
+      ({r, s, v} = await prepareData(validator, 1, root));
+      await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+
+      await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(contract.address);
+      newChain = await contractFactory.deploy(contractRegistry.address, blockPadding);
+    });
+
+    it('expect to have no blocks', async () => {
+      expect(await newChain.blocksCount()).to.eq(0);
+    });
+
+    it('expect to have offset', async () => {
+      expect(await newChain.blocksCountOffset()).to.eq(2+1);
+    });
+
+    it('expect to have valid block height', async () => {
+      expect(await contract.getBlockHeight()).to.eq(1);
+      await mintBlocks(blockPadding);
+      expect(await contract.getBlockHeight()).to.eq(2);
     });
   });
 });
