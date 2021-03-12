@@ -27,6 +27,16 @@ export const deployChain = async (contractRegistryAddress: string): Promise<Cont
   return chain;
 };
 
+export const deployValidatorRegistry = async (): Promise<Contract> => {
+  console.log('deploying ValidatorRegistry...');
+  const ValidatorRegistryContract = await ethers.getContractFactory('ValidatorRegistry');
+  const validatorRegistry = await ValidatorRegistryContract.deploy();
+  await validatorRegistry.deployed();
+
+  await verifyContract(validatorRegistry.address, 'ValidatorRegistry', '');
+  return validatorRegistry;
+};
+
 let contractRegistry: Contract;
 
 export const registerContract = async (addresses: string[]): Promise<void> => {
@@ -114,10 +124,7 @@ export const deployAllContracts = async (
 
   await verifyContract(token.address, 'Token', '');
 
-  console.log('deploying ValidatorRegistry...');
-  const ValidatorRegistryContract = await ethers.getContractFactory('ValidatorRegistry');
-  const validatorRegistry = await ValidatorRegistryContract.deploy();
-  await validatorRegistry.deployed();
+  const validatorRegistry = await deployValidatorRegistry();
 
   if (contractRegistry) {
     const tx = await contractRegistry.importAddresses([toBytes32('ValidatorRegistry')], [validatorRegistry.address]);
@@ -126,8 +133,6 @@ export const deployAllContracts = async (
   } else {
     console.log('ValidatorRegistry deployed to:', validatorRegistry.address);
   }
-
-  await verifyContract(validatorRegistry.address, 'ValidatorRegistry', '');
 
   console.log('deploying StakingBank...');
   const StakingBankContract = await ethers.getContractFactory('StakingBank');
