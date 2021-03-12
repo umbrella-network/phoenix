@@ -12,7 +12,7 @@ import 'hardhat-gas-reporter';
 
 import {HardhatUserConfig} from 'hardhat/types';
 
-const { INFURA_ID, DEPLOYER_PK } = process.env;
+const {INFURA_ID, DEPLOYER_PK, HARDHAT_MINING_AUTO = 'true', HARDHAT_MINING_INTERVAL = '5000'} = process.env;
 
 const balance = '1000' + '0'.repeat(18);
 
@@ -35,9 +35,14 @@ const config: HardhatUserConfig = {
         {balance, privateKey: '0x275cc4a2bfd4f612625204a20a2280ab53a6da2d14860c47a9f5affe58ad86d4'},
         {balance, privateKey: '0xee9d129c1997549ee09c0757af5939b2483d80ad649a0eda68e8b0357ad11131'}
       ],
+      mining: {
+        auto: HARDHAT_MINING_AUTO === 'true',
+        interval: parseInt(HARDHAT_MINING_INTERVAL, 10),
+      },
     },
     localhost: {
       blockGasLimit: 80000000,
+      url: 'ws://localhost:8545',
     },
     dev: {
       url: `https://kovan.infura.io/v3/${INFURA_ID}`,
@@ -53,10 +58,6 @@ const config: HardhatUserConfig = {
     },
     docker: {
       url: 'http://eth:8545',
-      mining: {
-        auto: false,
-        interval: 5000,
-      },
     },
   },
   gasReporter: {

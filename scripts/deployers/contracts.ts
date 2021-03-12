@@ -85,7 +85,9 @@ export const deployAllContracts = async (
       if (balance.toString() === '0') {
         console.log('sending ETH to validator');
         const ownerBalance = await owner.getBalance();
-        const tx = await owner.sendTransaction({to: wallet.address, value: ownerBalance.div(2).toHexString()});
+
+        const tx = await owner.sendTransaction(
+          {to: wallet.address, value: ownerBalance.div(validators.length + 1).toHexString()});
         await waitForTx(tx.hash, provider);
       }
     }
@@ -154,7 +156,7 @@ export const deployAllContracts = async (
     console.log('Chain deployed to:', chain.address);
   }
 
-  for (const {wallet, location} of validators) {
+  await Promise.all(validators.map(async ({wallet, location}) => {
     const tokenAmount = BigNumber.from(config.token.totalSupply).div(validators.length);
 
     let tx = await token.transfer(wallet.address, tokenAmount);
@@ -169,14 +171,13 @@ export const deployAllContracts = async (
     tx = await token.connect(wallet).approve(stakingBank.address, tokenAmount);
     await waitForTx(tx.hash, provider);
 
-
     console.log('...receiveApproval...');
     tx = await stakingBank.receiveApproval(wallet.address, tokenAmount, 0);
     await waitForTx(tx.hash, provider);
 
     console.log('validator balance:', (await token.balanceOf(wallet.address)).toString());
     console.log('staked balance:', (await stakingBank.balanceOf(wallet.address)).toString());
-  }
+  }));
 
   const leader = await chain.getLeaderAddress();
   console.log('Current leader: ' + leader);

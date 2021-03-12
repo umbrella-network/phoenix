@@ -1,16 +1,11 @@
 FROM node:15-alpine
+
 RUN apk add bash python make g++
-RUN adduser -D runner
-RUN mkdir -p /home/runner/app
-WORKDIR /home/runner/app
+
+WORKDIR /app
 
 COPY package*.json ./
 COPY tsconfig.json ./
-
-RUN npm install -g typescript
-RUN chown -R runner:runner /home/runner
-
-USER runner
 
 RUN npm install
 
