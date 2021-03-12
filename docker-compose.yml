@@ -1,0 +1,24 @@
+version: "3"
+services:
+  eth:
+    build: .
+    container_name: phoenix-eth
+    ports:
+      - "8545:8545"
+    env_file: .env
+    entrypoint: npm run node
+    networks:
+      - umbrella-network
+  deployer:
+    build: .
+    container_name: phoenix-deployer
+    env_file: .env
+    entrypoint: npx hardhat run --network docker scripts/deploy-all.ts
+    networks:
+      - umbrella-network
+    depends_on:
+      - eth
+networks:
+  umbrella-network:
+    name: umbrella-network
+
