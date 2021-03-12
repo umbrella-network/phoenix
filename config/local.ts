@@ -1,4 +1,5 @@
-import {Config} from './Config';
+import {Config} from './types';
+import {readValidators} from './utils';
 
 const local: Config = {
   contractRegistry: {
@@ -12,11 +13,7 @@ const local: Config = {
   chain: {
     blockPadding: 6
   },
-  validators: [
-    {
-      location: 'http://localhost:3000'
-    }
-  ]
+  validators: readValidators('http://localhost:3000'),
 };
 
 export default local;
