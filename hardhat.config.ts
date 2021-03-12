@@ -35,10 +35,6 @@ const config: HardhatUserConfig = {
         {balance, privateKey: '0x275cc4a2bfd4f612625204a20a2280ab53a6da2d14860c47a9f5affe58ad86d4'},
         {balance, privateKey: '0xee9d129c1997549ee09c0757af5939b2483d80ad649a0eda68e8b0357ad11131'}
       ],
-      mining: {
-        auto: false,
-        interval: 2000,
-      },
     },
     localhost: {
       blockGasLimit: 80000000,
