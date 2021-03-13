@@ -1,0 +1,27 @@
+version: "3"
+services:
+  eth:
+    build: .
+    container_name: phoenix-eth
+    ports:
+      - "8545:8545"
+    env_file: .env
+    environment:
+      - HARDHAT_MINING_AUTO=false
+      - HARDHAT_MINING_INTERVAL=2000
+    entrypoint: npx hardhat node
+    networks:
+      - umbrella-network
+  deployer:
+    build: .
+    container_name: phoenix-deployer
+    env_file: .env
+    entrypoint: npx hardhat run scripts/deploy-all.ts --network docker
+    networks:
+      - umbrella-network
+    depends_on:
+      - eth
+networks:
+  umbrella-network:
+    name: umbrella-network
+

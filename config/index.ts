@@ -1,10 +1,10 @@
-import {Config} from './Config';
-
-const env = process.env.NODE_ENV || 'local';
+import {Config} from './types';
 
 import local from './local';
 import dev from './dev';
 import production from './production';
+
+const env = process.env.NODE_ENV || 'local';
 
 const configuration = (environment = env): Config => {
   switch (environment) {

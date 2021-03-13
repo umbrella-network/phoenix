@@ -14,14 +14,10 @@ export const constructorAbi = (types: string[], values: any[]): string => {
   return ethers.utils.defaultAbiCoder.encode(types, values).replace('0x', '');
 };
 
-export const isLocalNetwork = (): boolean => ['buidlerevm', 'localhost'].includes(hre.network.name);
+export const isLocalNetwork = (): boolean => ['buidlerevm', 'localhost', 'docker'].includes(hre.network.name);
 
 export const getProvider = (): Provider => {
-  if (isLocalNetwork()) {
-    return new ethers.providers.WebSocketProvider('ws://localhost:8545');
-  } else {
-    return new ethers.providers.JsonRpcProvider((<HttpNetworkUserConfig>hre.config.networks[hre.network.name]).url);
-  }
+  return new ethers.providers.JsonRpcProvider((<HttpNetworkUserConfig>hre.config.networks[hre.network.name]).url);
 };
 
 export const waitForTx = async (txHash: string, provider: Provider): Promise<void> => {

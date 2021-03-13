@@ -1,4 +1,5 @@
-import {Config} from './Config';
+import {Config} from './types';
+import {readValidators} from './utils';
 
 const dev: Config = {
   contractRegistry: {
@@ -12,11 +13,7 @@ const dev: Config = {
   chain: {
     blockPadding: 6
   },
-  validators: [
-    {
-      location: 'https://validator-dev.umb.network'
-    }
-  ]
+  validators: readValidators('https://validator-dev.umb.network'),
 };
 
 export default dev;
