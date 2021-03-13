@@ -1,4 +1,4 @@
-export interface Validator {
+export interface ValidatorConfig {
   location: string;
   privateKey: string;
 }
@@ -15,5 +15,5 @@ export interface Config {
   chain: {
     blockPadding: number
   },
-  validators: Validator[],
+  validators: ValidatorConfig[],
 }

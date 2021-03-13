@@ -86,13 +86,13 @@ In case of any errors, please read error message. There should be some tips what
 ### Update contract
 
 ```shell
-hardhat compile && npm run flatten:chain && npx hardhat run --network localhost ./scripts/deploy-chain.ts
-hardhat compile && npm run flatten:chain && NODE_ENV=development npx hardhat run --network dev ./scripts/deploy-chain.ts
-hardhat compile && npm run flatten:chain && NODE_ENV=production npx hardhat run --network production ./scripts/deploy-chain.ts
+hardhat compile && npx hardhat run --network localhost ./scripts/deployChain.ts
+hardhat compile && npm run flatten:chain && NODE_ENV=development npx hardhat run --network dev ./scripts/deployChain.ts
+hardhat compile && npm run flatten:chain && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
 
-hardhat compile && npm run flatten:validator && npx hardhat run --network localhost ./scripts/deploy-validator-registry.ts
-hardhat compile && npm run flatten:validator && NODE_ENV=development npx hardhat run --network dev ./scripts/deploy-validator-registry.ts
-hardhat compile && npm run flatten:validator && NODE_ENV=production npx hardhat run --network production ./scripts/deploy-validator-registry.ts
+hardhat compile && npx hardhat run --network localhost ./scripts/reDeployValidatorRegistry.ts
+hardhat compile && npm run flatten:validator && NODE_ENV=development npx hardhat run --network dev ./scripts/reDeployValidatorRegistry.ts
+hardhat compile && npm run flatten:validator && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployValidatorRegistry.ts
 ```
 
 ### Connect with validators for development and testing

@@ -1,7 +1,7 @@
-import {Validator} from './types';
+import {ValidatorConfig} from './types';
 
-export const readValidators = (defaultLocation: string): Validator[] => {
-  const result: Validator[] = [];
+export const readValidators = (defaultLocation: string): ValidatorConfig[] => {
+  const result: ValidatorConfig[] = [];
 
   const {VALIDATOR_PK, VALIDATOR_LOCATION} = process.env;
 

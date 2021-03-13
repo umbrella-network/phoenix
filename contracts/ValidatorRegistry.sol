@@ -20,10 +20,6 @@ contract ValidatorRegistry is IValidatorRegistry, Ownable {
   event LogValidatorUpdated(address id);
   event LogValidatorRemoved(address id);
 
-  function getName() override external pure returns (bytes32) {
-    return "ValidatorRegistry";
-  }
-
   function create(address _id, string calldata _location) override external onlyOwner {
     Validator storage validator = validators[_id];
 
@@ -64,5 +60,9 @@ contract ValidatorRegistry is IValidatorRegistry, Ownable {
 
   function getNumberOfValidators() override external view returns (uint256) {
     return addresses.length;
+  }
+
+  function getName() override external pure returns (bytes32) {
+    return "ValidatorRegistry";
   }
 }
