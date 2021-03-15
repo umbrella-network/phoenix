@@ -6,7 +6,7 @@ const dev: Config = {
     address: '0x4545e91d2e3647808670DD045eA5f4079B436EbC'
   },
   token: {
-    totalSupply: '1000000000000000000',
+    totalSupply: '1000000' + '0'.repeat(18),
     name: 'Umbrella',
     symbol: 'UMB'
   },
