@@ -30,11 +30,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable {
     return "StakingBank";
   }
 
-  function receiveApproval(
-    address _from,
-    uint256 _value,
-    bytes calldata _data
-  ) override external nonReentrant returns (bool success) {
+  function receiveApproval(address _from) override external nonReentrant returns (bool success) {
     IValidatorRegistry registry = validatorRegistryContract();
     IERC20 token = tokenContract();
 

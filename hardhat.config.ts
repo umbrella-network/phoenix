@@ -42,7 +42,7 @@ const config: HardhatUserConfig = {
     },
     localhost: {
       blockGasLimit: 80000000,
-      url: 'ws://localhost:8545',
+      url: 'http://localhost:8545',
     },
     dev: {
       url: `https://kovan.infura.io/v3/${INFURA_ID}`,

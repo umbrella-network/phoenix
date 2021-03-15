@@ -49,6 +49,12 @@ describe('ValidatorRegistry', () => {
       it('expect addresses() to return validator', async () => {
         expect(await contract.addresses(0)).to.eq(validatorAddress);
       });
+
+      it('expect to be removed', async () => {
+        await expect(contract.remove(validatorAddress))
+          .to.emit(contract, 'LogValidatorRemoved').withArgs(validatorAddress);
+        expect(await contract.getNumberOfValidators()).to.eq(0);
+      });
     });
   });
 });
