@@ -104,6 +104,12 @@ describe('Chain', () => {
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
+  const executeSubmit = async (blockHeight: number) => {
+    await mockSubmit();
+    const {r, s, v} = await prepareData(validator, blockHeight, root);
+    await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+  };
+
   beforeEach(async () => {
     return ({
       owner,
@@ -241,6 +247,42 @@ describe('Chain', () => {
     });
   });
 
+  describe('.getLeaderIndex()', () => {
+    [1, 2, 3, 4].forEach(numberOfValidators => {
+      it(`expect to return valid index for ${numberOfValidators}`, async () => {
+        const id = (await contract.getLeaderIndex(numberOfValidators)).toNumber();
+
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq(id, 'round #1');
+        await mintBlocks(blockPadding);
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 1) % numberOfValidators, 'round #2');
+        await mintBlocks(blockPadding);
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 2) % numberOfValidators, 'round #3');
+        await mintBlocks(blockPadding);
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 3) % numberOfValidators, 'round #4');
+      });
+    });
+
+    describe('when block was minted', () => {
+      beforeEach(async () => {
+        await executeSubmit(0);
+      });
+
+      [1, 2, 3, 4].forEach(numberOfValidators => {
+        it(`expect to return valid index for ${numberOfValidators}`, async () => {
+          const id = (await contract.getLeaderIndex(numberOfValidators)).toNumber();
+
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq(id, 'round #1');
+          await mintBlocks(blockPadding);
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 1) % numberOfValidators, 'round #2');
+          await mintBlocks(blockPadding);
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 2) % numberOfValidators, 'round #3');
+          await mintBlocks(blockPadding);
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 3) % numberOfValidators, 'round #4');
+        });
+      });
+    });
+  });
+
   describe('.submit()', () => {
     describe('without FCD', () => {
       it('expect to mint a block', async () => {
@@ -356,9 +398,7 @@ describe('Chain', () => {
 
             describe('when block mined for new block height', () => {
               beforeEach(async () => {
-                await mockSubmit();
-                const {r, s, v} = await prepareData(validator, 1, root);
-                await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+                await executeSubmit(1);
                 await contract.setBlockPadding(100);
               });
 
@@ -428,7 +468,7 @@ describe('Chain', () => {
     });
 
     it('expect to have offset', async () => {
-      expect(await newChain.blocksCountOffset()).to.eq(2+1);
+      expect(await newChain.blocksCountOffset()).to.eq(2 + 1);
     });
 
     it('expect to have valid block height', async () => {
