@@ -15,6 +15,7 @@ import ValidatorRegistry
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import {toBytes32} from '../../scripts/utils/helpers';
+import {mintBlocks} from '../utils';
 
 const {toWei} = hre.web3.utils;
 
@@ -41,7 +42,8 @@ const setup = async () => {
     contractRegistry,
     validatorRegistry,
     stakingBank,
-    contract
+    contract,
+    contractFactory
   };
 };
 
@@ -84,7 +86,7 @@ const prepareData = async (
 describe('Chain', () => {
   let owner: Signer, validator: Signer, validatorAddress: string,
     contractRegistry: Contract, validatorRegistry: Contract, stakingBank: Contract,
-    contract: Contract;
+    contract: Contract, contractFactory: ContractFactory;
 
   const mockSubmit = async (
     leader = validator,
@@ -102,6 +104,12 @@ describe('Chain', () => {
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
+  const executeSubmit = async (blockHeight: number) => {
+    await mockSubmit();
+    const {r, s, v} = await prepareData(validator, blockHeight, root);
+    await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+  };
+
   beforeEach(async () => {
     return ({
       owner,
@@ -110,7 +118,8 @@ describe('Chain', () => {
       contractRegistry,
       validatorRegistry,
       stakingBank,
-      contract
+      contract,
+      contractFactory
     } = await setup());
   });
 
@@ -238,6 +247,42 @@ describe('Chain', () => {
     });
   });
 
+  describe('.getLeaderIndex()', () => {
+    [1, 2, 3, 4].forEach(numberOfValidators => {
+      it(`expect to return valid index for ${numberOfValidators}`, async () => {
+        const id = (await contract.getLeaderIndex(numberOfValidators)).toNumber();
+
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq(id, 'round #1');
+        await mintBlocks(blockPadding);
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 1) % numberOfValidators, 'round #2');
+        await mintBlocks(blockPadding);
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 2) % numberOfValidators, 'round #3');
+        await mintBlocks(blockPadding);
+        expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 3) % numberOfValidators, 'round #4');
+      });
+    });
+
+    describe('when block was minted', () => {
+      beforeEach(async () => {
+        await executeSubmit(0);
+      });
+
+      [1, 2, 3, 4].forEach(numberOfValidators => {
+        it(`expect to return valid index for ${numberOfValidators}`, async () => {
+          const id = (await contract.getLeaderIndex(numberOfValidators)).toNumber();
+
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq(id, 'round #1');
+          await mintBlocks(blockPadding);
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 1) % numberOfValidators, 'round #2');
+          await mintBlocks(blockPadding);
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 2) % numberOfValidators, 'round #3');
+          await mintBlocks(blockPadding);
+          expect(await contract.getLeaderIndex(numberOfValidators)).to.eq((id + 3) % numberOfValidators, 'round #4');
+        });
+      });
+    });
+  });
+
   describe('.submit()', () => {
     describe('without FCD', () => {
       it('expect to mint a block', async () => {
@@ -353,9 +398,7 @@ describe('Chain', () => {
 
             describe('when block mined for new block height', () => {
               beforeEach(async () => {
-                await mockSubmit();
-                const {r, s, v} = await prepareData(validator, 1, root);
-                await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+                await executeSubmit(1);
                 await contract.setBlockPadding(100);
               });
 
@@ -399,6 +442,39 @@ describe('Chain', () => {
           expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
         });
       });
+    });
+  });
+
+  describe('update/replace contract', () => {
+    let newChain: Contract;
+
+    beforeEach(async () => {
+      await mockSubmit();
+      let {r, s, v} = await prepareData(validator, 0, root);
+      await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+
+      await mintBlocks(blockPadding);
+
+      await mockSubmit();
+      ({r, s, v} = await prepareData(validator, 1, root));
+      await contract.connect(validator).submit(root, [], [], [v], [r], [s]);
+
+      await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(contract.address);
+      newChain = await contractFactory.deploy(contractRegistry.address, blockPadding);
+    });
+
+    it('expect to have no blocks', async () => {
+      expect(await newChain.blocksCount()).to.eq(0);
+    });
+
+    it('expect to have offset', async () => {
+      expect(await newChain.blocksCountOffset()).to.eq(2 + 1);
+    });
+
+    it('expect to have valid block height', async () => {
+      expect(await contract.getBlockHeight()).to.eq(1);
+      await mintBlocks(blockPadding);
+      expect(await contract.getBlockHeight()).to.eq(2);
     });
   });
 });

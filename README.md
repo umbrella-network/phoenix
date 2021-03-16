@@ -9,23 +9,23 @@ A minimum stake quorum must be achieved in order for a sidechain block to be min
 
 1. [brew](http://brew.sh)
 
-  ```sh
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  ```
+```sh
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
 
 2. [HubFlow](http://datasift.github.io/gitflow/)
 
-  ```sh
-  brew install hubflow
-  ```
+```sh
+brew install hubflow
+```
 
 > If you are on Linux
 
-  ```sh
-  git clone https://github.com/datasift/gitflow
-  cd gitflow
-  sudo ./install.sh
-  ```
+```sh
+git clone https://github.com/datasift/gitflow
+cd gitflow
+sudo ./install.sh
+```
 
 ---
 
@@ -76,7 +76,7 @@ npm run local-minter
 Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
 
 ```shell
-npm run flatten:all && npm run deploy:all:[dev|staging|production]
+npm run flatten:all && npm run deploy:all:[dev|production]
 ```
 
 In case of any errors, please read error message. There should be some tips what's need to be fixed.
@@ -86,9 +86,29 @@ In case of any errors, please read error message. There should be some tips what
 ### Update contract
 
 ```shell
-hardhat compile && npm run flatten:chain && npx hardhat run --network localhost ./scripts/deploy-chain.ts
-hardhat compile && npm run flatten:chain && NODE_ENV=development npx hardhat run --network dev ./scripts/deploy-chain.ts
-hardhat compile && npm run flatten:chain && NODE_ENV=production npx hardhat run --network production ./scripts/deploy-chain.ts
+hardhat compile && npx hardhat run --network localhost ./scripts/deployChain.ts
+hardhat compile && npm run flatten:chain && NODE_ENV=development npx hardhat run --network dev ./scripts/deployChain.ts
+hardhat compile && npm run flatten:chain && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
+
+hardhat compile && npx hardhat run --network localhost ./scripts/reDeployValidatorRegistry.ts
+hardhat compile && npm run flatten:validator && NODE_ENV=development npx hardhat run --network dev ./scripts/reDeployValidatorRegistry.ts
+hardhat compile && npm run flatten:validator && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployValidatorRegistry.ts
+```
+
+### Connect with validators for development and testing
+
+```shell
+# start hardhat network with contracts
+docker-compose up
+```
+
+```shell
+# navigate to validator repo
+cd ../pegasus
+
+# start hardhat network with contracts
+echo 'BLOCKCHAIN_PROVIDER_URL=http://eth:8545' >> .env
+docker-compose up
 ```
 
 ## TODO

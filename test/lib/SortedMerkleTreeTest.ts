@@ -54,6 +54,7 @@ describe('Tree', () => {
     });
 
     it('expect to validate proof off-chain', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(tree.verifyProof(tree.getProofForKey(key), tree.getHexRoot()!, tree.getLeafForKey(key))).to.be.true;
     });
 

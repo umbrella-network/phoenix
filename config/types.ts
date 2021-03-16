@@ -1,4 +1,9 @@
-export type Config = {
+export interface ValidatorConfig {
+  location: string;
+  privateKey: string;
+}
+
+export interface Config {
   contractRegistry: {
     address: string
   },
@@ -10,9 +15,5 @@ export type Config = {
   chain: {
     blockPadding: number
   },
-  validators: [
-    {
-      location: string
-    }
-  ]
-};
+  validators: ValidatorConfig[],
+}

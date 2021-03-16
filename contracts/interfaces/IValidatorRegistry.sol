@@ -11,4 +11,6 @@ interface IValidatorRegistry {
   function validators(address _id) external view returns (address id, string memory location);
 
   function getNumberOfValidators() external view returns (uint256);
+
+  function getName() external pure returns (bytes32);
 }

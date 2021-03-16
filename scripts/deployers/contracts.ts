@@ -2,16 +2,21 @@ require('custom-env').env(); // eslint-disable-line
 
 import {verifyContract} from '../utils/verifyContract';
 import {ethers} from 'hardhat';
-import {Contract} from 'ethers';
+import {Contract, Wallet, BigNumber} from 'ethers';
 
 import configuration from '../../config';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import {constructorAbi, getProvider, isLocalNetwork, toBytes32, waitForTx} from '../utils/helpers';
 
-const {BigNumber} = ethers;
-
 const config = configuration();
 const provider = getProvider();
+
+interface Validator {
+  wallet: Wallet,
+  location: string,
+  balance: BigNumber,
+  privateKey: string
+}
 
 export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
   console.log('deploying Chain...');
@@ -27,6 +32,16 @@ export const deployChain = async (contractRegistryAddress: string): Promise<Cont
   return chain;
 };
 
+export const deployValidatorRegistry = async (): Promise<Contract> => {
+  console.log('deploying ValidatorRegistry...');
+  const ValidatorRegistryContract = await ethers.getContractFactory('ValidatorRegistry');
+  const validatorRegistry = await ValidatorRegistryContract.deploy();
+  await validatorRegistry.deployed();
+
+  await verifyContract(validatorRegistry.address, 'ValidatorRegistry', '');
+  return validatorRegistry;
+};
+
 let contractRegistry: Contract;
 
 export const registerContract = async (addresses: string[]): Promise<void> => {
@@ -40,15 +55,41 @@ export const registerContract = async (addresses: string[]): Promise<void> => {
   console.log('contracts registered');
 };
 
+export const registerValidator = async (
+  validatorRegistry: Contract,
+  stakingBank: Contract,
+  token: Contract,
+  validatorId: number
+): Promise<void> => {
+  const validator = config.validators[validatorId];
+  const validatorWallet = new ethers.Wallet(validator.privateKey, provider);
+  const id = await validatorWallet.getAddress();
+
+  let tx = await validatorRegistry.create(id, validator.location);
+  await waitForTx(tx.hash, provider);
+
+  const validatorData = await validatorRegistry.validators(id);
+  console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
+
+  console.log('setting up staking...');
+  tx = await token.mintApproveAndStake(stakingBank.address, id, `${validatorId+1}${'0'.repeat(18)}`);
+  await waitForTx(tx.hash, provider);
+
+  console.log('validator balance:', (await token.balanceOf(id)).toString());
+  console.log('staked balance:', (await stakingBank.balanceOf(id)).toString());
+};
+
 export const deployAllContracts = async (
   registryAddress = '',
   doRegistration = false
-): Promise<{ chain: any; bank: any; validatorRegistry: any; token: any }> => {
-  const {VALIDATOR_PK} = process.env;
-
-  if (!VALIDATOR_PK) {
-    console.log('random PK', ethers.Wallet.createRandom().privateKey);
-    throw new Error('please setup VALIDATOR_PK in .env');
+): Promise<{ chain: string; bank: string; validatorRegistry: string; token: string }> => {
+  if (!config.validators.length) {
+    console.log('random PK', ethers.Wallet.createRandom({
+      extraEntropy: Buffer.from(Math.random().toString(10))
+    }).privateKey);
+    throw new Error(
+      'please setup (VALIDATOR_PK, VALIDATOR_LOCATION) or (VALIDATOR_?_PK, VALIDATOR_?_LOCATION) in .env'
+    );
   }
 
   const contractRegistryAddress = registryAddress || config.contractRegistry.address;
@@ -67,29 +108,40 @@ export const deployAllContracts = async (
     contractRegistry = new ethers.Contract(contractRegistryAddress, Registry.abi, provider).connect(owner);
   }
 
-  const validatorWallet = new ethers.Wallet(VALIDATOR_PK, provider);
-  const id = await validatorWallet.getAddress();
+  console.log(config.validators);
 
-  const balance = await validatorWallet.getBalance();
-  console.log('validator ETH balance:', balance.toString());
-  let tx;
+  const validators: Validator[] = await Promise.all(config.validators.map(async ({privateKey, location}) => {
+    const wallet = new ethers.Wallet(privateKey, provider);
+    const balance = await wallet.getBalance();
+    console.log(`validator ${wallet.address} ETH balance:`, balance.toString());
+
+    return {location, wallet, balance, privateKey};
+  }));
 
   if (isLocalNetwork()) {
-    if (balance.toString() === '0') {
-      console.log('sending ETH to validator');
-      const ownerBalance = await owner.getBalance();
-      tx = await owner.sendTransaction({to: id, value: ownerBalance.div(2).toHexString()});
-      await waitForTx(tx.hash, provider);
+    for (const {balance, wallet} of validators) {
+      if (balance.toString() === '0') {
+        console.log('sending ETH to validator');
+        const ownerBalance = await owner.getBalance();
+
+        const tx = await owner.sendTransaction(
+          {to: wallet.address, value: ownerBalance.div(validators.length + 1).toHexString()});
+        await waitForTx(tx.hash, provider);
+      }
     }
   } else {
-    if (balance.lt(BigNumber.from('10000000000000000'))) {
-      throw Error(`validator ${validatorWallet.address} does not have enough ETH`);
-    }
+    validators.forEach(({balance, wallet}) => {
+      if (balance.lt(BigNumber.from('10000000000000000'))) {
+        throw Error(`validator ${wallet.address} does not have enough ETH`);
+      }
+    });
   }
 
   console.log('deploying test token...');
   const TokenContract = await ethers.getContractFactory('Token');
-  const token = await TokenContract.deploy(config.token.name, config.token.symbol, config.token.totalSupply);
+  const tokenTypes = ['string', 'string'];
+  const tokenArgs = [config.token.name, config.token.symbol];
+  const token = await TokenContract.deploy(...tokenArgs);
   await token.deployed();
 
   if (contractRegistry) {
@@ -100,22 +152,17 @@ export const deployAllContracts = async (
     console.log('Token deployed to:', token.address);
   }
 
-  await verifyContract(token.address, 'Token', '');
+  await verifyContract(token.address, 'Token', constructorAbi(tokenTypes, tokenArgs));
 
-  console.log('deploying ValidatorRegistry...');
-  const ValidatorRegistryContract = await ethers.getContractFactory('ValidatorRegistry');
-  const validatorRegistry = await ValidatorRegistryContract.deploy();
-  await validatorRegistry.deployed();
+  const validatorRegistry = await deployValidatorRegistry();
 
   if (contractRegistry) {
-    tx = await contractRegistry.importAddresses([toBytes32('ValidatorRegistry')], [validatorRegistry.address]);
+    const tx = await contractRegistry.importAddresses([toBytes32('ValidatorRegistry')], [validatorRegistry.address]);
     await waitForTx(tx.hash, provider);
     console.log('validatorRegistry registered', await contractRegistry.getAddressByString('ValidatorRegistry'));
   } else {
     console.log('ValidatorRegistry deployed to:', validatorRegistry.address);
   }
-
-  await verifyContract(validatorRegistry.address, 'ValidatorRegistry', '');
 
   console.log('deploying StakingBank...');
   const StakingBankContract = await ethers.getContractFactory('StakingBank');
@@ -144,29 +191,9 @@ export const deployAllContracts = async (
     console.log('Chain deployed to:', chain.address);
   }
 
-  tx = await token.transfer(id, config.token.totalSupply);
-  await waitForTx(tx.hash, provider);
-  console.log('token transferred to validator:', config.token.totalSupply);
-
-  // todo - make it work for multiple validators in a future
-  const validator = config.validators[0];
-
-  tx = await validatorRegistry.create(id, validator.location);
-  await waitForTx(tx.hash, provider);
-
-  const validatorData = await validatorRegistry.validators(id);
-  console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
-
-  const approval = '100000'; //config.token.totalSupply;
-  tx = await token.connect(validatorWallet).approve(stakingBank.address, approval);
-  await waitForTx(tx.hash, provider);
-
-  console.log('...receiveApproval...');
-  tx = await stakingBank.receiveApproval(id, approval, 0);
-  await waitForTx(tx.hash, provider);
-
-  console.log('validator balance:', (await token.balanceOf(id)).toString());
-  console.log('staked balance:', (await stakingBank.balanceOf(id)).toString());
+  for (let i = 0; i < validators.length; i++) {
+    await registerValidator(validatorRegistry, stakingBank, token, i);
+  }
 
   const leader = await chain.getLeaderAddress();
   console.log('Current leader: ' + leader);
