@@ -16,7 +16,7 @@ services:
     build: .
     container_name: phoenix-deployer
     env_file: .env
-    entrypoint: npx hardhat run scripts/deploy-all.ts --network docker
+    entrypoint: npx hardhat run scripts/deployAll.ts --network docker
     networks:
       - umbrella-network
     depends_on:
