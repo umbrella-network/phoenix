@@ -158,16 +158,21 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocksCount + blocksCountOffset - 1;
   }
 
-  function getLeaderIndex(uint256 numberOfValidators) public view returns (uint256) {
-    uint256 padding = blockPadding;
-    padding = (padding == 0 ? 1 : padding);
+  function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber) public view returns (uint256) {
     uint256 latestBlockHeight = getLatestBlockHeightWithData();
-    uint256 tmpId = latestBlockHeight + ((block.number - blocks[latestBlockHeight].data.anchor) / padding);
-    return tmpId % numberOfValidators;
+
+    Block storage prevChainBlock = blocks[latestBlockHeight].data;
+
+    uint256 validatorIndex = prevChainBlock.timestamp + ((ethBlockNumber - prevChainBlock.anchor) / blockPadding);
+
+    return validatorIndex % numberOfValidators;
   }
 
-  // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
   function getLeaderAddress() public view returns (address) {
+    return getLeaderAddressAtBlock(block.number);
+  }
+
+  function getLeaderAddressAtBlock(uint256 ethBlockNumber) public view returns (address) {
     IValidatorRegistry validatorRegistry = validatorRegistryContract();
     uint256 numberOfValidators = validatorRegistry.getNumberOfValidators();
 
@@ -175,7 +180,9 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       return address(0x0);
     }
 
-    return validatorRegistry.addresses(getLeaderIndex(numberOfValidators));
+    uint256 validatorIndex = getLeaderIndex(numberOfValidators, ethBlockNumber);
+
+    return validatorRegistry.addresses(validatorIndex);
   }
 
   function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
