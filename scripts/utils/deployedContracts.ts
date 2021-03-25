@@ -20,9 +20,9 @@ export const deployedRegistry = async (): Promise<Contract> => {
 };
 
 export const deployedContract = async (
-  name: 'StakingBank' | 'ValidatorRegistry' | 'Token'
+  name: 'StakingBank' | 'ValidatorRegistry' | 'UMB'
 ): Promise<Contract> => {
-  const address = (await deployedRegistry()).getAddressByString(name);
+  const address = await (await deployedRegistry()).getAddressByString(name);
   let abi;
 
   switch (name) {
@@ -32,7 +32,7 @@ export const deployedContract = async (
   case 'StakingBank':
     abi = StakingBank.abi;
     break;
-  case 'Token':
+  case 'UMB':
     abi = Token.abi;
     break;
   }
