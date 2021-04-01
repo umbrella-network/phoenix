@@ -158,24 +158,36 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocksCount + blocksCountOffset - 1;
   }
 
-  function getLeaderIndex(uint256 numberOfValidators) public view returns (uint256) {
-    uint256 padding = blockPadding;
-    padding = (padding == 0 ? 1 : padding);
+  function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber) public view returns (uint256) {
     uint256 latestBlockHeight = getLatestBlockHeightWithData();
-    uint256 tmpId = latestBlockHeight + ((block.number - blocks[latestBlockHeight].data.anchor) / padding);
-    return tmpId % numberOfValidators;
+
+    uint256 validatorIndex = latestBlockHeight +
+      (ethBlockNumber - blocks[latestBlockHeight].data.anchor) / blockPadding;
+
+    return validatorIndex % numberOfValidators;
+  }
+
+  function getNextLeaderAddress() public view returns (address) {
+    return getLeaderAddressAtBlock(block.number + 1);
+  }
+
+  function getLeaderAddress() public view returns (address) {
+    return getLeaderAddressAtBlock(block.number);
   }
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
-  function getLeaderAddress() public view returns (address) {
+  function getLeaderAddressAtBlock(uint256 ethBlockNumber) public view returns (address) {
     IValidatorRegistry validatorRegistry = validatorRegistryContract();
+
     uint256 numberOfValidators = validatorRegistry.getNumberOfValidators();
 
     if (numberOfValidators == 0) {
       return address(0x0);
     }
 
-    return validatorRegistry.addresses(getLeaderIndex(numberOfValidators));
+    uint256 validatorIndex = getLeaderIndex(numberOfValidators, ethBlockNumber);
+
+    return validatorRegistry.addresses(validatorIndex);
   }
 
   function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
