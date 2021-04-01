@@ -12,6 +12,7 @@ const provider = getProvider();
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/ValidatorRegistry.json';
+import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 
 export const deployedRegistry = async (): Promise<Contract> => {
@@ -20,7 +21,7 @@ export const deployedRegistry = async (): Promise<Contract> => {
 };
 
 export const deployedContract = async (
-  name: 'StakingBank' | 'ValidatorRegistry' | 'UMB'
+  name: 'StakingBank' | 'ValidatorRegistry' | 'UMB' | 'Chain'
 ): Promise<Contract> => {
   const address = await (await deployedRegistry()).getAddressByString(name);
   let abi;
@@ -31,6 +32,9 @@ export const deployedContract = async (
     break;
   case 'StakingBank':
     abi = StakingBank.abi;
+    break;
+  case 'Chain':
+    abi = Chain.abi;
     break;
   case 'UMB':
     abi = Token.abi;

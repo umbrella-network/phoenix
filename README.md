@@ -95,6 +95,7 @@ hardhat compile && npm run flatten:validator && NODE_ENV=development npx hardhat
 hardhat compile && npm run flatten:validator && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployValidatorRegistry.ts
 
 hardhat compile && NODE_ENV=development npx hardhat run --network dev ./scripts/registerNewValidator.ts
+hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/registerNewValidator.ts
 ```
 
 ### Connect with validators for development and testing
