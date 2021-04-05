@@ -1,10 +1,11 @@
-import {ethers} from 'ethers';
+import {ethers, Contract} from 'ethers';
 
 require('custom-env').env(); // eslint-disable-line
 
 import superagent from 'superagent';
 import {deployedContract} from './utils/deployedContracts';
 import {getProvider, waitForTx} from './utils/helpers';
+import {formatEther} from 'ethers/lib/utils';
 
 const provider = getProvider();
 
@@ -23,6 +24,8 @@ interface ValidatorInfo {
   name: string
 }
 
+let validatorRegistry: Contract;
+
 const resolveValidatorInfo = async (location: string): Promise<ValidatorInfo> => {
   const res = await superagent.get(`${location}/info`);
   return res.body;
@@ -35,7 +38,7 @@ const checkValidator = async (info:ValidatorInfo): Promise<boolean> => {
 
   console.log(`address ${info.validator} OK`);
 
-  if (info.version !== '0.7.2') {
+  if (info.version !== '0.8.2') {
     throw Error(`${info.version} is not last version`);
   }
 
@@ -48,6 +51,19 @@ const checkValidator = async (info:ValidatorInfo): Promise<boolean> => {
   }
 
   console.log(`Chain ${info.chainContractAddress} OK`);
+
+  const balance = await provider.getBalance(info.validator);
+  if (balance.lt(`3${'0'.repeat(17)}`)) {
+    throw Error (`validator balance is too low: ${formatEther(balance)}`);
+  }
+
+  console.log(`validator balance: ${formatEther(balance)} OK`);
+
+  const registeredValidator = await validatorRegistry.validators(info.validator);
+
+  if (registeredValidator.id !== ethers.constants.AddressZero) {
+    throw Error(`validator ${info.validator} already registered`);
+  }
 
   return true;
 };
@@ -63,7 +79,7 @@ const registerNewValidator = async () => {
   console.log(`Adding new validator based on location: ${location} with stake of ${stake} UMB`);
 
   const stakingBank = await deployedContract('StakingBank');
-  const validatorRegistry = await deployedContract('ValidatorRegistry');
+  validatorRegistry = await deployedContract('ValidatorRegistry');
   const token = await deployedContract('UMB');
 
   const info = await resolveValidatorInfo(location);
@@ -82,6 +98,12 @@ const registerNewValidator = async () => {
   console.log('validator registry:', validatorRegistry.address);
   console.log('stakingBank:', stakingBank.address);
   console.log('token:', token.address);
+
+  const registeredValidator = await validatorRegistry.validators(validator.id);
+
+  if (registeredValidator.id !== ethers.constants.AddressZero) {
+    throw Error(`validator ${validator.id} already registered`);
+  }
 
   let tx = await validatorRegistry.create(validator.id, validator.location);
   await waitForTx(tx.hash, provider);
