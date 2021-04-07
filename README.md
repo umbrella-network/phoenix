@@ -76,7 +76,7 @@ npm run local-minter
 Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
 
 ```shell
-npm run flatten:all && npm run deploy:all:[dev|production]
+npm run flatten:all && npm run deploy:all:[staging|production]
 ```
 
 In case of any errors, please read error message. There should be some tips what's need to be fixed.
@@ -87,18 +87,18 @@ In case of any errors, please read error message. There should be some tips what
 
 ```shell
 hardhat compile && npx hardhat run --network localhost ./scripts/deployChain.ts
-hardhat compile && npm run flatten:chain && NODE_ENV=development npx hardhat run --network dev ./scripts/deployChain.ts
+hardhat compile && npm run flatten:chain && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployChain.ts
 hardhat compile && npm run flatten:chain && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
 
 hardhat compile && npx hardhat run --network localhost ./scripts/reDeployValidatorRegistry.ts
-hardhat compile && npm run flatten:validator && NODE_ENV=development npx hardhat run --network dev ./scripts/reDeployValidatorRegistry.ts
+hardhat compile && npm run flatten:validator && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployValidatorRegistry.ts
 hardhat compile && npm run flatten:validator && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployValidatorRegistry.ts
 
-hardhat compile && NODE_ENV=development npx hardhat run --network dev ./scripts/registerNewValidator.ts
+hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/registerNewValidator.ts
 hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/registerNewValidator.ts
 ```
 
-### Connect with validators for development and testing
+### Connect with validators for staging and testing
 
 ```shell
 # start hardhat network with contracts
