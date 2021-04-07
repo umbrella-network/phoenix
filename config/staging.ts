@@ -1,35 +1,35 @@
 import {GlobalConfig} from './types';
 import {readValidators} from './utils';
 
-const production: GlobalConfig = {
+const staging: GlobalConfig = {
   ethereum: {
     contractRegistry: {
-      address: '0x8d16D5D2859f4c54b226180A46F26D57A4d727A0'
+      address: '0x4545e91d2e3647808670DD045eA5f4079B436EbC'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
-      name: 'Umbrella test token',
+      name: 'Umbrella',
       symbol: 'UMB'
     },
     chain: {
       blockPadding: 6
     },
-    validators: readValidators('https://validator.umb.network'),
+    validators: readValidators('https://validator-dev.umb.network'),
   },
   smartchain: {
     contractRegistry: {
-      address: '0x67D0B6c70B71d1065927401744f853f60d6f59a5'
+      address: '0x8f98d3B5C911206C1Ac08B9938875620A03BCd59'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
-      name: 'Umbrella test token',
+      name: 'Umbrella',
       symbol: 'UMB'
     },
     chain: {
       blockPadding: 6
     },
-    validators: readValidators('https://validator-bsc.umb.network'),
+    validators: readValidators('https://validator-bsc-dev.umb.network'),
   }
 };
 
-export default production;
+export default staging;
