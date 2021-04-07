@@ -27,18 +27,18 @@ export const deployedContract = async (
   let abi;
 
   switch (name) {
-  case 'ValidatorRegistry':
-    abi = ValidatorRegistry.abi;
-    break;
-  case 'StakingBank':
-    abi = StakingBank.abi;
-    break;
-  case 'Chain':
-    abi = Chain.abi;
-    break;
-  case 'UMB':
-    abi = Token.abi;
-    break;
+    case 'ValidatorRegistry':
+      abi = ValidatorRegistry.abi;
+      break;
+    case 'StakingBank':
+      abi = StakingBank.abi;
+      break;
+    case 'Chain':
+      abi = Chain.abi;
+      break;
+    case 'UMB':
+      abi = Token.abi;
+      break;
   }
 
   return new ethers.Contract(address, abi, provider).connect((await ethers.getSigners())[0]);

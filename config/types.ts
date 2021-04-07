@@ -17,3 +17,8 @@ export interface Config {
   },
   validators: ValidatorConfig[],
 }
+
+export interface GlobalConfig {
+  ethereum: Config,
+  smartchain: Config,
+}
