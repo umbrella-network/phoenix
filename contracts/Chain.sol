@@ -30,7 +30,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 staked;
     uint256 power;
     uint256 anchor;
-    uint256 timestamp;
+    uint256 blockTimestamp;
+    uint256 dataTimestamp;
   }
 
   struct ExtendedBlock {
@@ -66,6 +67,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function submit(
+    uint256 _dataTimestamp,
     bytes32 _root,
     bytes32[] memory _keys,
     uint256[] memory _values,
@@ -76,11 +78,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 blockHeight = getBlockHeight();
     require(blocks[blockHeight].data.anchor == 0, "block already mined for current blockHeight");
 
-    address leaderAddress = getLeaderAddress();
+    bytes memory testimony = abi.encodePacked(_dataTimestamp, blockHeight, _root);
 
-    bytes memory testimony = abi.encodePacked(blockHeight, _root);
-
-    require(msg.sender == leaderAddress, "sender is not the leader");
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
     for (uint256 i = 0; i < _keys.length; i++) {
@@ -95,25 +94,70 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
     bytes32 affidavit = keccak256(testimony);
 
+    address leaderAddress;
+
     for (uint256 i = 0; i < _v.length; i++) {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
-      require(balance > 0, "no balance OR wrong blockHeight OR invalid signature");
-      require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
+      if (balance == 0) {
+        // if no balance -> move on
+        // if we calculated root for other blockHeight then recovering signer will not work -> move on
+        // if invalid signature for any reason -> move on
+        // we don't have to reject tx because of above, the worst what can happen is if we move on, we spend more gas
+        // so if validators wants to misbehave they will pay more
+        continue;
+      }
+
+      // I remove requirement for leader, so now anyone can submit
+      // that's ok because we do not care about leader really - data is what we care about
+
+      // if we want to know the leader, we can assume, that leader signature will be set as first
+      // so anyone who will be submitting tx, will set its own signature at begin
+      // of course this is not 100% valid way of checking, because someone can scan pending tx, get data,
+      // change order of signatures and submit tx with higher gas to become a leader... but why?
+      // also, if this will be a problem, we can add some additional checks like: ask validators to sign leader address
+      // and Chain will check that... but the only reason why we would like to know the leader is that he spend money
+      // on tx and he should get paid more than others, to compensate that... but for that we need msg.sender only
+      // so I dont see any reason why Chain have to check, if leader is the one who submitting data
+      // leader selection is only important for validators, so they know who should submit
+
+      // in case of holding data and use them in future - we can do it even now, removing leader check changes nothing
+      // if validator get signatures and not sent block and noone else will be sending, the block can be mined in the future
+      // the only fix for that is to add dataTimestamp, and we can do this in two ways:
+      // 1. we wil add this dataTimestamp, validators will sign it, we put it in `block`
+      //    and that's it, Chain will not check it - whoever will be using data should check it
+      //    and decide if time of data is valid for them (I do like this approach)
+      // 2. we can reject tx if dataTimestamp will be too old... but this make no sense to me - first of all,
+      //    if validator hold data then we go to next round and new leader can submit, so helded data can't be use
+      //    anymore even without this dataTimestamp check, they will be rejected because of blockHeight will be taken,
+      //    majority of validators must be involve in holding data attack so it can work.
+
+      // not checking leader also allow us to accept blocks even when new round will start.
+      // see https://umbnetwork.slab.com/posts/po-c-for-umbrella-multichain-architecture-v-3-tu1k3yt8#what-if-validator-will-be-too-slow-and-will-send-tx-when-his-round-is-almost-over
+
+      if (i = 0) {
+        // for now we can assume first sig is a leader, because validator currently puts his sig on 1st place
+        leaderAddress = signer;
+      }
+
+      if (blocks[blockHeight].votes[signer] != 0) {
+        // "validator included more than once");
+        // lets just ignore
+        continue;
+      }
 
       blocks[blockHeight].voters.push(signer);
 
       blocks[blockHeight].votes[signer] = balance;
       power = power.add(balance);
 
-      if (power.mul(100) > minimum) {
-        break;
-      }
+      // I don't want to stop when we reach required power because we loosing info how good or bad is our consensus
+      // if we not break we will be able to see all voters that participated
+      // if (power.mul(100) > minimum) {break;}
     }
 
     require(power.mul(100) > minimum, "not enough power was gathered");
-
 
     blocks[blockHeight].data.root = _root;
     blocks[blockHeight].data.minter = leaderAddress;
@@ -158,25 +202,26 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocksCount + blocksCountOffset - 1;
   }
 
-  function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber) public view returns (uint256) {
+  function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber)
+  public view returns (uint256 leaderIndex, uint256 newBlockHeight) {
     uint256 latestBlockHeight = getLatestBlockHeightWithData();
-
-    uint256 validatorIndex = latestBlockHeight +
-      (ethBlockNumber - blocks[latestBlockHeight].data.anchor) / blockPadding;
-
-    return validatorIndex % numberOfValidators;
+    newBlockHeight = latestBlockHeight + (ethBlockNumber - blocks[latestBlockHeight].data.anchor) / blockPadding;
+    leaderIndex = nextBlockHeight % numberOfValidators;
   }
 
-  function getNextLeaderAddress() public view returns (address) {
+  // when we return leader with blockHeight, validator can drop call for blockHeight
+  // its not only optimization, most important here is fact, that in situation when eth blocks
+  // goes like this: 1 2 3 4 >3< 4, we can avoid confusion about leader, whe blocks are not yet stable
+  function getNextLeaderAddress() public view returns (address, uint256) {
     return getLeaderAddressAtBlock(block.number + 1);
   }
 
-  function getLeaderAddress() public view returns (address) {
+  function getLeaderAddress() public view returns (address, uint256) {
     return getLeaderAddressAtBlock(block.number);
   }
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
-  function getLeaderAddressAtBlock(uint256 ethBlockNumber) public view returns (address) {
+  function getLeaderAddressAtBlock(uint256 ethBlockNumber) public view returns (address, uint256) {
     IValidatorRegistry validatorRegistry = validatorRegistryContract();
 
     uint256 numberOfValidators = validatorRegistry.getNumberOfValidators();
@@ -185,9 +230,9 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       return address(0x0);
     }
 
-    uint256 validatorIndex = getLeaderIndex(numberOfValidators, ethBlockNumber);
+    (uint256 validatorIndex, uint256 newBlockHeight) = getLeaderIndex(numberOfValidators, ethBlockNumber);
 
-    return validatorRegistry.addresses(validatorIndex);
+    return (validatorRegistry.addresses(validatorIndex), newBlockHeight);
   }
 
   function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
