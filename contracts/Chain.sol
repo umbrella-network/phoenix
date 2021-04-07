@@ -76,11 +76,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 blockHeight = getBlockHeight();
     require(blocks[blockHeight].data.anchor == 0, "block already mined for current blockHeight");
 
-    address leaderAddress = getLeaderAddress();
-
     bytes memory testimony = abi.encodePacked(blockHeight, _root);
 
-    require(msg.sender == leaderAddress, "sender is not the leader");
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
     for (uint256 i = 0; i < _keys.length; i++) {
@@ -98,25 +95,26 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     for (uint256 i = 0; i < _v.length; i++) {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
-
-      require(balance > 0, "no balance OR wrong blockHeight OR invalid signature");
       require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
+
+      if (balance == 0) {
+        // if no balance -> move on
+        // if we calculated root for other blockHeight, then recovering signer will not work -> move on
+        // if invalid signature for any reason -> move on
+        // we don't have to reject tx because of above
+        continue;
+      }
 
       blocks[blockHeight].voters.push(signer);
 
       blocks[blockHeight].votes[signer] = balance;
       power = power.add(balance);
-
-      if (power.mul(100) > minimum) {
-        break;
-      }
     }
 
     require(power.mul(100) > minimum, "not enough power was gathered");
 
-
     blocks[blockHeight].data.root = _root;
-    blocks[blockHeight].data.minter = leaderAddress;
+    blocks[blockHeight].data.minter = msg.sender;
     blocks[blockHeight].data.staked = staked;
     blocks[blockHeight].data.power = power;
     blocks[blockHeight].data.anchor = block.number;

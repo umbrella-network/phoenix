@@ -1,20 +1,41 @@
 import superagent from 'superagent';
 import {isLocalNetwork, sleep} from './helpers';
 import fs from 'fs';
+import {ENVS, NETWORKS} from '../../config';
 
-const netName = (): string | undefined => {
-  switch (process.env.NODE_ENV) {
-  case 'live':
-    return '';
-  case 'development':
-  case 'dev':
-    return '-kovan';
-  case 'staging':
-  case 'production':
-    return '-ropsten';
-  default:
-    return undefined;
+const {NODE_ENV, NETWORK, BSCSCAN_API, ETHERSCAN_API} = process.env;
+
+const getScanApiUrl = (): string | undefined => {
+  if (NETWORK === NETWORKS.ETH) {
+    let prefix = '';
+
+    switch (NODE_ENV) {
+      case 'live':
+        break;
+      case 'development':
+      case 'dev':
+      case 'staging':
+        prefix = '-kovan';
+        break;
+      case 'production':
+        prefix = '-ropsten';
+        break;
+      default:
+        return undefined;
+    }
+
+    return `https://api${prefix}.etherscan.io/api`;
   }
+
+  if (NETWORK === NETWORKS.BSC) {
+    if (NODE_ENV === ENVS.local) {
+      return undefined;
+    }
+
+    return 'https://api-testnet.bscscan.com/api';
+  }
+
+  return undefined;
 };
 
 export const pullSource = (contractName: string): string => {
@@ -39,9 +60,9 @@ export const verifyContract = async (
   console.log('doing API call...');
   let notok = true;
 
-  const network = netName();
+  const scanApiUrl = getScanApiUrl();
 
-  if (network === undefined) {
+  if (scanApiUrl === undefined) {
     console.log('NODE_ENV not set....');
     return;
   }
@@ -52,10 +73,10 @@ export const verifyContract = async (
     await sleep(5000);
 
     const response = await superagent
-      .post(`https://api${network}.etherscan.io/api`) //Set to the  correct API url for Other Networks
+      .post(scanApiUrl) //Set to the  correct API url for Other Networks
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .send({
-        apikey: process.env.ETHERSCAN_API,                     //A valid API-Key is required
+        apikey: NETWORK === NETWORKS.BSC ? BSCSCAN_API : ETHERSCAN_API,  //A valid API-Key is required
         module: 'contract',                             //Do not change
         action: 'verifysourcecode',                     //Do not change
         contractaddress,   //Contract Address starts with 0x...

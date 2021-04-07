@@ -1,5 +1,6 @@
 require('custom-env').env(); // eslint-disable-line
 
+
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-web3';
@@ -12,9 +13,20 @@ import 'hardhat-gas-reporter';
 
 import {HardhatUserConfig} from 'hardhat/types';
 
-const {INFURA_ID, DEPLOYER_PK, HARDHAT_MINING_AUTO = 'true', HARDHAT_MINING_INTERVAL = '5000'} = process.env;
+import {NETWORKS} from './config';
+
+const {
+  NETWORK,
+  INFURA_ID,
+  BSC_RPC_PROVIDER,
+  DEPLOYER_PK,
+  HARDHAT_MINING_AUTO = 'true',
+  HARDHAT_MINING_INTERVAL = '5000'
+} = process.env;
 
 const balance = '1000' + '0'.repeat(18);
+
+console.log('selected NETWORK=', NETWORK);
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -44,17 +56,17 @@ const config: HardhatUserConfig = {
       blockGasLimit: 80000000,
       url: 'http://localhost:8545',
     },
-    dev: {
-      url: `https://kovan.infura.io/v3/${INFURA_ID}`,
+    staging: {
+      url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://kovan.infura.io/v3/${INFURA_ID}`,
       accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
-      chainId: 42,
-      gasPrice: 1000000000
+      chainId: NETWORK === NETWORKS.BSC ? 97 : 42,
+      gasPrice: NETWORK === NETWORKS.BSC ? 10000000000 : 1000000000
     },
     production: {
-      url: `https://ropsten.infura.io/v3/${INFURA_ID}`,
+      url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://ropsten.infura.io/v3/${INFURA_ID}`,
       accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
-      chainId: 3,
-      gasPrice: 1000000000
+      chainId: NETWORK === NETWORKS.BSC ? 97 : 3,
+      gasPrice: NETWORK === NETWORKS.BSC ? 10000000000 : 1000000000
     },
     docker: {
       url: 'http://eth:8545',
