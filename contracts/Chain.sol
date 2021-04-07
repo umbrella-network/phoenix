@@ -97,7 +97,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       uint256 balance = stakingBank.balanceOf(signer);
       require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
 
-      if (balance == 0 || blocks[blockHeight].votes[signer] != 0) {
+      if (balance == 0) {
         // if no balance -> move on
         // if we calculated root for other blockHeight, then recovering signer will not work -> move on
         // if invalid signature for any reason -> move on
