@@ -128,6 +128,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       // 1. we wil add this dataTimestamp, validators will sign it, we put it in `block`
       //    and that's it, Chain will not check it - whoever will be using data should check it
       //    and decide if time of data is valid for them (I do like this approach)
+      //    well - the only reasonable check will be that new dataTimestamp should be higher that last dataTimestamp
       // 2. we can reject tx if dataTimestamp will be too old... but this make no sense to me - first of all,
       //    if validator hold data then we go to next round and new leader can submit, so helded data can't be use
       //    anymore even without this dataTimestamp check, they will be rejected because of blockHeight will be taken,
