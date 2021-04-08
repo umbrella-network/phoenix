@@ -31,6 +31,15 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 power;
     uint256 anchor;
     uint256 timestamp;
+    uint256 dataTimestamp;
+    // instead of Chain provides blockHeight for validators to calculate
+    // each validator can calculate blockHeight by itself easily
+    // however, validator can do it slighty different:
+    // Chain keep blockHeight at same level even if there is no vote for "round", because this allow to not
+    // have empty blocks, but validator can actually increment blockHeight each round and use it as nonce
+    // that way if we have two tx (slow/old, and new one made for next round), they will use different nonce
+    // and we can accept both, currenty for that situation we get thrwo with error: blockHeight already taken
+    uint256 nonce;
   }
 
   struct ExtendedBlock {
@@ -66,6 +75,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function submit(
+    uint256 _nonce,
+    uint256 _dataTimestamp,
     bytes32 _root,
     bytes32[] memory _keys,
     uint256[] memory _values,
@@ -73,15 +84,20 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     bytes32[] memory _r,
     bytes32[] memory _s
   ) public nonReentrant returns (bool) {
+    uint256 latestBlockId = getLatestBlockId();
+    uint256 newBlockId = latestBlockId + 1;
     uint256 blockHeight = getBlockHeight();
-    require(blocks[blockHeight].data.anchor == 0, "block already mined for current blockHeight");
 
-    bytes memory testimony = abi.encodePacked(blockHeight, _root);
+    // in future we can add timePadding and remove blockPadding
+    require(blocks[latestBlockId].data.dataTimestamp > _dataTimestamp, "can NOT submit older data");
+    require(blocks[latestBlockId].data.nonce > _nonce, "nonce already taken");
+
+    bytes memory testimony = abi.encodePacked(_nonce, _dataTimestamp, _root);
 
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
     for (uint256 i = 0; i < _keys.length; i++) {
-      blocks[blockHeight].numericFCD[_keys[i]] = _values[i];
+      blocks[newBlockId].numericFCD[_keys[i]] = _values[i];
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
 
@@ -95,34 +111,34 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     for (uint256 i = 0; i < _v.length; i++) {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
-      require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
+      require(blocks[newBlockId].votes[signer] == 0, "validator included more than once");
 
       if (balance == 0) {
-        // if no balance -> move on
+        // if no balance -> move on, it can be invalid address but also fresh validator with no balance
+        // we can spend gas and check if address is validator address, but I see no point, its cheaper to ignore
         // if we calculated root for other blockHeight, then recovering signer will not work -> move on
-        // if invalid signature for any reason -> move on
-        // we don't have to reject tx because of above
         continue;
       }
 
-      blocks[blockHeight].voters.push(signer);
-
-      blocks[blockHeight].votes[signer] = balance;
+      blocks[newBlockId].voters.push(signer);
+      blocks[newBlockId].votes[signer] = balance;
       power = power.add(balance);
     }
 
     require(power.mul(100) > minimum, "not enough power was gathered");
 
-    blocks[blockHeight].data.root = _root;
-    blocks[blockHeight].data.minter = msg.sender;
-    blocks[blockHeight].data.staked = staked;
-    blocks[blockHeight].data.power = power;
-    blocks[blockHeight].data.anchor = block.number;
-    blocks[blockHeight].data.timestamp = block.timestamp;
+    blocks[newBlockId].data.nonce = _nonce;
+    blocks[newBlockId].data.root = _root;
+    blocks[newBlockId].data.minter = msg.sender;
+    blocks[newBlockId].data.staked = staked;
+    blocks[newBlockId].data.power = power;
+    blocks[newBlockId].data.anchor = block.number;
+    blocks[newBlockId].data.timestamp = block.timestamp;
+    blocks[newBlockId].data.dataTimestamp = _dataTimestamp;
 
     blocksCount++;
 
-    emit LogMint(msg.sender, blockHeight, block.number);
+    emit LogMint(msg.sender, newBlockId, block.number);
 
     return true;
   }
@@ -152,15 +168,48 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return _blocksCount - 1;
   }
 
-  function getLatestBlockHeightWithData() public view returns (uint256) {
+  // we should calculate this in validator, Im only showing how to do it
+  function getNextNonce(uint256 _ethBlockNumber) public view returns (uint256) {
+    uint256 lastBlockId = getLatestBlockId();
+    return blocks[lastBlockId].data.nonce + (_ethBlockNumber - blocks[lastBlockId].data.anchor) / blockPadding;
+  }
+
+  function getStatus() external view returns(
+    address nextLeader,
+    address[] memory validators,
+    uint256[] memory powers,
+    uint256 lastBlockId,
+    uint256 lastNonce,
+    uint256 nextNonce
+  ) {
+    nextLeader = getLeaderAddressAtBlock(block.number + 1);
+    lastBlockId = getLatestBlockId();
+    lastNonce = blocks[lastBlockId].data.nonce;
+    nextNonce = getNextNonce(block.number);
+
+    IValidatorRegistry vr = validatorRegistryContract();
+    validators = new address[](vr.getNumberOfValidators());
+    for (uint256 i = 0; i < validators.length; i++) {
+      validators[i] = vr.addresses(i);
+    }
+
+    IStakingBank stakingBank = stakingBankContract();
+    powers = new uint256[](validators.length);
+
+    for (uint256 i = 0; i < validators.length; i++) {
+      powers[i] = stakingBank.balanceOf(validators[i]);
+    }
+  }
+
+  function getLatestBlockId() public view returns (uint256) {
     return blocksCount + blocksCountOffset - 1;
   }
 
   function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber) public view returns (uint256) {
-    uint256 latestBlockHeight = getLatestBlockHeightWithData();
+    uint256 latestBlockId = getLatestBlockId();
 
-    uint256 validatorIndex = latestBlockHeight +
-      (ethBlockNumber - blocks[latestBlockHeight].data.anchor) / blockPadding;
+    uint256 validatorIndex = latestBlockId +
+      (ethBlockNumber - blocks[latestBlockId].data.anchor) / blockPadding;
 
     return validatorIndex % numberOfValidators;
   }
@@ -337,7 +386,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
   function getCurrentValue(bytes32 _key) external view returns (uint256 value, uint timestamp) {
     // it will revert when no blocks
-    return getNumericFCD(getLatestBlockHeightWithData(), _key);
+    return getNumericFCD(getLatestBlockId(), _key);
   }
 
   // ========== EVENTS ========== //
