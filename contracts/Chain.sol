@@ -174,7 +174,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocks[lastBlockId].data.nonce + (_ethBlockNumber - blocks[lastBlockId].data.anchor) / blockPadding;
   }
 
-  function getStatus() external view returns(
+  function getStatus(uint256 _ethBlockNumber) external view returns(
     address nextLeader,
     address[] memory validators,
     uint256[] memory powers,
@@ -185,7 +185,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     nextLeader = getLeaderAddressAtBlock(block.number + 1);
     lastBlockId = getLatestBlockId();
     lastNonce = blocks[lastBlockId].data.nonce;
-    nextNonce = getNextNonce(block.number);
+    nextNonce = getNextNonce(_ethBlockNumber);
 
     IValidatorRegistry vr = validatorRegistryContract();
     validators = new address[](vr.getNumberOfValidators());
