@@ -75,7 +75,10 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function submit(
+    // nonce will help to see for which round validator is voting, help with debug,
+    // allows for slow tx since we no longer checking leader
     uint256 _nonce,
+    // validators already using timestamp (our latest changes) so lets include
     uint256 _dataTimestamp,
     bytes32 _root,
     bytes32[] memory _keys,
