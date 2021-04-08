@@ -169,6 +169,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   // we should calculate this in validator, Im only showing how to do it
+  // validator should use getStatus and he will have all he needs
   function getNextNonce(uint256 _ethBlockNumber) public view returns (uint256) {
     uint256 lastBlockId = getLatestBlockId();
     return blocks[lastBlockId].data.nonce + (_ethBlockNumber - blocks[lastBlockId].data.anchor) / blockPadding;
