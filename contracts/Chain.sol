@@ -76,9 +76,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
   function submit(
     // nonce will help to see for which round validator is voting, help with debug,
-    // allows for slow tx since we no longer checking leader
+    // allows for slow tx to be accepted since we no longer checking leader
     uint256 _nonce,
-    // validators already using timestamp (our latest changes) so lets include
     uint256 _dataTimestamp,
     bytes32 _root,
     bytes32[] memory _keys,
@@ -89,11 +88,10 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   ) public nonReentrant returns (bool) {
     uint256 latestBlockId = getLatestBlockId();
     uint256 newBlockId = latestBlockId + 1;
-    uint256 blockHeight = getBlockHeight();
 
     // in future we can add timePadding and remove blockPadding
-    require(blocks[latestBlockId].data.dataTimestamp > _dataTimestamp, "can NOT submit older data");
-    require(blocks[latestBlockId].data.nonce > _nonce, "nonce already taken");
+    require(blocks[latestBlockId].data.dataTimestamp < _dataTimestamp, "can NOT submit older data");
+    require(blocks[latestBlockId].data.nonce < _nonce, "nonce already taken");
 
     bytes memory testimony = abi.encodePacked(_nonce, _dataTimestamp, _root);
 
@@ -106,35 +104,13 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
     IStakingBank stakingBank = stakingBankContract();
     uint256 staked = stakingBank.totalSupply();
-    uint256 power = 0;
-    uint256 minimum = staked.mul(66);
-
     bytes32 affidavit = keccak256(testimony);
-
-    for (uint256 i = 0; i < _v.length; i++) {
-      address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
-      uint256 balance = stakingBank.balanceOf(signer);
-      require(blocks[newBlockId].votes[signer] == 0, "validator included more than once");
-
-      if (balance == 0) {
-        // if no balance -> move on, it can be invalid address but also fresh validator with no balance
-        // we can spend gas and check if address is validator address, but I see no point, its cheaper to ignore
-        // if we calculated root for other blockHeight, then recovering signer will not work -> move on
-        continue;
-      }
-
-      blocks[newBlockId].voters.push(signer);
-      blocks[newBlockId].votes[signer] = balance;
-      power = power.add(balance);
-    }
-
-    require(power.mul(100) > minimum, "not enough power was gathered");
 
     blocks[newBlockId].data.nonce = _nonce;
     blocks[newBlockId].data.root = _root;
     blocks[newBlockId].data.minter = msg.sender;
     blocks[newBlockId].data.staked = staked;
-    blocks[newBlockId].data.power = power;
+    blocks[newBlockId].data.power = _validateSignatures(stakingBank, newBlockId, affidavit, _v, _r, _s, staked);
     blocks[newBlockId].data.anchor = block.number;
     blocks[newBlockId].data.timestamp = block.timestamp;
     blocks[newBlockId].data.dataTimestamp = _dataTimestamp;
@@ -144,6 +120,37 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     emit LogMint(msg.sender, newBlockId, block.number);
 
     return true;
+  }
+
+  function _validateSignatures(
+    IStakingBank _stakingBank,
+    uint256 _newBlockId,
+    bytes32 _affidavit,
+    uint8[] memory _v,
+    bytes32[] memory _r,
+    bytes32[] memory _s,
+    uint256 _staked
+  ) internal returns (uint256 power){
+    power = 0;
+
+    for (uint256 i = 0; i < _v.length; i++) {
+      address signer = recoverSigner(_affidavit, _v[i], _r[i], _s[i]);
+      uint256 balance = _stakingBank.balanceOf(signer);
+      require(blocks[_newBlockId].votes[signer] == 0, "validator included more than once");
+
+      if (balance == 0) {
+        // if no balance -> move on, it can be invalid address but also fresh validator with no balance
+        // we can spend gas and check if address is validator address, but I see no point, its cheaper to ignore
+        // if we calculated root for other blockHeight, then recovering signer will not work -> move on
+        continue;
+      }
+
+      blocks[_newBlockId].voters.push(signer);
+      blocks[_newBlockId].votes[signer] = balance;
+      power = power.add(balance);
+    }
+
+    require(power.mul(100) > _staked.mul(66), "not enough power was gathered");
   }
 
   // ========== VIEWS ========== //
@@ -157,48 +164,41 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return ecrecover(hash, _v, _r, _s);
   }
 
-  function getBlockHeight() public view returns (uint256) {
-    uint _blocksCount = blocksCount + blocksCountOffset;
-
-    if (_blocksCount == 0) {
-      return 0;
-    }
-
-    if (blocks[_blocksCount - 1].data.anchor + blockPadding < block.number) {
-      return _blocksCount;
-    }
-
-    return _blocksCount - 1;
-  }
-
   // we should calculate this in validator, Im only showing how to do it
   // validator should use getStatus and he will have all he needs
-  function getNextNonce(uint256 _ethBlockNumber) public view returns (uint256) {
+  function getNextNonce() public view returns (uint256) {
     uint256 lastBlockId = getLatestBlockId();
-    return blocks[lastBlockId].data.nonce + (_ethBlockNumber - blocks[lastBlockId].data.anchor) / blockPadding;
+    return blocks[lastBlockId].data.nonce + (block.number - blocks[lastBlockId].data.anchor) / blockPadding;
   }
 
-  function getStatus(uint256 _ethBlockNumber) external view returns(
+  function getStatus() external view returns(
     address nextLeader,
     address[] memory validators,
     uint256[] memory powers,
+    string[] memory locations,
+    uint256 staked,
     uint256 lastBlockId,
     uint256 lastNonce,
     uint256 nextNonce
   ) {
-    nextLeader = getLeaderAddressAtBlock(block.number + 1);
+    nextLeader = getLeaderAddressAtBlock(block.number);
     lastBlockId = getLatestBlockId();
     lastNonce = blocks[lastBlockId].data.nonce;
-    nextNonce = getNextNonce(_ethBlockNumber);
+    nextNonce = getNextNonce();
 
     IValidatorRegistry vr = validatorRegistryContract();
-    validators = new address[](vr.getNumberOfValidators());
+    uint256 numberOfValidators = vr.getNumberOfValidators();
+    validators = new address[](numberOfValidators);
+    locations = new string[](numberOfValidators);
+
     for (uint256 i = 0; i < validators.length; i++) {
       validators[i] = vr.addresses(i);
+      ( , locations[i]) = vr.validators(validators[i]);
     }
 
     IStakingBank stakingBank = stakingBankContract();
     powers = new uint256[](validators.length);
+    staked = stakingBank.totalSupply();
 
     for (uint256 i = 0; i < validators.length; i++) {
       powers[i] = stakingBank.balanceOf(validators[i]);
