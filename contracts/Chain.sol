@@ -254,12 +254,12 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function verifyProofForBlock(
-    uint256 _blockHeight,
+    uint256 _blockId,
     bytes32[] memory _proof,
     bytes memory _key,
     bytes memory _value
   ) public view returns (bool) {
-    return verifyProof(_proof, blocks[_blockHeight].data.root, hashLeaf(_key, _value));
+    return verifyProof(_proof, blocks[_blockId].data.root, hashLeaf(_key, _value));
   }
 
   function bytesToBytes32Array(
@@ -284,7 +284,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function verifyProofs(
-    uint256[] memory _blockHeights,
+    uint256[] memory _blockIds,
     bytes memory _proofs,
     uint256[] memory _proofItemsCounter,
     bytes32[] memory _leaves
@@ -295,7 +295,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     for (uint256 i = 0; i < _leaves.length; i++) {
       results[i] = verifyProof(
         bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]),
-        blocks[_blockHeights[i]].data.root,
+        blocks[_blockIds[i]].data.root,
         _leaves[i]
       );
 
@@ -312,79 +312,79 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function verifyProofForBlockForNumber(
-    uint256 _blockHeight,
+    uint256 _blockId,
     bytes32[] memory _proof,
     bytes memory _key,
     bytes memory _value
   ) public view returns (bool, uint256) {
-    return (verifyProof(_proof, blocks[_blockHeight].data.root, hashLeaf(_key, _value)), _value.leafToUint());
+    return (verifyProof(_proof, blocks[_blockId].data.root, hashLeaf(_key, _value)), _value.leafToUint());
   }
 
   function verifyProofForBlockForFloat(
-    uint256 _blockHeight,
+    uint256 _blockId,
     bytes32[] memory _proof,
     bytes memory _key,
     bytes memory _value
   ) public view returns (bool, uint256) {
     return (
-      verifyProof(_proof, blocks[_blockHeight].data.root, hashLeaf(_key, _value)),
+      verifyProof(_proof, blocks[_blockId].data.root, hashLeaf(_key, _value)),
       _value.leafTo18DecimalsFloat()
     );
   }
 
-  function getBlockData(uint256 _blockHeight) external view returns (Block memory) {
-    return blocks[_blockHeight].data;
+  function getBlockData(uint256 _blockId) external view returns (Block memory) {
+    return blocks[_blockId].data;
   }
 
-  function getBlockRoot(uint256 _blockHeight) external view returns (bytes32) {
-    return blocks[_blockHeight].data.root;
+  function getBlockRoot(uint256 _blockId) external view returns (bytes32) {
+    return blocks[_blockId].data.root;
   }
 
-  function getBlockMinter(uint256 _blockHeight) external view returns (address) {
-    return blocks[_blockHeight].data.minter;
+  function getBlockMinter(uint256 _blockId) external view returns (address) {
+    return blocks[_blockId].data.minter;
   }
 
-  function getBlockStaked(uint256 _blockHeight) external view returns (uint256) {
-    return blocks[_blockHeight].data.staked;
+  function getBlockStaked(uint256 _blockId) external view returns (uint256) {
+    return blocks[_blockId].data.staked;
   }
 
-  function getBlockPower(uint256 _blockHeight) external view returns (uint256) {
-    return blocks[_blockHeight].data.power;
+  function getBlockPower(uint256 _blockId) external view returns (uint256) {
+    return blocks[_blockId].data.power;
   }
 
-  function getBlockAnchor(uint256 _blockHeight) external view returns (uint256) {
-    return blocks[_blockHeight].data.anchor;
+  function getBlockAnchor(uint256 _blockId) external view returns (uint256) {
+    return blocks[_blockId].data.anchor;
   }
 
-  function getBlockTimestamp(uint256 _blockHeight) external view returns (uint256) {
-    return blocks[_blockHeight].data.timestamp;
+  function getBlockTimestamp(uint256 _blockId) external view returns (uint256) {
+    return blocks[_blockId].data.timestamp;
   }
 
-  function getBlockVotersCount(uint256 _blockHeight) external view returns (uint256) {
-    return blocks[_blockHeight].voters.length;
+  function getBlockVotersCount(uint256 _blockId) external view returns (uint256) {
+    return blocks[_blockId].voters.length;
   }
 
-  function getBlockVoters(uint256 _blockHeight) external view returns (address[] memory) {
-    return blocks[_blockHeight].voters;
+  function getBlockVoters(uint256 _blockId) external view returns (address[] memory) {
+    return blocks[_blockId].voters;
   }
 
-  function getBlockVotes(uint256 _blockHeight, address _voter) external view returns (uint256) {
-    return blocks[_blockHeight].votes[_voter];
+  function getBlockVotes(uint256 _blockId, address _voter) external view returns (uint256) {
+    return blocks[_blockId].votes[_voter];
   }
 
-  function getNumericFCD(uint256 _blockHeight, bytes32 _key) public view returns (uint256 value, uint timestamp) {
-    ExtendedBlock storage extendedBlock = blocks[_blockHeight];
+  function getNumericFCD(uint256 _blockId, bytes32 _key) public view returns (uint256 value, uint timestamp) {
+    ExtendedBlock storage extendedBlock = blocks[_blockId];
     return (extendedBlock.numericFCD[_key], extendedBlock.data.timestamp);
   }
 
   function getNumericFCDs(
-    uint256 _blockHeight, bytes32[] calldata _keys
+    uint256 _blockId, bytes32[] calldata _keys
   ) external view returns (uint256[] memory values, uint256 timestamp) {
-    timestamp = blocks[_blockHeight].data.timestamp;
+    timestamp = blocks[_blockId].data.timestamp;
     values = new uint256[](_keys.length);
 
     for (uint i=0; i<_keys.length; i++) {
-      values[i] = blocks[_blockHeight].numericFCD[_keys[i]];
+      values[i] = blocks[_blockId].numericFCD[_keys[i]];
     }
   }
 
