@@ -63,13 +63,12 @@ const root = tree.getHexRoot();
 
 const prepareData = async (
   signer: Signer,
-  nonce: number,
   dataTimestamp: number,
   root: string | null,
   fcdKeys: string[] = [],
   fcdValues: number[] = []
 ) => {
-  let testimony = ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256', 'bytes32'], [nonce, dataTimestamp, root]);
+  let testimony = ethers.utils.defaultAbiCoder.encode(['uint256', 'bytes32'], [dataTimestamp, root]);
 
   for (let i = 0; i < fcdKeys.length; i++) {
     testimony += ethers.utils.defaultAbiCoder.encode(['bytes32', 'uint256'], [fcdKeys[i], fcdValues[i]]).slice(2);
@@ -102,10 +101,10 @@ describe('Chain', () => {
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
-  const executeSubmit = async (nonce: number, dataTimestamp = Math.trunc(Date.now() / 1000)) => {
+  const executeSubmit = async (dataTimestamp = Math.trunc(Date.now() / 1000)) => {
     await mockSubmit();
-    const {r, s, v} = await prepareData(validator, nonce, dataTimestamp, root);
-    await contract.connect(validator).submit(nonce, dataTimestamp, root, [], [], [v], [r], [s]);
+    const {r, s, v} = await prepareData(validator, dataTimestamp, root);
+    await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
   };
 
   beforeEach(async () => {
@@ -129,10 +128,6 @@ describe('Chain', () => {
     it('expect to have no blocks', async () => {
       expect(await contract.blocksCount()).to.eq(0);
     });
-
-    it('expect to getNextNonce to be 0', async () => {
-      expect(await contract.getNextNonce()).to.eq(0);
-    });
   });
 
   describe('setBlockPadding()', () => {
@@ -151,7 +146,7 @@ describe('Chain', () => {
 
   describe('recoverSigner()', () => {
     it('expect to return signer', async () => {
-      const {sig, affidavit, r, s, v, hashForSolidity} = await prepareData(validator, 0, 1, root);
+      const {sig, affidavit, r, s, v, hashForSolidity} = await prepareData(validator, 0, root);
 
       const signer = await contract.recoverSigner(hashForSolidity, v, r, s);
 
@@ -267,7 +262,7 @@ describe('Chain', () => {
 
     describe('when block was minted', () => {
       beforeEach(async () => {
-        await executeSubmit(1, 1);
+        await executeSubmit(1);
       });
 
       [1, 2, 3, 4].forEach(numberOfValidators => {
@@ -295,29 +290,25 @@ describe('Chain', () => {
     describe('without FCD', () => {
       it('expect to mint a block', async () => {
         await mockSubmit();
-        const {r, s, v} = await prepareData(validator, 1, 1, root);
+        const {r, s, v} = await prepareData(validator, 1, root);
 
-        await expect(contract.connect(validator).submit(1, 1, root, [], [], [v], [r], [s])).not.to.be.reverted;
+        await expect(contract.connect(validator).submit(1, root, [], [], [v], [r], [s])).not.to.be.reverted;
         console.log(await contract.blocks(0));
       });
 
       it('fail when signature do not match', async () => {
         await mockSubmit();
-        const {r, s, v} = await prepareData(validator, 1, 1, root);
+        const {r, s, v} = await prepareData(validator, 1, root);
 
         const differentRoot = '0x00000000000000000000000000000000000000000000000000000000000001';
-        await expect(contract.connect(validator).submit(1, 1, differentRoot, [], [], [v], [r], [s])).to.be.reverted;
+        await expect(contract.connect(validator).submit(1, differentRoot, [], [], [v], [r], [s])).to.be.reverted;
       });
 
       describe('when block submitted', () => {
         beforeEach(async () => {
           await mockSubmit();
-          const {r, s, v} = await prepareData(validator, 1, 1, root);
-          await contract.connect(validator).submit(1, 1, root, [], [], [v], [r], [s]);
-        });
-
-        it('expect to nextNonce NOT change when minimal padding not reached', async () => {
-          expect(await contract.getNextNonce()).to.eq(1);
+          const {r, s, v} = await prepareData(validator, 1, root);
+          await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
         });
 
         it('expect to have 1 block', async () => {
@@ -387,12 +378,12 @@ describe('Chain', () => {
           });
         });
 
-        describe('when still on the same nonce', () => {
+        describe('when still on the same timestamp', () => {
           it('expect submit to be reverted', async () => {
             await mockSubmit();
-            const {r, s, v} = await prepareData(validator, 1, 2, root);
-            await expect(contract.connect(validator).submit(1, 2, root, [], [], [v], [r], [s]))
-              .to.revertedWith('revert nonce already taken');
+            const {r, s, v} = await prepareData(validator, 1, root);
+            await expect(contract.connect(validator).submit(1, root, [], [], [v], [r], [s]))
+              .to.revertedWith('revert can NOT submit older data');
           });
 
           describe('when minimal padding reached', () => {
@@ -401,29 +392,18 @@ describe('Chain', () => {
               await mintBlocks();
             });
 
-            it('expect nonce to change', async () => {
-              expect(await contract.getNextNonce()).to.eq(3);
-            });
-
-            describe('when block mined for new nonce', () => {
+            describe('when block mined for new time', () => {
               beforeEach(async () => {
                 await contract.setBlockPadding(1);
-                await executeSubmit(2, 2);
+                await executeSubmit(2);
                 await contract.setBlockPadding(100);
               });
 
-              it('expect to revert when submit again for same nonce', async () => {
+              it('expect to revert when submit again for same time', async () => {
                 await mockSubmit();
-                const {r, s, v} = await prepareData(validator, 3, 2, root);
-                await expect(contract.connect(validator).submit(3, 2, root, [], [], [v], [r], [s]))
+                const {r, s, v} = await prepareData(validator, 2, root);
+                await expect(contract.connect(validator).submit(2, root, [], [], [v], [r], [s]))
                   .to.revertedWith('can NOT submit older data');
-              });
-
-              it('expect to revert when submit again for same nonce', async () => {
-                await mockSubmit();
-                const {r, s, v} = await prepareData(validator, 2, 3, root);
-                await expect(contract.connect(validator).submit(2, 3, root, [], [], [v], [r], [s]))
-                  .to.revertedWith('nonce already taken');
               });
             });
           });
@@ -438,9 +418,9 @@ describe('Chain', () => {
       describe('when block submitted', () => {
         beforeEach(async () => {
           await mockSubmit();
-          const {r, s, v} = await prepareData(validator, 1, 1, root, fcdKeys, fcdValues);
+          const {r, s, v} = await prepareData(validator, 1, root, fcdKeys, fcdValues);
 
-          await expect(contract.connect(validator).submit(1, 1, root, fcdKeys, fcdValues, [v], [r], [s]))
+          await expect(contract.connect(validator).submit(1, root, fcdKeys, fcdValues, [v], [r], [s]))
             .to.emit(contract, 'LogMint');
         });
 
@@ -467,16 +447,22 @@ describe('Chain', () => {
 
     beforeEach(async () => {
       await mockSubmit();
-      let {r, s, v} = await prepareData(validator, 1, 1, root);
-      await contract.connect(validator).submit(1, 1, root, [], [], [v], [r], [s]);
+      let {r, s, v} = await prepareData(validator, 1, root);
+      await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
 
       await mintBlocks(blockPadding);
 
       await mockSubmit();
-      ({r, s, v} = await prepareData(validator, 2, 2, root));
-      await contract.connect(validator).submit(2, 2, root, [], [], [v], [r], [s]);
+      ({r, s, v} = await prepareData(validator, 2, root));
+      await contract.connect(validator).submit(2, root, [], [], [v], [r], [s]);
+
+      await mintBlocks(blockPadding);
 
       await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(contract.address);
+      await contractRegistry.mock.getAddress.withArgs(toBytes32('ValidatorRegistry')).returns(validatorRegistry.address);
+      await validatorRegistry.mock.getNumberOfValidators.returns(0);
+      await contractRegistry.mock.getAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
+      await stakingBank.mock.totalSupply.returns(1);
       newChain = await contractFactory.deploy(contractRegistry.address, blockPadding);
     });
 

@@ -39,7 +39,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     // have empty blocks, but validator can actually increment blockHeight each round and use it as nonce
     // that way if we have two tx (slow/old, and new one made for next round), they will use different nonce
     // and we can accept both, currenty for that situation we get thrwo with error: blockHeight already taken
-    uint256 nonce;
+    // uint256 nonce; ...we can use dataTimestamp as nonce!! it has exactly the same properties as nonce :)
   }
 
   struct ExtendedBlock {
@@ -62,8 +62,13 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
 
     if (address(oldChain) != address(0x0)) {
+      (uint256 lastDataTimestamp, uint256 lastBlockId,,,,,) = oldChain.getStatus();
+      // save last timestamp, so we dont create situation that validators can abuse and submit any timestamp
+      // after contract is updated
+      blocks[lastBlockId].data.dataTimestamp = lastDataTimestamp;
       // +1 because it might be situation when tx is already in progress in old contract
-      blocksCountOffset = oldChain.blocksCount() + oldChain.blocksCountOffset() + 1;
+      // blocksCountOffset = blockCount + 1, blockCount = lastBlockId + 1 => (lastBlockId + 1) + 1
+      blocksCountOffset = lastBlockId + 2;
     }
   }
 
@@ -75,9 +80,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function submit(
-    // nonce will help to see for which round validator is voting, help with debug,
+    // nonce => _dataTimestamp will help to see for which round validator is voting, help with debug,
     // allows for slow tx to be accepted since we no longer checking leader
-    uint256 _nonce,
     uint256 _dataTimestamp,
     bytes32 _root,
     bytes32[] memory _keys,
@@ -91,9 +95,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
     // in future we can add timePadding and remove blockPadding
     require(blocks[latestBlockId].data.dataTimestamp < _dataTimestamp, "can NOT submit older data");
-    require(blocks[latestBlockId].data.nonce < _nonce, "nonce already taken");
 
-    bytes memory testimony = abi.encodePacked(_nonce, _dataTimestamp, _root);
+    bytes memory testimony = abi.encodePacked(_dataTimestamp, _root);
 
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
@@ -106,7 +109,6 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 staked = stakingBank.totalSupply();
     bytes32 affidavit = keccak256(testimony);
 
-    blocks[newBlockId].data.nonce = _nonce;
     blocks[newBlockId].data.root = _root;
     blocks[newBlockId].data.minter = msg.sender;
     blocks[newBlockId].data.staked = staked;
@@ -164,27 +166,18 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return ecrecover(hash, _v, _r, _s);
   }
 
-  // we should calculate this in validator, Im only showing how to do it
-  // validator should use getStatus and he will have all he needs
-  function getNextNonce() public view returns (uint256) {
-    uint256 lastBlockId = getLatestBlockId();
-    return blocks[lastBlockId].data.nonce + (block.number - blocks[lastBlockId].data.anchor) / blockPadding;
-  }
-
   function getStatus() external view returns(
+    uint256 lastDataTimestamp,
+    uint256 lastBlockId,
     address nextLeader,
     address[] memory validators,
     uint256[] memory powers,
     string[] memory locations,
-    uint256 staked,
-    uint256 lastBlockId,
-    uint256 lastNonce,
-    uint256 nextNonce
+    uint256 staked
   ) {
     nextLeader = getLeaderAddressAtBlock(block.number);
     lastBlockId = getLatestBlockId();
-    lastNonce = blocks[lastBlockId].data.nonce;
-    nextNonce = getNextNonce();
+    lastDataTimestamp = blocks[lastBlockId].data.dataTimestamp;
 
     IValidatorRegistry vr = validatorRegistryContract();
     uint256 numberOfValidators = vr.getNumberOfValidators();
