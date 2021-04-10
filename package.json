@@ -10,6 +10,9 @@
     "compile": "npx hardhat compile",
     "node": "hardhat node",
     "test": "hardhat test",
+    "prettier": "prettier --config .prettierrc 'scripts/**/*.ts' 'test/**/*.ts' --check",
+    "prettier:format": "prettier --config .prettierrc 'scripts/**/*.ts' 'test/**/*.ts' --write",
+
     "local-minter": "npx hardhat run --network localhost ./scripts/minter.ts",
     "block-listener": "npx hardhat run --network localhost scripts/blockListener.ts",
     "deploy:registry": "npx hardhat run --network localhost scripts/deployRegistry.ts",
