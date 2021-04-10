@@ -62,13 +62,13 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
 
     if (address(oldChain) != address(0x0)) {
-      (uint256 lastDataTimestamp, uint256 lastBlockId,,,,,) = oldChain.getStatus();
+      (uint256 lastDataTimestamp, uint256 lastBlockId,,,,,, bool readyForNextBlock) = oldChain.getStatus();
       // save last timestamp, so we dont create situation that validators can abuse and submit any timestamp
       // after contract is updated
       blocks[lastBlockId].data.dataTimestamp = lastDataTimestamp;
       // +1 because it might be situation when tx is already in progress in old contract
       // blocksCountOffset = blockCount + 1, blockCount = lastBlockId + 1 => (lastBlockId + 1) + 1
-      blocksCountOffset = lastBlockId + 2;
+      blocksCountOffset = lastBlockId + 1 + (readyForNextBlock ? 1 : 0);
     }
   }
 
@@ -95,6 +95,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
     // in future we can add timePadding and remove blockPadding
     require(blocks[latestBlockId].data.dataTimestamp < _dataTimestamp, "can NOT submit older data");
+    require(blocks[latestBlockId].data.anchor + blockPadding < block.number, "do not spam, too fast");
 
     bytes memory testimony = abi.encodePacked(_dataTimestamp, _root);
 
@@ -173,7 +174,8 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     address[] memory validators,
     uint256[] memory powers,
     string[] memory locations,
-    uint256 staked
+    uint256 staked,
+    bool readyForNextBlock
   ) {
     nextLeader = getLeaderAddressAtBlock(block.number);
     lastBlockId = getLatestBlockId();
@@ -186,7 +188,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
     for (uint256 i = 0; i < validators.length; i++) {
       validators[i] = vr.addresses(i);
-      ( , locations[i]) = vr.validators(validators[i]);
+      (, locations[i]) = vr.validators(validators[i]);
     }
 
     IStakingBank stakingBank = stakingBankContract();
@@ -196,6 +198,9 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     for (uint256 i = 0; i < validators.length; i++) {
       powers[i] = stakingBank.balanceOf(validators[i]);
     }
+
+    // in future we might switch to timestamp so we can have better control over consensus on different chains
+    readyForNextBlock = blocks[lastBlockId].data.anchor + blockPadding < block.number + 1;
   }
 
   function getLatestBlockId() public view returns (uint256) {
