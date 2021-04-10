@@ -137,6 +137,22 @@ describe('Chain', () => {
     it('expect to have no blocks', async () => {
       expect(await contract.blocksCount()).to.eq(0);
     });
+
+    it('expect to have offset', async () => {
+      expect(await contract.blocksCountOffset()).to.eq(1);
+    });
+    
+    it('not throw on status', async () => {
+      await contractRegistry.mock.requireAndGetAddress
+        .withArgs(toBytes32('ValidatorRegistry'))
+        .returns(validatorRegistry.address);
+
+      await validatorRegistry.mock.getNumberOfValidators.returns(0);
+      await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
+      await stakingBank.mock.totalSupply.returns(0);
+
+      await expect(contract.getStatus()).not.to.be.reverted;
+    });
   });
 
   describe('setBlockPadding()', () => {
@@ -265,25 +281,25 @@ describe('Chain', () => {
     [1, 2, 3, 4].forEach((numberOfValidators) => {
       it(`expect to return valid index for ${numberOfValidators}`, async () => {
         const id = (
-          await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())
+          await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 0)
         ).toNumber();
 
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 0)).to.eq(
           id,
           'round #1'
         );
         await mintBlocks(blockPadding);
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 0)).to.eq(
           (id + 1) % numberOfValidators,
           'round #2'
         );
         await mintBlocks(blockPadding);
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 0)).to.eq(
           (id + 2) % numberOfValidators,
           'round #3'
         );
         await mintBlocks(blockPadding);
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 0)).to.eq(
           (id + 3) % numberOfValidators,
           'round #4'
         );
@@ -298,25 +314,25 @@ describe('Chain', () => {
       [1, 2, 3, 4].forEach((numberOfValidators) => {
         it(`expect to return valid index for ${numberOfValidators}`, async () => {
           const id = (
-            await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())
+            await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 1)
           ).toNumber();
 
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 1)).to.eq(
             id,
             'round #1'
           );
           await mintBlocks(blockPadding);
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 1)).to.eq(
             (id + 1) % numberOfValidators,
             'round #2'
           );
           await mintBlocks(blockPadding);
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 1)).to.eq(
             (id + 2) % numberOfValidators,
             'round #3'
           );
           await mintBlocks(blockPadding);
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber(), 1)).to.eq(
             (id + 3) % numberOfValidators,
             'round #4'
           );
@@ -328,23 +344,26 @@ describe('Chain', () => {
   describe('.submit()', () => {
     describe('without FCD', () => {
       it('expect to mint a block', async () => {
+        await mintBlocks(blockPadding);
         await mockSubmit();
         const { r, s, v } = await prepareData(validator, 1, root);
 
         await expect(contract.connect(validator).submit(1, root, [], [], [v], [r], [s])).not.to.be.reverted;
-        console.log(await contract.blocks(0));
+        console.log(await contract.blocks(1));
       });
 
-      it('fail when signature do not match', async () => {
+      it('fail when submit too fast', async () => {
         await mockSubmit();
-        const { r, s, v } = await prepareData(validator, 1, root);
+        let { r, s, v } = await prepareData(validator, 1, root);
+        await expect(contract.connect(validator).submit(1, root, [], [], [v], [r], [s])).not.to.be.reverted;
 
-        const differentRoot = '0x00000000000000000000000000000000000000000000000000000000000001';
-        await expect(contract.connect(validator).submit(1, differentRoot, [], [], [v], [r], [s])).to.be.reverted;
+        ({ r, s, v } = await prepareData(validator, 2, root));
+        await expect(contract.connect(validator).submit(2, root, [], [], [v], [r], [s])).to.be.revertedWith('spam');
       });
 
       describe('when block submitted', () => {
         beforeEach(async () => {
+          await mintBlocks(blockPadding);
           await mockSubmit();
           const { r, s, v } = await prepareData(validator, 1, root);
           await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
@@ -355,26 +374,26 @@ describe('Chain', () => {
         });
 
         it('expect to save valid root', async () => {
-          expect((await contract.blocks(0)).root).to.eq(tree.getHexRoot());
+          expect((await contract.blocks(1)).root).to.eq(tree.getHexRoot());
         });
 
         it('expect to get number of block voters', async () => {
-          expect(await contract.getBlockVotersCount(0)).to.eq(1);
+          expect(await contract.getBlockVotersCount(1)).to.eq(1);
         });
 
         it('expect to get block voters', async () => {
           const voter = await validator.getAddress();
-          expect(await contract.getBlockVoters(0)).to.eql([voter]);
+          expect(await contract.getBlockVoters(1)).to.eql([voter]);
         });
 
         it('expect to get block votes', async () => {
           const voter = await validator.getAddress();
-          expect(await contract.getBlockVotes(0, voter)).to.eq(1000);
+          expect(await contract.getBlockVotes(1, voter)).to.eq(1000);
         });
 
         it('expect to get FCD', async () => {
           const bytes32 = `0x${'0'.repeat(64)}`;
-          const fcds = await contract.getNumericFCDs(0, [bytes32]);
+          const fcds = await contract.getNumericFCDs(1, [bytes32]);
           console.log(fcds);
           expect(fcds[0]).to.eql([BigNumber.from(0)]);
           expect(fcds.timestamp).to.gt(0);
@@ -387,7 +406,7 @@ describe('Chain', () => {
               const v = inputs[k];
               const proof = tree.getProofForKey(k);
 
-              expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
+              expect(await contract.verifyProofForBlock(1, proof, LeafKeyCoder.encode(k), v)).to.be.true;
             });
           });
         });
@@ -398,7 +417,7 @@ describe('Chain', () => {
             const v = inputs[k];
 
             const proof = tree.getProofForKey(k);
-            const result = await contract.verifyProofForBlockForNumber(0, proof, LeafKeyCoder.encode(k), v);
+            const result = await contract.verifyProofForBlockForNumber(1, proof, LeafKeyCoder.encode(k), v);
 
             expect(result[0]).to.eq(true);
             expect(result[1]).to.eq(LeafValueCoder.decode(inputs[k].toString('hex')));
@@ -408,7 +427,7 @@ describe('Chain', () => {
         describe('verifyProofs()', () => {
           it('expect to validate multiple proofs as once', async () => {
             const keys = Object.keys(inputs).slice(-3);
-            const blockHeights = new Array(keys.length).fill(0);
+            const blockHeights = new Array(keys.length).fill(1);
             const { proofs, proofItemsCounter } = tree.getFlatProofsForKeys(keys);
             const leaves = keys.map((k) => tree.getLeafForKey(k));
             const result = new Array(keys.length).fill(true);
@@ -458,6 +477,7 @@ describe('Chain', () => {
 
       describe('when block submitted', () => {
         beforeEach(async () => {
+          await mintBlocks(blockPadding);
           await mockSubmit();
           const { r, s, v } = await prepareData(validator, 1, root, fcdKeys, fcdValues);
 
@@ -468,7 +488,7 @@ describe('Chain', () => {
         });
 
         it('expect to get First Class Data', async () => {
-          const fcds = await contract.getNumericFCDs(0, [fcdKeys[0]]);
+          const fcds = await contract.getNumericFCDs(1, [fcdKeys[0]]);
           console.log(fcds);
           expect(fcds[0]).to.eql([BigNumber.from(fcdValues[0])]);
           expect(fcds.timestamp).to.gt(0);
@@ -479,7 +499,7 @@ describe('Chain', () => {
           const v = inputs[k];
           const proof = tree.getProofForKey(k);
 
-          expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
+          expect(await contract.verifyProofForBlock(1, proof, LeafKeyCoder.encode(k), v)).to.be.true;
         });
       });
     });
@@ -487,13 +507,11 @@ describe('Chain', () => {
 
   it('expect to getStatus()', async () => {
     await mintBlocks(blockPadding);
-
     await mockSubmit();
     let { r, s, v } = await prepareData(validator, 1, root);
     await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
 
     await mintBlocks(blockPadding);
-
     await mockSubmit();
     ({ r, s, v } = await prepareData(validator, 2, root));
     await contract.connect(validator).submit(2, root, [], [], [v], [r], [s]);
@@ -511,13 +529,13 @@ describe('Chain', () => {
 
     const status = await contract.getStatus();
 
-    expect(status.lastDataTimestamp).to.eq(2);
-    expect(status.lastBlockId).to.eq(1);
-    expect(status.nextLeader).to.eq(validatorAddress);
-    expect(status.validators).to.eql([validatorAddress]);
-    expect(status.powers).to.eql([BigNumber.from(321)]);
-    expect(status.locations).to.eql(['abc']);
-    expect(status.staked).to.eq(123);
+    expect(status.lastDataTimestamp).to.eq(2, 'invalid lastDataTimestamp');
+    expect(status.lastBlockId).to.eq(2, 'invalid block id');
+    expect(status.nextLeader).to.eq(validatorAddress, 'invalid validator');
+    expect(status.validators).to.eql([validatorAddress], 'invalid validators list');
+    expect(status.powers).to.eql([BigNumber.from(321)], 'invalid powers');
+    expect(status.locations).to.eql(['abc'], 'invalid locations');
+    expect(status.staked).to.eq(123, 'invalid staked');
     expect(status.readyForNextBlock).to.be.true;
   });
 
@@ -525,6 +543,7 @@ describe('Chain', () => {
     let newChain: Contract;
 
     beforeEach(async () => {
+      await mintBlocks(blockPadding);
       await mockSubmit();
       let { r, s, v } = await prepareData(validator, 1, root);
       await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
@@ -552,13 +571,13 @@ describe('Chain', () => {
     });
 
     it('expect to have offset', async () => {
-      expect(await newChain.blocksCountOffset()).to.eq(2 + 1);
+      expect(await newChain.blocksCountOffset()).to.eq(3 + 1);
     });
 
     it('expect to have valid blockId', async () => {
-      expect(await contract.getLatestBlockId()).to.eq(1);
+      expect(await contract.getLatestBlockId()).to.eq(2);
       await mintBlocks(blockPadding);
-      expect(await contract.getLatestBlockId()).to.eq(1);
+      expect(await contract.getLatestBlockId()).to.eq(2);
     });
   });
 });

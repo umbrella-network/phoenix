@@ -69,6 +69,9 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       // +1 because it might be situation when tx is already in progress in old contract
       // blocksCountOffset = blockCount + 1, blockCount = lastBlockId + 1 => (lastBlockId + 1) + 1
       blocksCountOffset = lastBlockId + 1 + (readyForNextBlock ? 1 : 0);
+    } else {
+      // this will resolve some initial issues when we dont have any blocks
+      blocksCountOffset = 1;
     }
   }
 
@@ -177,7 +180,6 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 staked,
     bool readyForNextBlock
   ) {
-    nextLeader = getLeaderAddressAtBlock(block.number);
     lastBlockId = getLatestBlockId();
     lastDataTimestamp = blocks[lastBlockId].data.dataTimestamp;
 
@@ -186,16 +188,18 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     validators = new address[](numberOfValidators);
     locations = new string[](numberOfValidators);
 
-    for (uint256 i = 0; i < validators.length; i++) {
+    for (uint256 i = 0; i < numberOfValidators; i++) {
       validators[i] = vr.addresses(i);
       (, locations[i]) = vr.validators(validators[i]);
     }
 
+    nextLeader = numberOfValidators > 0 ? validators[getLeaderIndex(numberOfValidators, block.number + 1, lastBlockId)] : address(0);
+
     IStakingBank stakingBank = stakingBankContract();
-    powers = new uint256[](validators.length);
+    powers = new uint256[](numberOfValidators);
     staked = stakingBank.totalSupply();
 
-    for (uint256 i = 0; i < validators.length; i++) {
+    for (uint256 i = 0; i < numberOfValidators; i++) {
       powers[i] = stakingBank.balanceOf(validators[i]);
     }
 
@@ -207,25 +211,17 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocksCount + blocksCountOffset - 1;
   }
 
-  function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber) public view returns (uint256) {
-    uint256 latestBlockId = getLatestBlockId();
-
-    uint256 validatorIndex = latestBlockId +
-      (ethBlockNumber - blocks[latestBlockId].data.anchor) / blockPadding;
-
+  function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber, uint256 blockId) public view returns (uint256) {
+    uint256 validatorIndex = blockId + (ethBlockNumber - blocks[blockId].data.anchor) / blockPadding;
     return validatorIndex % numberOfValidators;
   }
 
-  function getNextLeaderAddress() public view returns (address) {
-    return getLeaderAddressAtBlock(block.number + 1);
-  }
-
   function getLeaderAddress() public view returns (address) {
-    return getLeaderAddressAtBlock(block.number);
+    return getLeaderAddressAtBlock(block.number, getLatestBlockId());
   }
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
-  function getLeaderAddressAtBlock(uint256 ethBlockNumber) public view returns (address) {
+  function getLeaderAddressAtBlock(uint256 ethBlockNumber, uint256 blockId) public view returns (address) {
     IValidatorRegistry validatorRegistry = validatorRegistryContract();
 
     uint256 numberOfValidators = validatorRegistry.getNumberOfValidators();
@@ -234,7 +230,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       return address(0x0);
     }
 
-    uint256 validatorIndex = getLeaderIndex(numberOfValidators, ethBlockNumber);
+    uint256 validatorIndex = getLeaderIndex(numberOfValidators, ethBlockNumber, blockId);
 
     return validatorRegistry.addresses(validatorIndex);
   }
