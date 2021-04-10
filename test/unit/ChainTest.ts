@@ -1,10 +1,10 @@
-import hre, {ethers} from 'hardhat';
-import {expect, use} from 'chai';
-import {BigNumber, Contract, ContractFactory, Signer} from 'ethers';
-import {waffleChai} from '@ethereum-waffle/chai';
-import {deployMockContract} from '@ethereum-waffle/mock-contract';
+import hre, { ethers } from 'hardhat';
+import { expect, use } from 'chai';
+import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
+import { waffleChai } from '@ethereum-waffle/chai';
+import { deployMockContract } from '@ethereum-waffle/mock-contract';
 
-import {LeafKeyCoder, LeafType, LeafValueCoder} from '@umb-network/toolbox';
+import { LeafKeyCoder, LeafType, LeafValueCoder } from '@umb-network/toolbox';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
 
@@ -13,10 +13,10 @@ import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/ValidatorRegistry.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
-import {toBytes32} from '../../scripts/utils/helpers';
-import {mintBlocks} from '../utils';
+import { toBytes32 } from '../../scripts/utils/helpers';
+import { mintBlocks } from '../utils';
 
-const {toWei} = hre.web3.utils;
+const { toWei } = hre.web3.utils;
 
 use(waffleChai);
 
@@ -85,9 +85,9 @@ const prepareData = async (
   const affidavit = ethers.utils.arrayify(hashForSolidity);
 
   const sig = await signer.signMessage(affidavit);
-  const {r, s, v} = ethers.utils.splitSignature(sig);
+  const { r, s, v } = ethers.utils.splitSignature(sig);
 
-  return {testimony, affidavit, sig, r, s, v, hashForSolidity};
+  return { testimony, affidavit, sig, r, s, v, hashForSolidity };
 };
 
 describe('Chain', () => {
@@ -112,7 +112,7 @@ describe('Chain', () => {
 
   const executeSubmit = async (dataTimestamp = Math.trunc(Date.now() / 1000)) => {
     await mockSubmit();
-    const {r, s, v} = await prepareData(validator, dataTimestamp, root);
+    const { r, s, v } = await prepareData(validator, dataTimestamp, root);
     await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
   };
 
@@ -157,7 +157,7 @@ describe('Chain', () => {
 
   describe('recoverSigner()', () => {
     it('expect to return signer', async () => {
-      const {sig, affidavit, r, s, v, hashForSolidity} = await prepareData(validator, 0, root);
+      const { sig, affidavit, r, s, v, hashForSolidity } = await prepareData(validator, 0, root);
 
       const signer = await contract.recoverSigner(hashForSolidity, v, r, s);
 
@@ -329,7 +329,7 @@ describe('Chain', () => {
     describe('without FCD', () => {
       it('expect to mint a block', async () => {
         await mockSubmit();
-        const {r, s, v} = await prepareData(validator, 1, root);
+        const { r, s, v } = await prepareData(validator, 1, root);
 
         await expect(contract.connect(validator).submit(1, root, [], [], [v], [r], [s])).not.to.be.reverted;
         console.log(await contract.blocks(0));
@@ -337,7 +337,7 @@ describe('Chain', () => {
 
       it('fail when signature do not match', async () => {
         await mockSubmit();
-        const {r, s, v} = await prepareData(validator, 1, root);
+        const { r, s, v } = await prepareData(validator, 1, root);
 
         const differentRoot = '0x00000000000000000000000000000000000000000000000000000000000001';
         await expect(contract.connect(validator).submit(1, differentRoot, [], [], [v], [r], [s])).to.be.reverted;
@@ -346,7 +346,7 @@ describe('Chain', () => {
       describe('when block submitted', () => {
         beforeEach(async () => {
           await mockSubmit();
-          const {r, s, v} = await prepareData(validator, 1, root);
+          const { r, s, v } = await prepareData(validator, 1, root);
           await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
         });
 
@@ -409,7 +409,7 @@ describe('Chain', () => {
           it('expect to validate multiple proofs as once', async () => {
             const keys = Object.keys(inputs).slice(-3);
             const blockHeights = new Array(keys.length).fill(0);
-            const {proofs, proofItemsCounter} = tree.getFlatProofsForKeys(keys);
+            const { proofs, proofItemsCounter } = tree.getFlatProofsForKeys(keys);
             const leaves = keys.map((k) => tree.getLeafForKey(k));
             const result = new Array(keys.length).fill(true);
 
@@ -420,7 +420,7 @@ describe('Chain', () => {
         describe('when still on the same timestamp', () => {
           it('expect submit to be reverted', async () => {
             await mockSubmit();
-            const {r, s, v} = await prepareData(validator, 1, root);
+            const { r, s, v } = await prepareData(validator, 1, root);
             await expect(contract.connect(validator).submit(1, root, [], [], [v], [r], [s])).to.revertedWith(
               'revert can NOT submit older data'
             );
@@ -441,7 +441,7 @@ describe('Chain', () => {
 
               it('expect to revert when submit again for same time', async () => {
                 await mockSubmit();
-                const {r, s, v} = await prepareData(validator, 2, root);
+                const { r, s, v } = await prepareData(validator, 2, root);
                 await expect(contract.connect(validator).submit(2, root, [], [], [v], [r], [s])).to.revertedWith(
                   'can NOT submit older data'
                 );
@@ -459,7 +459,7 @@ describe('Chain', () => {
       describe('when block submitted', () => {
         beforeEach(async () => {
           await mockSubmit();
-          const {r, s, v} = await prepareData(validator, 1, root, fcdKeys, fcdValues);
+          const { r, s, v } = await prepareData(validator, 1, root, fcdKeys, fcdValues);
 
           await expect(contract.connect(validator).submit(1, root, fcdKeys, fcdValues, [v], [r], [s])).to.emit(
             contract,
@@ -489,18 +489,16 @@ describe('Chain', () => {
     await mintBlocks(blockPadding);
 
     await mockSubmit();
-    let {r, s, v} = await prepareData(validator, 1, root);
+    let { r, s, v } = await prepareData(validator, 1, root);
     await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
 
     await mintBlocks(blockPadding);
 
     await mockSubmit();
-    ({r, s, v} = await prepareData(validator, 2, root));
+    ({ r, s, v } = await prepareData(validator, 2, root));
     await contract.connect(validator).submit(2, root, [], [], [v], [r], [s]);
 
-    await contractRegistry.mock.getAddress
-      .withArgs(toBytes32('ValidatorRegistry'))
-      .returns(validatorRegistry.address);
+    await contractRegistry.mock.getAddress.withArgs(toBytes32('ValidatorRegistry')).returns(validatorRegistry.address);
 
     await validatorRegistry.mock.getNumberOfValidators.returns(1);
     await validatorRegistry.mock.addresses.withArgs(0).returns(validatorAddress);
@@ -523,19 +521,18 @@ describe('Chain', () => {
     expect(status.readyForNextBlock).to.be.true;
   });
 
-
   describe('update/replace contract', () => {
     let newChain: Contract;
 
     beforeEach(async () => {
       await mockSubmit();
-      let {r, s, v} = await prepareData(validator, 1, root);
+      let { r, s, v } = await prepareData(validator, 1, root);
       await contract.connect(validator).submit(1, root, [], [], [v], [r], [s]);
 
       await mintBlocks(blockPadding);
 
       await mockSubmit();
-      ({r, s, v} = await prepareData(validator, 2, root));
+      ({ r, s, v } = await prepareData(validator, 2, root));
       await contract.connect(validator).submit(2, root, [], [], [v], [r], [s]);
 
       await mintBlocks(blockPadding);
