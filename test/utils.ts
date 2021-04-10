@@ -1,4 +1,4 @@
-import {ethers} from 'hardhat';
+import { ethers } from 'hardhat';
 
 export const mintBlocks = async (count = 1): Promise<void> => {
   while (count-- > 0) {

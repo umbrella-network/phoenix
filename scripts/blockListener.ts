@@ -1,8 +1,8 @@
-import {ethers} from 'hardhat';
+import { ethers } from 'hardhat';
 import Chain from '../artifacts/contracts/Chain.sol/Chain.json';
-import {getProvider} from './utils/helpers';
+import { getProvider } from './utils/helpers';
 
-import {BigNumber} from 'ethers';
+import { BigNumber } from 'ethers';
 import configuration from '../config';
 import Registry from '../artifacts/contracts/Registry.sol/Registry.json';
 

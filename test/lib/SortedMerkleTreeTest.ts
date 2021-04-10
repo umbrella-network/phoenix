@@ -1,16 +1,16 @@
-import {ethers} from 'hardhat';
-import {use, expect} from 'chai';
+import { ethers } from 'hardhat';
+import { use, expect } from 'chai';
 
-import {ContractFactory, Contract} from 'ethers';
-import {waffleChai} from '@ethereum-waffle/chai';
-import {LeafKeyCoder, LeafValueCoder, LeafType} from '@umb-network/toolbox';
+import { ContractFactory, Contract } from 'ethers';
+import { waffleChai } from '@ethereum-waffle/chai';
+import { LeafKeyCoder, LeafValueCoder, LeafType } from '@umb-network/toolbox';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
 
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import {deployMockContract} from '@ethereum-waffle/mock-contract';
+import { deployMockContract } from '@ethereum-waffle/mock-contract';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import {toBytes32} from '../../scripts/utils/helpers';
+import { toBytes32 } from '../../scripts/utils/helpers';
 
 use(waffleChai);
 
@@ -38,15 +38,15 @@ describe('Tree', () => {
 
   describe('getHexRoot()', () => {
     it('expect to have different root for different data', async () => {
-      const tree1 = new SortedMerkleTree({'a': LeafValueCoder.encode(1, LeafType.TYPE_INTEGER)});
-      const tree2 = new SortedMerkleTree({'a': LeafValueCoder.encode(2, LeafType.TYPE_INTEGER)});
+      const tree1 = new SortedMerkleTree({ a: LeafValueCoder.encode(1, LeafType.TYPE_INTEGER) });
+      const tree2 = new SortedMerkleTree({ a: LeafValueCoder.encode(2, LeafType.TYPE_INTEGER) });
       expect(tree1.getHexRoot()).not.to.eq(tree2.getHexRoot());
     });
   });
 
   describe('with one element', () => {
     const key = 'eth-usd';
-    const data = {[key]: LeafValueCoder.encode(123, LeafType.TYPE_INTEGER)};
+    const data = { [key]: LeafValueCoder.encode(123, LeafType.TYPE_INTEGER) };
     const tree = new SortedMerkleTree(data);
 
     it('expect leaf === tree', async () => {
@@ -69,11 +69,19 @@ describe('Tree', () => {
     const data: Record<string, Buffer> = {};
 
     const keys = [
-      'eth-eur', 'btc-eur', 'war-eur', 'ltc-eur', 'uni-eur',
-      'eth-usd', 'btc-usd', 'war-usd', 'ltc-usd', 'uni-usd',
+      'eth-eur',
+      'btc-eur',
+      'war-eur',
+      'ltc-eur',
+      'uni-eur',
+      'eth-usd',
+      'btc-usd',
+      'war-usd',
+      'ltc-usd',
+      'uni-usd',
     ];
 
-    keys.sort().forEach(k => {
+    keys.sort().forEach((k) => {
       data[k] = LeafValueCoder.encode(Math.round(Math.random() * 1000), LeafType.TYPE_INTEGER);
     });
 
@@ -83,7 +91,7 @@ describe('Tree', () => {
     it('keys order should not matter', async () => {
       const dataReverse: Record<string, Buffer> = {};
 
-      keys.reverse().forEach(k => {
+      keys.reverse().forEach((k) => {
         dataReverse[k] = data[k];
       });
 
@@ -95,7 +103,7 @@ describe('Tree', () => {
     it('expect to validate proof for all keys', async () => {
       const awaits: any[] = [];
 
-      Object.keys(data).forEach(k => {
+      Object.keys(data).forEach((k) => {
         const proof = tree.getProofForKey(k);
         const leaf = tree.createLeafHash(k);
 
@@ -103,7 +111,7 @@ describe('Tree', () => {
         awaits.push(contract.verifyProof(proof, tree.getHexRoot(), leaf));
       });
 
-      expect((await Promise.all(awaits)).every(result => result)).to.be.true;
+      expect((await Promise.all(awaits)).every((result) => result)).to.be.true;
     });
   });
 });

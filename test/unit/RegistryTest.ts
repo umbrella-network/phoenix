@@ -1,10 +1,10 @@
 import { expect, use } from 'chai';
 
-import {ethers, ContractFactory, Contract, Signer} from 'ethers';
-import {waffleChai} from '@ethereum-waffle/chai';
-import {deployMockContract} from '@ethereum-waffle/mock-contract';
-import {loadFixture} from 'ethereum-waffle';
-import {toBytes32} from '../../scripts/utils/helpers';
+import { ethers, ContractFactory, Contract, Signer } from 'ethers';
+import { waffleChai } from '@ethereum-waffle/chai';
+import { deployMockContract } from '@ethereum-waffle/mock-contract';
+import { loadFixture } from 'ethereum-waffle';
+import { toBytes32 } from '../../scripts/utils/helpers';
 
 import Registrable from '../../artifacts/contracts/extensions/Registrable.sol/Registrable.json';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
@@ -19,7 +19,7 @@ async function fixture([owner]: Signer[]) {
   return {
     ownerAddress: await owner.getAddress(),
     registrable,
-    contract
+    contract,
   };
 }
 
@@ -31,7 +31,7 @@ describe('Registry', () => {
   let ownerAddress: string, contract: Contract, registrable: Contract;
 
   beforeEach(async () => {
-    ({ownerAddress, registrable, contract} = await loadFixture(fixture));
+    ({ ownerAddress, registrable, contract } = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {
@@ -51,7 +51,8 @@ describe('Registry', () => {
       await registrable.mock.getName.returns(toBytes32(registrableName));
 
       await expect(contract.importContracts([registrable.address]))
-        .to.emit(contract, 'LogRegistered').withArgs(registrable.address, toBytes32(registrableName));
+        .to.emit(contract, 'LogRegistered')
+        .withArgs(registrable.address, toBytes32(registrableName));
     });
   });
 
@@ -69,11 +70,13 @@ describe('Registry', () => {
     });
 
     it('expect to throw when uneven number of inputs', async () => {
-      await expect(contract.importAddresses([aName32, bName32], [ownerAddress]))
-        .to.revertedWith('Input lengths must match');
+      await expect(contract.importAddresses([aName32, bName32], [ownerAddress])).to.revertedWith(
+        'Input lengths must match'
+      );
 
-      await expect(contract.importAddresses([aName32], [ownerAddress, ownerAddress]))
-        .to.revertedWith('Input lengths must match');
+      await expect(contract.importAddresses([aName32], [ownerAddress, ownerAddress])).to.revertedWith(
+        'Input lengths must match'
+      );
     });
   });
 
@@ -102,8 +105,9 @@ describe('Registry', () => {
       });
 
       it('expect to throw when address not exists', async () => {
-        await expect(contract.requireAndGetAddress(toBytes32('-----')))
-          .to.be.revertedWith('revert Name not registered: -----');
+        await expect(contract.requireAndGetAddress(toBytes32('-----'))).to.be.revertedWith(
+          'revert Name not registered: -----'
+        );
       });
     });
   });

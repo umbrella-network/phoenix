@@ -1,16 +1,16 @@
 require('custom-env').env(); // eslint-disable-line
 
-import {deployedContract} from './utils/deployedContracts';
-import {Contract} from 'ethers';
+import { deployedContract } from './utils/deployedContracts';
+import { Contract } from 'ethers';
 
-import {deployValidatorRegistry, registerContract} from './deployers/contracts';
-import {getProvider, waitForTx} from './utils/helpers';
+import { deployValidatorRegistry, registerContract } from './deployers/contracts';
+import { getProvider, waitForTx } from './utils/helpers';
 
 const provider = getProvider();
 
 interface Validator {
-  id: string,
-  location: string
+  id: string;
+  location: string;
 }
 
 const existingValidators = async (): Promise<Validator[]> => {
@@ -20,8 +20,8 @@ const existingValidators = async (): Promise<Validator[]> => {
 
   for (let i = 0; i < validatorsCount; i++) {
     const address = await validatorRegistry.addresses(i);
-    const {id, location} = await validatorRegistry.validators(address);
-    validators.push({id, location});
+    const { id, location } = await validatorRegistry.validators(address);
+    validators.push({ id, location });
   }
 
   console.log('Existing validators:');
@@ -50,7 +50,7 @@ const reDeployAndRegister = async () => {
 
 reDeployAndRegister()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

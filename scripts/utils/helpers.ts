@@ -1,10 +1,10 @@
 require('custom-env').env(); // eslint-disable-line
 
 import hre from 'hardhat';
-import {HttpNetworkUserConfig} from 'hardhat/types';
-import {ethers} from 'ethers';
+import { HttpNetworkUserConfig } from 'hardhat/types';
+import { ethers } from 'ethers';
 import '@nomiclabs/hardhat-web3';
-import {Provider} from '@ethersproject/providers';
+import { Provider } from '@ethersproject/providers';
 
 export const sleep = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));

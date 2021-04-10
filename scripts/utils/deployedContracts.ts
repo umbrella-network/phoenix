@@ -1,10 +1,10 @@
 require('custom-env').env(); // eslint-disable-line
 
-import {ethers} from 'hardhat';
-import {Contract} from 'ethers';
+import { ethers } from 'hardhat';
+import { Contract } from 'ethers';
 
 import configuration from '../../config';
-import {getProvider} from './helpers';
+import { getProvider } from './helpers';
 
 const config = configuration();
 const provider = getProvider();
@@ -16,8 +16,9 @@ import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 
 export const deployedRegistry = async (): Promise<Contract> => {
-  return new ethers.Contract(config.contractRegistry.address, Registry.abi, provider)
-    .connect((await ethers.getSigners())[0]);
+  return new ethers.Contract(config.contractRegistry.address, Registry.abi, provider).connect(
+    (await ethers.getSigners())[0]
+  );
 };
 
 export const deployedContract = async (
