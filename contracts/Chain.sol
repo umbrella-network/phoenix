@@ -98,6 +98,9 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
     // in future we can add timePadding and remove blockPadding
     require(blocks[latestBlockId].data.dataTimestamp < _dataTimestamp, "can NOT submit older data");
+    // in future we should use dataTimestamp + timePadding < _dataTimestamp
+    // because it is more real life case, blocks can be mined in different speed
+    // so padding based on blocks is not the best padding, its better to use time
     require(blocks[latestBlockId].data.anchor + blockPadding < block.number, "do not spam, too fast");
 
     bytes memory testimony = abi.encodePacked(_dataTimestamp, _root);
@@ -203,7 +206,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       powers[i] = stakingBank.balanceOf(validators[i]);
     }
 
-    // in future we might switch to timestamp so we can have better control over consensus on different chains
+    // in future we might switch to timestamp, so we can have better control over consensus on different chains
     readyForNextBlock = blocks[lastBlockId].data.anchor + blockPadding < block.number + 1;
   }
 
