@@ -4,11 +4,10 @@ import { use, expect } from 'chai';
 import { ContractFactory, Contract } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { LeafKeyCoder, LeafValueCoder, LeafType } from '@umb-network/toolbox';
+import { deployMockContract } from '@ethereum-waffle/mock-contract';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
-
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import { deployMockContract } from '@ethereum-waffle/mock-contract';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 

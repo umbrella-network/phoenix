@@ -25,8 +25,9 @@ const {
 } = process.env;
 
 const balance = '1000' + '0'.repeat(18);
+const autoMinting = HARDHAT_MINING_AUTO === 'true';
 
-console.log('selected NETWORK=', NETWORK);
+console.log({NETWORK, autoMinting, HARDHAT_MINING_INTERVAL});
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -48,8 +49,8 @@ const config: HardhatUserConfig = {
         {balance, privateKey: '0xee9d129c1997549ee09c0757af5939b2483d80ad649a0eda68e8b0357ad11131'}
       ],
       mining: {
-        auto: HARDHAT_MINING_AUTO === 'true',
-        interval: parseInt(HARDHAT_MINING_INTERVAL, 10),
+        auto: autoMinting,
+        interval: autoMinting ? 0 : parseInt(HARDHAT_MINING_INTERVAL || '0', 10),
       },
     },
     localhost: {
