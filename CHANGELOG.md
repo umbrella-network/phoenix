@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- status getter that will return all needed data 
+
+### Changed
+- included `dataTimestamp` as part of validator signature
 
 ## [0.5.0] - 2021-04-07
 ### Changed
