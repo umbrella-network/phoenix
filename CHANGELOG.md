@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [1.0.1] - 2021-04-16
+### Changed
+- remove requirements for `block.timestamp` as we can't rely on miners timestamp
+
 ## [1.0.0] - 2021-04-15
 ### Added
 - status getter that will return all needed data 

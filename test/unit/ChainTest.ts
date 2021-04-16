@@ -366,7 +366,7 @@ describe('Chain', () => {
           .revertedWith('Mock on the method is not initialized');
       });
 
-      it('fail when data older than 25 minutes', async () => {
+      /* it('fail when data older than 25 minutes', async () => {
         await mockSubmit();
         const t = await blockTimestamp();
         const { r, s, v, dataTimestamp } = await prepareData(validator, 0, t - 25 * 60 - 1, root);
@@ -375,6 +375,16 @@ describe('Chain', () => {
           'data are older than 25 minutes'
         );
       });
+
+      it('fail when data from future', async () => {
+        await mockSubmit();
+        const t = await blockTimestamp();
+        const { r, s, v, dataTimestamp } = await prepareData(validator, 0, t + 65, root);
+
+        await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).to.be.revertedWith(
+          'oh, so you can predict future'
+        );
+      }); // */
 
       describe('when block submitted', () => {
         let previousDataTimestamp: number;

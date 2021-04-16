@@ -75,9 +75,6 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     bytes32[] memory _r,
     bytes32[] memory _s
   ) public nonReentrant returns (bool) {
-    require(_dataTimestamp + 25 minutes > block.timestamp, "data are older than 25 minutes");
-    require(_dataTimestamp <= block.timestamp, "oh, so you can predict future? :)");
-
     uint256 blockHeight = getBlockHeight();
     require(blocks[blockHeight].data.anchor == 0, "block already mined for current blockHeight");
     // in future we can add timePadding and remove blockPadding
