@@ -14,7 +14,7 @@ import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/V
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
-import { mintBlocks } from '../utils';
+import { blockTimestamp, mintBlocks } from '../utils';
 
 const { toWei } = hre.web3.utils;
 
@@ -105,13 +105,11 @@ describe('Chain', () => {
     contract: Contract,
     contractFactory: ContractFactory;
 
-  const mockSubmit = async (leader = validator, numberOfValidators = 1, totalSupply = 1000, balance = 1000) => {
+  const mockSubmit = async (leader = validator, totalSupply = 1000, balance = 1000) => {
     await contractRegistry.mock.requireAndGetAddress
       .withArgs(toBytes32('ValidatorRegistry'))
       .returns(validatorRegistry.address);
 
-    await validatorRegistry.mock.getNumberOfValidators.returns(numberOfValidators);
-    await validatorRegistry.mock.addresses.returns(await leader.getAddress());
     await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
     await stakingBank.mock.totalSupply.returns(totalSupply);
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
@@ -315,7 +313,7 @@ describe('Chain', () => {
 
     describe('when block was minted', () => {
       beforeEach(async () => {
-        await executeSubmit(0, 1);
+        await executeSubmit(0, await blockTimestamp());
       });
 
       [1, 2, 3, 4].forEach((numberOfValidators) => {
@@ -352,7 +350,7 @@ describe('Chain', () => {
     describe('without FCD', () => {
       it('expect to mint a block', async () => {
         await mockSubmit();
-        const { r, s, v, dataTimestamp } = await prepareData(validator, 0, 1, root);
+        const { r, s, v, dataTimestamp } = await prepareData(validator, 0, await blockTimestamp(), root);
 
         await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).not.to.be.reverted;
         console.log(await contract.blocks(0));
@@ -360,17 +358,31 @@ describe('Chain', () => {
 
       it('fail when signature do not match', async () => {
         await mockSubmit();
-        const { r, s, v, dataTimestamp } = await prepareData(validator, 0, 1, root);
+        const { r, s, v, dataTimestamp } = await prepareData(validator, 0, await blockTimestamp(), root);
 
-        const differentRoot = '0x00000000000000000000000000000000000000000000000000000000000001';
-        await expect(contract.connect(validator).submit(dataTimestamp, differentRoot, [], [], [v], [r], [s])).to.be
-          .reverted;
+        const differentRoot = '0x0000000000000000000000000000000000000000000000000000000000000001';
+        await expect(contract.connect(validator).submit(dataTimestamp, differentRoot, [], [], [v], [r], [s]))
+          .to.be // recover sig will return some other address than validator, so mock function will fail
+          .revertedWith('Mock on the method is not initialized');
+      });
+
+      it('fail when data older than 25 minutes', async () => {
+        await mockSubmit();
+        const t = await blockTimestamp();
+        const { r, s, v, dataTimestamp } = await prepareData(validator, 0, t - 25 * 60 - 1, root);
+
+        await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).to.be.revertedWith(
+          'data are older than 25 minutes'
+        );
       });
 
       describe('when block submitted', () => {
+        let previousDataTimestamp: number;
+
         beforeEach(async () => {
           await mockSubmit();
-          const { r, s, v, dataTimestamp } = await prepareData(validator, 0, 1, root);
+          const { r, s, v, dataTimestamp } = await prepareData(validator, 0, await blockTimestamp(), root);
+          previousDataTimestamp = dataTimestamp;
           await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
         });
 
@@ -406,6 +418,16 @@ describe('Chain', () => {
           console.log(fcds);
           expect(fcds[0]).to.eql([BigNumber.from(0)]);
           expect(fcds.timestamp).to.gt(0);
+        });
+
+        it('fail when data NOT newer than previous block', async () => {
+          await mintBlocks(blockPadding);
+          await mockSubmit();
+          const { r, s, v, dataTimestamp } = await prepareData(validator, 1, previousDataTimestamp, root);
+
+          await expect(
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
+          ).to.be.revertedWith('can NOT submit older data');
         });
 
         describe('verify Proof', () => {
@@ -448,7 +470,7 @@ describe('Chain', () => {
         describe('when still on the same block height', () => {
           it('expect submit to be reverted', async () => {
             await mockSubmit();
-            const { r, s, v, dataTimestamp } = await prepareData(validator, 0, 1, root);
+            const { r, s, v, dataTimestamp } = await prepareData(validator, 0, await blockTimestamp(), root);
             await expect(
               contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
             ).to.revertedWith('revert block already mined for current blockHeight');
@@ -466,13 +488,13 @@ describe('Chain', () => {
             describe('when block mined for new block height', () => {
               beforeEach(async () => {
                 await contract.setBlockPadding(1);
-                await executeSubmit(1, 2);
+                await executeSubmit(1, await blockTimestamp());
                 await contract.setBlockPadding(100);
               });
 
               it('expect to revert when submit again for same block', async () => {
                 await mockSubmit();
-                const { r, s, v, dataTimestamp } = await prepareData(validator, 1, 3, root);
+                const { r, s, v, dataTimestamp } = await prepareData(validator, 1, await blockTimestamp(), root);
                 await expect(
                   contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
                 ).to.revertedWith('revert block already mined for current blockHeight');
@@ -490,7 +512,14 @@ describe('Chain', () => {
       describe('when block submitted', () => {
         beforeEach(async () => {
           await mockSubmit();
-          const { r, s, v, dataTimestamp } = await prepareData(validator, 0, 1, root, fcdKeys, fcdValues);
+          const { r, s, v, dataTimestamp } = await prepareData(
+            validator,
+            0,
+            await blockTimestamp(),
+            root,
+            fcdKeys,
+            fcdValues
+          );
 
           await expect(
             contract.connect(validator).submit(dataTimestamp, root, fcdKeys, fcdValues, [v], [r], [s])
@@ -518,12 +547,12 @@ describe('Chain', () => {
   it('expect to getStatus()', async () => {
     await mintBlocks(blockPadding);
     await mockSubmit();
-    let { r, s, v, dataTimestamp } = await prepareData(validator, 0, 1, root);
+    let { r, s, v, dataTimestamp } = await prepareData(validator, 0, await blockTimestamp(), root);
     await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
     await mintBlocks(blockPadding);
     await mockSubmit();
-    ({ r, s, v, dataTimestamp } = await prepareData(validator, 1, 2, root));
+    ({ r, s, v, dataTimestamp } = await prepareData(validator, 1, dataTimestamp + 1, root));
     await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
     await contractRegistry.mock.getAddress.withArgs(toBytes32('ValidatorRegistry')).returns(validatorRegistry.address);
@@ -538,7 +567,7 @@ describe('Chain', () => {
 
     const status = await contract.getStatus();
 
-    expect(status.lastDataTimestamp).to.eq(2, 'invalid lastDataTimestamp');
+    expect(status.lastDataTimestamp).to.eq(dataTimestamp, 'invalid lastDataTimestamp');
     expect(status.lastBlockHeight).to.eq(1, 'invalid block height');
     expect(status.nextBlockHeight).to.eq(2, 'invalid block height');
     expect(status.nextLeader).to.eq(validatorAddress, 'invalid validator');
@@ -553,13 +582,13 @@ describe('Chain', () => {
 
     beforeEach(async () => {
       await mockSubmit();
-      let { r, s, v, dataTimestamp } = await prepareData(validator, 0, 1, root);
+      let { r, s, v, dataTimestamp } = await prepareData(validator, 0, await blockTimestamp(), root);
       await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
       await mintBlocks(blockPadding);
 
       await mockSubmit();
-      ({ r, s, v, dataTimestamp } = await prepareData(validator, 1, 2, root));
+      ({ r, s, v, dataTimestamp } = await prepareData(validator, 1, dataTimestamp + 1, root));
       await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
       await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(contract.address);
