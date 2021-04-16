@@ -1,21 +1,21 @@
 require('custom-env').env(); // eslint-disable-line
 
-import {verifyContract} from '../utils/verifyContract';
-import {ethers} from 'hardhat';
-import {Contract, Wallet, BigNumber} from 'ethers';
+import { verifyContract } from '../utils/verifyContract';
+import { ethers } from 'hardhat';
+import { Contract, Wallet, BigNumber } from 'ethers';
 
 import configuration from '../../config';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import {constructorAbi, getProvider, isLocalNetwork, toBytes32, waitForTx} from '../utils/helpers';
+import { constructorAbi, getProvider, isLocalNetwork, toBytes32, waitForTx } from '../utils/helpers';
 
 const config = configuration();
 const provider = getProvider();
 
 interface Validator {
-  wallet: Wallet,
-  location: string,
-  balance: BigNumber,
-  privateKey: string
+  wallet: Wallet;
+  location: string;
+  balance: BigNumber;
+  privateKey: string;
 }
 
 export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
@@ -72,7 +72,7 @@ export const registerValidator = async (
   console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
 
   console.log('setting up staking...');
-  tx = await token.mintApproveAndStake(stakingBank.address, id, `${validatorId+1}${'0'.repeat(18)}`);
+  tx = await token.mintApproveAndStake(stakingBank.address, id, `${validatorId + 1}${'0'.repeat(18)}`);
   await waitForTx(tx.hash, provider);
 
   console.log('validator balance:', (await token.balanceOf(id)).toString());
@@ -84,9 +84,12 @@ export const deployAllContracts = async (
   doRegistration = false
 ): Promise<{ chain: string; bank: string; validatorRegistry: string; token: string }> => {
   if (!config.validators.length) {
-    console.log('random PK', ethers.Wallet.createRandom({
-      extraEntropy: Buffer.from(Math.random().toString(10))
-    }).privateKey);
+    console.log(
+      'random PK',
+      ethers.Wallet.createRandom({
+        extraEntropy: Buffer.from(Math.random().toString(10)),
+      }).privateKey
+    );
     throw new Error(
       'please setup (VALIDATOR_PK, VALIDATOR_LOCATION) or (VALIDATOR_?_PK, VALIDATOR_?_LOCATION) in .env'
     );
@@ -110,27 +113,31 @@ export const deployAllContracts = async (
 
   console.log(config.validators);
 
-  const validators: Validator[] = await Promise.all(config.validators.map(async ({privateKey, location}) => {
-    const wallet = new ethers.Wallet(privateKey, provider);
-    const balance = await wallet.getBalance();
-    console.log(`validator ${wallet.address} ETH balance:`, balance.toString());
+  const validators: Validator[] = await Promise.all(
+    config.validators.map(async ({ privateKey, location }) => {
+      const wallet = new ethers.Wallet(privateKey, provider);
+      const balance = await wallet.getBalance();
+      console.log(`validator ${wallet.address} ETH balance:`, balance.toString());
 
-    return {location, wallet, balance, privateKey};
-  }));
+      return { location, wallet, balance, privateKey };
+    })
+  );
 
   if (isLocalNetwork()) {
-    for (const {balance, wallet} of validators) {
+    for (const { balance, wallet } of validators) {
       if (balance.toString() === '0') {
         console.log('sending ETH to validator');
         const ownerBalance = await owner.getBalance();
 
-        const tx = await owner.sendTransaction(
-          {to: wallet.address, value: ownerBalance.div(validators.length + 1).toHexString()});
+        const tx = await owner.sendTransaction({
+          to: wallet.address,
+          value: ownerBalance.div(validators.length + 1).toHexString(),
+        });
         await waitForTx(tx.hash, provider);
       }
     }
   } else {
-    validators.forEach(({balance, wallet}) => {
+    validators.forEach(({ balance, wallet }) => {
       if (balance.lt(BigNumber.from('10000000000000000'))) {
         throw Error(`validator ${wallet.address} does not have enough ETH`);
       }
@@ -202,6 +209,6 @@ export const deployAllContracts = async (
     token: token.address,
     chain: chain.address,
     bank: stakingBank.address,
-    validatorRegistry: validatorRegistry.address
+    validatorRegistry: validatorRegistry.address,
   };
 };

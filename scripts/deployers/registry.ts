@@ -1,15 +1,15 @@
 require('custom-env').env(); // eslint-disable-line
 
-import {Contract} from 'ethers';
-import {ethers} from 'hardhat';
+import { Contract } from 'ethers';
+import { ethers } from 'hardhat';
 
-import {getProvider, isLocalNetwork} from '../utils/helpers';
-import {verifyContract} from '../utils/verifyContract';
+import { getProvider, isLocalNetwork } from '../utils/helpers';
+import { verifyContract } from '../utils/verifyContract';
 
 const provider = getProvider();
 
 export const deployContractRegistry = async (): Promise<Contract> => {
-  const {DEPLOYER_PK} = process.env;
+  const { DEPLOYER_PK } = process.env;
 
   let ownerWallet;
 

@@ -1,12 +1,12 @@
-import {use, expect} from 'chai';
-import {Contract, ContractFactory, Signer} from 'ethers';
-import {waffleChai} from '@ethereum-waffle/chai';
-import {deployMockContract} from '@ethereum-waffle/mock-contract';
-import {loadFixture} from 'ethereum-waffle';
+import { use, expect } from 'chai';
+import { Contract, ContractFactory, Signer } from 'ethers';
+import { waffleChai } from '@ethereum-waffle/chai';
+import { deployMockContract } from '@ethereum-waffle/mock-contract';
+import { loadFixture } from 'ethereum-waffle';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
-import {toBytes32} from '../../scripts/utils/helpers';
+import { toBytes32 } from '../../scripts/utils/helpers';
 
 use(waffleChai);
 
@@ -21,7 +21,7 @@ async function fixture([owner]: Signer[]) {
   const contract = await contractFactory.deploy(contractRegistry.address, 'Umbrella', 'UMB');
 
   return {
-    contract
+    contract,
   };
 }
 
@@ -29,7 +29,7 @@ describe('StakingBank', () => {
   let contract: Contract;
 
   beforeEach(async () => {
-    ({contract} = await loadFixture(fixture));
+    ({ contract } = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {

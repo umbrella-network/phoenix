@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [1.0.0] - 2021-04-15
+### Added
+- status getter that will return all needed data 
+
+### Changed
+- included `dataTimestamp` as part of validator signature
+
 ## [0.5.0] - 2021-04-07
 ### Changed
 - submit will not throw on cases that not affects consensus validation eg invalid balance

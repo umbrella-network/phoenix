@@ -1,9 +1,9 @@
-import hre, {ethers} from 'hardhat';
+import hre, { ethers } from 'hardhat';
 import configuration from '../config';
 import Registry from '../artifacts/contracts/Registry.sol/Registry.json';
 import Chain from '../artifacts/contracts/Chain.sol/Chain.json';
-import {getProvider} from './utils/helpers';
-import {Contract} from 'ethers';
+import { getProvider } from './utils/helpers';
+import { Contract } from 'ethers';
 
 const web3 = hre.web3;
 
@@ -29,8 +29,11 @@ const mineBlock = async () => {
 const minting = async (blockTime: string | undefined) => {
   if (!blockTime) {
     blockTime = '1';
-    console.log('\n➡➡➡➡️ default time for block is set to', blockTime,
-      'You can configure it using LOCAL_BLOCK_TIME in .env.\n');
+    console.log(
+      '\n➡➡➡➡️ default time for block is set to',
+      blockTime,
+      'You can configure it using LOCAL_BLOCK_TIME in .env.\n'
+    );
   }
 
   chain = new ethers.Contract(await registry.getAddressByString('Chain'), Chain.abi, provider);
@@ -41,7 +44,7 @@ const minting = async (blockTime: string | undefined) => {
 
 minting(process.env.LOCAL_BLOCK_TIME as string)
   .then()
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

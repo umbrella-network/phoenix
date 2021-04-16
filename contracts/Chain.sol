@@ -31,6 +31,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     uint256 power;
     uint256 anchor;
     uint256 timestamp;
+    uint256 dataTimestamp;
   }
 
   struct ExtendedBlock {
@@ -66,6 +67,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function submit(
+    uint256 _dataTimestamp,
     bytes32 _root,
     bytes32[] memory _keys,
     uint256[] memory _values,
@@ -73,10 +75,15 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     bytes32[] memory _r,
     bytes32[] memory _s
   ) public nonReentrant returns (bool) {
+    require(_dataTimestamp + 25 minutes > block.timestamp, "data are older than 25 minutes");
+    require(_dataTimestamp <= block.timestamp, "oh, so you can predict future? :)");
+
     uint256 blockHeight = getBlockHeight();
     require(blocks[blockHeight].data.anchor == 0, "block already mined for current blockHeight");
+    // in future we can add timePadding and remove blockPadding
+    require(blocks[blockHeight - 1].data.dataTimestamp < _dataTimestamp, "can NOT submit older data");
 
-    bytes memory testimony = abi.encodePacked(blockHeight, _root);
+    bytes memory testimony = abi.encodePacked(blockHeight, _dataTimestamp, _root);
 
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
@@ -85,46 +92,54 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
 
-    IStakingBank stakingBank = stakingBankContract();
-    uint256 staked = stakingBank.totalSupply();
-    uint256 power = 0;
-    uint256 minimum = staked.mul(66);
-
     bytes32 affidavit = keccak256(testimony);
 
-    for (uint256 i = 0; i < _v.length; i++) {
-      address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
-      uint256 balance = stakingBank.balanceOf(signer);
-      require(blocks[blockHeight].votes[signer] == 0, "validator included more than once");
-
-      if (balance == 0) {
-        // if no balance -> move on
-        // if we calculated root for other blockHeight, then recovering signer will not work -> move on
-        // if invalid signature for any reason -> move on
-        // we don't have to reject tx because of above
-        continue;
-      }
-
-      blocks[blockHeight].voters.push(signer);
-
-      blocks[blockHeight].votes[signer] = balance;
-      power = power.add(balance);
-    }
-
-    require(power.mul(100) > minimum, "not enough power was gathered");
+    (blocks[blockHeight].data.staked, blocks[blockHeight].data.power) =
+      _validateSignatures(blockHeight, affidavit, _v, _r, _s);
 
     blocks[blockHeight].data.root = _root;
-    blocks[blockHeight].data.minter = msg.sender;
-    blocks[blockHeight].data.staked = staked;
-    blocks[blockHeight].data.power = power;
+    blocks[blockHeight].data.minter = msg.sender; //TODO check if validator is registered
     blocks[blockHeight].data.anchor = block.number;
     blocks[blockHeight].data.timestamp = block.timestamp;
+    blocks[blockHeight].data.dataTimestamp = _dataTimestamp;
 
     blocksCount++;
 
     emit LogMint(msg.sender, blockHeight, block.number);
 
     return true;
+  }
+
+  function _validateSignatures(
+    uint256 _blockHeight,
+    bytes32 _affidavit,
+    uint8[] memory _v,
+    bytes32[] memory _r,
+    bytes32[] memory _s
+  ) internal returns (uint256 staked, uint256 power){
+    IStakingBank stakingBank = stakingBankContract();
+    staked = stakingBank.totalSupply();
+
+    power = 0;
+
+    for (uint256 i = 0; i < _v.length; i++) {
+      address signer = recoverSigner(_affidavit, _v[i], _r[i], _s[i]);
+      uint256 balance = stakingBank.balanceOf(signer);
+      require(blocks[_blockHeight].votes[signer] == 0, "validator included more than once");
+
+      if (balance == 0) {
+        // if no balance -> move on, it can be invalid address but also fresh validator with no balance
+        // we can spend gas and check if address is validator address, but I see no point, its cheaper to ignore
+        // if we calculated root for other blockHeight, then recovering signer will not work -> move on
+        continue;
+      }
+
+      blocks[_blockHeight].voters.push(signer);
+      blocks[_blockHeight].votes[signer] = balance;
+      power = power.add(balance);
+    }
+
+    require(power.mul(100) > staked.mul(66), "not enough power was gathered");
   }
 
   // ========== VIEWS ========== //
@@ -136,6 +151,44 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   function recoverSigner(bytes32 affidavit, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {
     bytes32 hash = keccak256(abi.encodePacked(ETH_PREFIX, affidavit));
     return ecrecover(hash, _v, _r, _s);
+  }
+
+  function getStatus() external view returns(
+    uint256 blockNumber,
+    uint256 lastDataTimestamp,
+    uint256 lastBlockHeight,
+    address nextLeader,
+    uint256 nextBlockHeight,
+    address[] memory validators,
+    uint256[] memory powers,
+    string[] memory locations,
+    uint256 staked
+  ) {
+    blockNumber = block.number;
+    lastBlockHeight = getLatestBlockHeightWithData();
+    lastDataTimestamp = blocks[lastBlockHeight].data.dataTimestamp;
+
+    IValidatorRegistry vr = validatorRegistryContract();
+    uint256 numberOfValidators = vr.getNumberOfValidators();
+    validators = new address[](numberOfValidators);
+    locations = new string[](numberOfValidators);
+
+    for (uint256 i = 0; i < numberOfValidators; i++) {
+      validators[i] = vr.addresses(i);
+      (, locations[i]) = vr.validators(validators[i]);
+    }
+
+    nextLeader = numberOfValidators > 0 ? validators[getLeaderIndex(numberOfValidators, block.number + 1)] : address(0);
+
+    IStakingBank stakingBank = stakingBankContract();
+    powers = new uint256[](numberOfValidators);
+    staked = stakingBank.totalSupply();
+
+    for (uint256 i = 0; i < numberOfValidators; i++) {
+      powers[i] = stakingBank.balanceOf(validators[i]);
+    }
+
+    nextBlockHeight = getBlockHeight();
   }
 
   function getBlockHeight() public view returns (uint256) {

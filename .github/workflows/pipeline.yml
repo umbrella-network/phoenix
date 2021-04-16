@@ -19,21 +19,28 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - name: Compile contracts
-      run: |
-        npm run compile
-    - name: Unit tests
-      run: |
-        npm run test
-    - name: Solidity Lint
-      run: |
-        npm run lint:sol
-    - name: JS Lint
-      run: |
-        npm run lint:ts
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm install
+      - name: Compile contracts
+        run: |
+          npm run compile
+
+      - name: Unit tests
+        run: |
+          npm run test
+
+      - name: Solidity Lint
+        run: |
+          npm run lint:sol
+
+      - name: JS Lint
+        run: |
+          npm run lint:ts
+
+      - name: Prettier
+        run: npm run prettier

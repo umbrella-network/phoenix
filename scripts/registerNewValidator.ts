@@ -1,27 +1,27 @@
-import {ethers, Contract} from 'ethers';
+import { ethers, Contract } from 'ethers';
 
 require('custom-env').env(); // eslint-disable-line
 
 import superagent from 'superagent';
-import {deployedContract} from './utils/deployedContracts';
-import {getProvider, waitForTx} from './utils/helpers';
-import {formatEther} from 'ethers/lib/utils';
+import { deployedContract } from './utils/deployedContracts';
+import { getProvider, waitForTx } from './utils/helpers';
+import { formatEther } from 'ethers/lib/utils';
 
 const provider = getProvider();
 
 interface Validator {
-  id: string,
-  location: string
+  id: string;
+  location: string;
 }
 
 interface ValidatorInfo {
-  validator: string,
-  contractRegistryAddress: string,
-  validatorRegistryAddress: string,
-  chainContractAddress: string,
-  version: string,
-  environment: string,
-  name: string
+  validator: string;
+  contractRegistryAddress: string;
+  validatorRegistryAddress: string;
+  chainContractAddress: string;
+  version: string;
+  environment: string;
+  name: string;
 }
 
 let validatorRegistry: Contract;
@@ -31,7 +31,7 @@ const resolveValidatorInfo = async (location: string): Promise<ValidatorInfo> =>
   return res.body;
 };
 
-const checkValidator = async (info:ValidatorInfo): Promise<boolean> => {
+const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
   if (!ethers.utils.isAddress(info.validator)) {
     throw Error(`${info.validator} is not valid address`);
   }
@@ -54,7 +54,7 @@ const checkValidator = async (info:ValidatorInfo): Promise<boolean> => {
 
   const balance = await provider.getBalance(info.validator);
   if (balance.lt(`3${'0'.repeat(17)}`)) {
-    throw Error (`validator balance is too low: ${formatEther(balance)}`);
+    throw Error(`validator balance is too low: ${formatEther(balance)}`);
   }
 
   console.log(`validator balance: ${formatEther(balance)} OK`);
@@ -87,7 +87,7 @@ const registerNewValidator = async () => {
 
   const validator: Validator = {
     id: info.validator,
-    location
+    location,
   };
 
   if (!validator.id || !validator.location) {
@@ -109,14 +109,14 @@ const registerNewValidator = async () => {
   await waitForTx(tx.hash, provider);
   console.log('new validator created, now staking...');
 
-  tx = await token.mintApproveAndStake(stakingBank.address, validator.id, stake.toString(10)+'0'.repeat(18));
+  tx = await token.mintApproveAndStake(stakingBank.address, validator.id, stake.toString(10) + '0'.repeat(18));
   await waitForTx(tx.hash, provider);
   console.log('mintApproveAndStake DONE');
 };
 
 registerNewValidator()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

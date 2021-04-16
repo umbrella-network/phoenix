@@ -1,7 +1,7 @@
-import {use, expect} from 'chai';
-import {Contract, ContractFactory, Signer} from 'ethers';
-import {waffleChai} from '@ethereum-waffle/chai';
-import {loadFixture} from 'ethereum-waffle';
+import { use, expect } from 'chai';
+import { Contract, ContractFactory, Signer } from 'ethers';
+import { waffleChai } from '@ethereum-waffle/chai';
+import { loadFixture } from 'ethereum-waffle';
 
 import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/ValidatorRegistry.json';
 
@@ -14,16 +14,15 @@ async function fixture([owner, validator]: Signer[]) {
   return {
     owner,
     validatorAddress: await validator.getAddress(),
-    contract
+    contract,
   };
 }
-
 
 describe('ValidatorRegistry', () => {
   let validatorAddress: string, contract: Contract;
 
   beforeEach(async () => {
-    ({validatorAddress, contract} = await loadFixture(fixture));
+    ({ validatorAddress, contract } = await loadFixture(fixture));
   });
 
   describe('when deployed', () => {
@@ -52,7 +51,8 @@ describe('ValidatorRegistry', () => {
 
       it('expect to be removed', async () => {
         await expect(contract.remove(validatorAddress))
-          .to.emit(contract, 'LogValidatorRemoved').withArgs(validatorAddress);
+          .to.emit(contract, 'LogValidatorRemoved')
+          .withArgs(validatorAddress);
         expect(await contract.getNumberOfValidators()).to.eq(0);
       });
     });
