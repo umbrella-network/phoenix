@@ -14,7 +14,7 @@ import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/V
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
-import { blockTimestamp, mintBlocks } from '../utils';
+import { blockNumber, blockTimestamp, mintBlocks } from '../utils';
 
 const { toWei } = hre.web3.utils;
 
@@ -552,6 +552,28 @@ describe('Chain', () => {
         });
       });
     });
+  });
+
+  it('expect to getBlockHeightForBlock()', async () => {
+    let bn = await blockNumber();
+    expect(await contract.getBlockHeightForBlock(bn)).to.eq(0);
+    expect(await contract.getBlockHeightForBlock(bn + 100)).to.eq(0);
+
+    await mockSubmit();
+    await executeSubmit(0, await blockTimestamp());
+    expect(await contract.getBlockHeightForBlock(bn)).to.eq(0);
+
+    await mintBlocks(blockPadding);
+    await mockSubmit();
+    await executeSubmit(1, await blockTimestamp());
+    bn = await blockNumber();
+
+    for (let i = 0; i <= blockPadding; i++) {
+      expect(await contract.getBlockHeightForBlock(bn + i)).to.eq(1);
+    }
+
+    expect(await contract.getBlockHeightForBlock(bn + blockPadding + 1)).to.eq(2);
+    expect(await contract.getBlockHeightForBlock(bn + blockPadding + 1000)).to.eq(2);
   });
 
   it('expect to getStatus()', async () => {

@@ -175,7 +175,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       (, locations[i]) = vr.validators(validators[i]);
     }
 
-    nextLeader = numberOfValidators > 0 ? validators[getLeaderIndex(numberOfValidators, block.number + 1)] : address(0);
+    nextLeader = numberOfValidators > 0 ? validators[getLeaderIndex(numberOfValidators, blockNumber + 1)] : address(0);
 
     IStakingBank stakingBank = stakingBankContract();
     powers = new uint256[](numberOfValidators);
@@ -185,21 +185,23 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       powers[i] = stakingBank.balanceOf(validators[i]);
     }
 
-    nextBlockHeight = getBlockHeight();
+    nextBlockHeight = getBlockHeightForBlock(blockNumber + 1);
   }
 
   function getBlockHeight() public view returns (uint256) {
+    return getBlockHeightForBlock(block.number);
+  }
+
+  function getBlockHeightForBlock(uint256 _ethBlockNumber) public view returns (uint256) {
     uint _blocksCount = blocksCount + blocksCountOffset;
 
     if (_blocksCount == 0) {
       return 0;
     }
 
-    if (blocks[_blocksCount - 1].data.anchor + blockPadding < block.number) {
-      return _blocksCount;
-    }
-
-    return _blocksCount - 1;
+    return (blocks[_blocksCount - 1].data.anchor + blockPadding < _ethBlockNumber)
+      ? _blocksCount
+      : _blocksCount - 1;
   }
 
   function getLatestBlockHeightWithData() public view returns (uint256) {
