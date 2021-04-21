@@ -10,3 +10,8 @@ export const blockTimestamp = async (): Promise<number> => {
   const block = await ethers.provider.getBlock('latest');
   return block.timestamp;
 };
+
+export const blockNumber = async (): Promise<number> => {
+  const block = await ethers.provider.getBlock('latest');
+  return block.number;
+};
