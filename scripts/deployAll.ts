@@ -2,7 +2,7 @@ require('custom-env').env(); // eslint-disable-line
 
 import { deployAllContracts } from './deployers/contracts';
 import { deployContractRegistry } from './deployers/registry';
-import { isLocalNetwork } from './utils/helpers';
+import { isLocalNetwork, pressToContinue } from './utils/helpers';
 
 async function main() {
   const registry = await deployContractRegistry();
@@ -22,9 +22,11 @@ async function main() {
   console.log('Registry:', registry.address);
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+pressToContinue('y', () => {
+  main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+});
