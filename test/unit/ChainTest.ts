@@ -20,6 +20,18 @@ const { toWei } = hre.web3.utils;
 
 use(waffleChai);
 
+export interface ChainStatus {
+  blockNumber: BigNumber;
+  lastDataTimestamp: BigNumber;
+  lastBlockHeight: BigNumber;
+  nextBlockHeight: BigNumber;
+  nextLeader: string;
+  validators: string[];
+  powers: BigNumber[];
+  locations: string[];
+  staked: BigNumber;
+}
+
 const blockPadding = 100;
 
 const setup = async () => {
@@ -283,31 +295,26 @@ describe('Chain', () => {
   });
 
   describe('.getLeaderIndex()', () => {
+    const { getBlockNumber } = ethers.provider;
+
     [1, 2, 3, 4].forEach((numberOfValidators) => {
       it(`expect to return valid index for ${numberOfValidators}`, async () => {
-        const id = (
-          await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())
-        ).toNumber();
+        const id = (await contract.getLeaderIndex(numberOfValidators, await getBlockNumber())).toNumber();
+        let bn = await getBlockNumber();
 
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-          id,
-          'round #1'
-        );
-        await mintBlocks(blockPadding);
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-          (id + 1) % numberOfValidators,
-          'round #2'
-        );
-        await mintBlocks(blockPadding);
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-          (id + 2) % numberOfValidators,
-          'round #3'
-        );
-        await mintBlocks(blockPadding);
-        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-          (id + 3) % numberOfValidators,
-          'round #4'
-        );
+        expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq(id, 'round #1');
+
+        await mintBlocks(blockPadding + 1);
+        bn = await getBlockNumber();
+        expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq((id + 1) % numberOfValidators, 'round #2');
+
+        await mintBlocks(blockPadding + 1);
+        bn = await getBlockNumber();
+        expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq((id + 2) % numberOfValidators, 'round #3');
+
+        await mintBlocks(blockPadding + 1);
+        bn = await getBlockNumber();
+        expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq((id + 3) % numberOfValidators, 'round #4');
       });
     });
 
@@ -318,26 +325,27 @@ describe('Chain', () => {
 
       [1, 2, 3, 4].forEach((numberOfValidators) => {
         it(`expect to return valid index for ${numberOfValidators}`, async () => {
-          const id = (
-            await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())
-          ).toNumber();
+          let bn = await getBlockNumber();
+          const id = (await contract.getLeaderIndex(numberOfValidators, bn)).toNumber();
+          expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq(id, 'round #1');
 
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-            id,
-            'round #1'
-          );
-          await mintBlocks(blockPadding);
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          await mintBlocks(blockPadding + 1);
+          bn = await getBlockNumber();
+          expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq(
             (id + 1) % numberOfValidators,
             'round #2'
           );
-          await mintBlocks(blockPadding);
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+
+          await mintBlocks(blockPadding + 1);
+          bn = await getBlockNumber();
+          expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq(
             (id + 2) % numberOfValidators,
             'round #3'
           );
-          await mintBlocks(blockPadding);
-          expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+
+          await mintBlocks(blockPadding + 1);
+          bn = await getBlockNumber();
+          expect(await contract.getLeaderIndex(numberOfValidators, bn)).to.eq(
             (id + 3) % numberOfValidators,
             'round #4'
           );
@@ -597,7 +605,7 @@ describe('Chain', () => {
 
     await mintBlocks(blockPadding);
 
-    const status = await contract.getStatus();
+    const status: ChainStatus = await contract.getStatus();
 
     expect(status.lastDataTimestamp).to.eq(dataTimestamp, 'invalid lastDataTimestamp');
     expect(status.lastBlockHeight).to.eq(1, 'invalid block height');
