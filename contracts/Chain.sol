@@ -211,8 +211,9 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   function getLeaderIndex(uint256 numberOfValidators, uint256 ethBlockNumber) public view returns (uint256) {
     uint256 latestBlockHeight = getLatestBlockHeightWithData();
 
+    // blockPadding + 1 => because padding is a space between blocks, so next round starts on first block after padding
     uint256 validatorIndex = latestBlockHeight +
-      (ethBlockNumber - blocks[latestBlockHeight].data.anchor) / blockPadding;
+      (ethBlockNumber - blocks[latestBlockHeight].data.anchor) / (blockPadding + 1);
 
     return validatorIndex % numberOfValidators;
   }
