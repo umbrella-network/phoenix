@@ -47,9 +47,15 @@ export const pressToContinue = (charToPress = 'y', callback: () => void): void =
   console.log('-'.repeat(80));
 
   const stdin = process.stdin;
+  const {setRawMode} = stdin;
+
+  if (setRawMode === undefined) {
+    callback();
+    return;
+  }
 
   // without this, we would only get streams once enter is pressed
-  stdin.setRawMode(true);
+  setRawMode(true);
 
   // resume stdin in the parent process (node app won't quit all by itself
   // unless an error or process.exit() happens)
