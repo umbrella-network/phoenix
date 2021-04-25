@@ -71,7 +71,7 @@
     "ethers": "^5.0.32",
     "ethereum-waffle": "^3.2.2",
     "ganache-cli": "^6.12.1",
-    "hardhat": "^2.1.1",
+    "hardhat": "^2.2.1",
     "hardhat-deploy": "^0.7.0-beta.45",
     "hardhat-deploy-ethers": "^0.3.0-beta.7",
     "hardhat-gas-reporter": "^1.0.4",
