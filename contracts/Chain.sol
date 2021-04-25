@@ -20,17 +20,20 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
   // ========== STATE VARIABLES ========== //
 
-  uint256 public blockPadding;
-
   bytes constant public ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
 
   struct Block {
     bytes32 root;
-    address minter;
     uint256 staked;
     uint256 power;
     uint256 anchor;
-    uint256 timestamp;
+    address minter;
+    uint256 dataTimestamp;
+    uint32 timestamp;
+  }
+
+  struct NumericFCD {
+    uint256 value;
     uint256 dataTimestamp;
   }
 
@@ -38,17 +41,18 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     Block data;
     address[] voters;
     mapping(address => uint256) votes;
-    mapping(bytes32 => uint256) numericFCD;
   }
 
   mapping(uint256 => ExtendedBlock) public blocks;
+  mapping(bytes32 => NumericFCD) public numericFCDs;
 
-  uint256 public blocksCount;
-  uint256 public blocksCountOffset;
+  uint32 public blocksCount;
+  uint32 public blocksCountOffset;
+  uint8 public blockPadding;
 
   // ========== CONSTRUCTOR ========== //
 
-  constructor(address _contractRegistry, uint256 _blockPadding) public Registrable(_contractRegistry) {
+  constructor(address _contractRegistry, uint8 _blockPadding) public Registrable(_contractRegistry) {
     blockPadding = _blockPadding;
 
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
@@ -61,7 +65,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
 
   // ========== MUTATIVE FUNCTIONS ========== //
 
-  function setBlockPadding(uint256 _blockPadding) external onlyOwner {
+  function setBlockPadding(uint8 _blockPadding) external onlyOwner {
     blockPadding = _blockPadding;
     emit LogBlockPadding(msg.sender, _blockPadding);
   }
@@ -85,7 +89,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
     for (uint256 i = 0; i < _keys.length; i++) {
-      blocks[blockHeight].numericFCD[_keys[i]] = _values[i];
+      numericFCDs[_keys[i]] = NumericFCD(_values[i], _dataTimestamp);
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
 
@@ -97,7 +101,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     blocks[blockHeight].data.root = _root;
     blocks[blockHeight].data.minter = msg.sender; //TODO check if validator is registered
     blocks[blockHeight].data.anchor = block.number;
-    blocks[blockHeight].data.timestamp = block.timestamp;
+    blocks[blockHeight].data.timestamp = uint32(block.timestamp);
     blocks[blockHeight].data.dataTimestamp = _dataTimestamp;
 
     blocksCount++;
@@ -136,6 +140,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
       power = power.add(balance);
     }
 
+    // TODO to optimise break the loop when get enough power
     require(power.mul(100) > staked.mul(66), "not enough power was gathered");
   }
 
@@ -193,7 +198,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function getBlockHeightForBlock(uint256 _ethBlockNumber) public view returns (uint256) {
-    uint _blocksCount = blocksCount + blocksCountOffset;
+    uint256 _blocksCount = blocksCount + blocksCountOffset;
 
     if (_blocksCount == 0) {
       return 0;
@@ -254,7 +259,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function verifyProofForBlock(
-    uint256 _blockHeight,
+    uint32 _blockHeight,
     bytes32[] memory _proof,
     bytes memory _key,
     bytes memory _value
@@ -284,7 +289,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function verifyProofs(
-    uint256[] memory _blockHeights,
+    uint32[] memory _blockHeights,
     bytes memory _proofs,
     uint256[] memory _proofItemsCounter,
     bytes32[] memory _leaves
@@ -312,7 +317,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function verifyProofForBlockForNumber(
-    uint256 _blockHeight,
+    uint32 _blockHeight,
     bytes32[] memory _proof,
     bytes memory _key,
     bytes memory _value
@@ -321,7 +326,7 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
   }
 
   function verifyProofForBlockForFloat(
-    uint256 _blockHeight,
+    uint32 _blockHeight,
     bytes32[] memory _proof,
     bytes memory _key,
     bytes memory _value
@@ -332,69 +337,67 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     );
   }
 
-  function getBlockData(uint256 _blockHeight) external view returns (Block memory) {
+  function getBlockData(uint32 _blockHeight) external view returns (Block memory) {
     return blocks[_blockHeight].data;
   }
 
-  function getBlockRoot(uint256 _blockHeight) external view returns (bytes32) {
+  function getBlockRoot(uint32 _blockHeight) external view returns (bytes32) {
     return blocks[_blockHeight].data.root;
   }
 
-  function getBlockMinter(uint256 _blockHeight) external view returns (address) {
+  function getBlockMinter(uint32 _blockHeight) external view returns (address) {
     return blocks[_blockHeight].data.minter;
   }
 
-  function getBlockStaked(uint256 _blockHeight) external view returns (uint256) {
+  function getBlockStaked(uint32 _blockHeight) external view returns (uint256) {
     return blocks[_blockHeight].data.staked;
   }
 
-  function getBlockPower(uint256 _blockHeight) external view returns (uint256) {
+  function getBlockPower(uint32 _blockHeight) external view returns (uint256) {
     return blocks[_blockHeight].data.power;
   }
 
-  function getBlockAnchor(uint256 _blockHeight) external view returns (uint256) {
+  function getBlockAnchor(uint32 _blockHeight) external view returns (uint256) {
     return blocks[_blockHeight].data.anchor;
   }
 
-  function getBlockTimestamp(uint256 _blockHeight) external view returns (uint256) {
+  function getBlockTimestamp(uint32 _blockHeight) external view returns (uint32) {
     return blocks[_blockHeight].data.timestamp;
   }
 
-  function getBlockVotersCount(uint256 _blockHeight) external view returns (uint256) {
+  function getBlockVotersCount(uint32 _blockHeight) external view returns (uint256) {
     return blocks[_blockHeight].voters.length;
   }
 
-  function getBlockVoters(uint256 _blockHeight) external view returns (address[] memory) {
+  function getBlockVoters(uint32 _blockHeight) external view returns (address[] memory) {
     return blocks[_blockHeight].voters;
   }
 
-  function getBlockVotes(uint256 _blockHeight, address _voter) external view returns (uint256) {
+  function getBlockVotes(uint32 _blockHeight, address _voter) external view returns (uint256) {
     return blocks[_blockHeight].votes[_voter];
   }
 
-  function getNumericFCD(uint256 _blockHeight, bytes32 _key) public view returns (uint256 value, uint timestamp) {
-    ExtendedBlock storage extendedBlock = blocks[_blockHeight];
-    return (extendedBlock.numericFCD[_key], extendedBlock.data.timestamp);
-  }
-
-  function getNumericFCDs(
-    uint256 _blockHeight, bytes32[] calldata _keys
-  ) external view returns (uint256[] memory values, uint256 timestamp) {
-    timestamp = blocks[_blockHeight].data.timestamp;
+  // it will revert when any keys not exists
+  function getCurrentValues(bytes32[] calldata _keys)
+  external view returns (uint256[] memory values, uint256[] memory timestamps) {
+    timestamps = new uint256[](_keys.length);
     values = new uint256[](_keys.length);
 
     for (uint i=0; i<_keys.length; i++) {
-      values[i] = blocks[_blockHeight].numericFCD[_keys[i]];
+      NumericFCD storage numericFCD = numericFCDs[_keys[i]];
+      values[i] = numericFCD.value;
+      timestamps[i] = numericFCD.dataTimestamp;
     }
   }
 
-  function getCurrentValue(bytes32 _key) external view returns (uint256 value, uint timestamp) {
-    // it will revert when no blocks
-    return getNumericFCD(getLatestBlockHeightWithData(), _key);
+  // it will revert when keys not exists
+  function getCurrentValue(bytes32 _key) external view returns (uint256 value, uint256 timestamp) {
+    NumericFCD storage numericFCD = numericFCDs[_key];
+    return (numericFCD.value, numericFCD.dataTimestamp);
   }
 
   // ========== EVENTS ========== //
 
   event LogMint(address indexed minter, uint256 blockHeight, uint256 anchor);
-  event LogBlockPadding(address indexed executor, uint256 blockPadding);
+  event LogBlockPadding(address indexed executor, uint8 blockPadding);
 }
