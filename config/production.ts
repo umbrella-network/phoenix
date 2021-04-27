@@ -18,7 +18,7 @@ const production: GlobalConfig = {
   },
   smartchain: {
     contractRegistry: {
-      address: '0x67D0B6c70B71d1065927401744f853f60d6f59a5'
+      address: '0x3508848650Bb8eA55390fAEefA13312cb4D87E1d'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
@@ -26,7 +26,7 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      blockPadding: 6
+      blockPadding: 20
     },
     validators: readValidators('https://validator-bsc.umb.network'),
   }

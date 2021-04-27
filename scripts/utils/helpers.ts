@@ -55,7 +55,7 @@ export const pressToContinue = (charToPress = 'y', callback: () => void): void =
   }
 
   // without this, we would only get streams once enter is pressed
-  setRawMode(true);
+  // setRawMode(true);
 
   // resume stdin in the parent process (node app won't quit all by itself
   // unless an error or process.exit() happens)
@@ -69,7 +69,7 @@ export const pressToContinue = (charToPress = 'y', callback: () => void): void =
     stdin.setRawMode(false);
 
     // ctrl-c ( end of text )
-    if (key.toString() === '\u0003' || key.toString().toLowerCase() !== charToPress.toLowerCase()) {
+    if (key.toString() === '\u0003') {
       process.exit();
     }
 
