@@ -14,7 +14,7 @@ import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/V
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
-import { blockNumber, blockTimestamp, mintBlocks } from '../utils';
+import { blockTimestamp, mintBlocks } from '../utils';
 
 const { toWei } = hre.web3.utils;
 
@@ -430,12 +430,11 @@ describe('Chain', () => {
           expect(await contract.getBlockVotes(0, voter)).to.eq(1000);
         });
 
-        it('expect to get FCD', async () => {
+        it('expect to get current FCD', async () => {
           const bytes32 = `0x${'0'.repeat(64)}`;
-          const fcds = await contract.getNumericFCDs(0, [bytes32]);
-          console.log(fcds);
+          const fcds = await contract.getCurrentValues([bytes32]);
           expect(fcds[0]).to.eql([BigNumber.from(0)]);
-          expect(fcds.timestamp).to.gt(0);
+          expect(fcds[1]).to.eql([BigNumber.from(0)]);
         });
 
         it('fail when data NOT newer than previous block', async () => {
@@ -545,10 +544,9 @@ describe('Chain', () => {
         });
 
         it('expect to get First Class Data', async () => {
-          const fcds = await contract.getNumericFCDs(0, [fcdKeys[0]]);
-          console.log(fcds);
+          const fcds = await contract.getCurrentValues([fcdKeys[0]]);
           expect(fcds[0]).to.eql([BigNumber.from(fcdValues[0])]);
-          expect(fcds.timestamp).to.gt(0);
+          expect(fcds[1][0]).to.gt(0);
         });
 
         it('expect to validate proof for selected key-value pair', async () => {
@@ -562,28 +560,6 @@ describe('Chain', () => {
     });
   });
 
-  it('expect to getBlockHeightForBlock()', async () => {
-    let bn = await blockNumber();
-    expect(await contract.getBlockHeightForBlock(bn)).to.eq(0);
-    expect(await contract.getBlockHeightForBlock(bn + 100)).to.eq(0);
-
-    await mockSubmit();
-    await executeSubmit(0, await blockTimestamp());
-    expect(await contract.getBlockHeightForBlock(bn)).to.eq(0);
-
-    await mintBlocks(blockPadding);
-    await mockSubmit();
-    await executeSubmit(1, await blockTimestamp());
-    bn = await blockNumber();
-
-    for (let i = 0; i <= blockPadding; i++) {
-      expect(await contract.getBlockHeightForBlock(bn + i)).to.eq(1);
-    }
-
-    expect(await contract.getBlockHeightForBlock(bn + blockPadding + 1)).to.eq(2);
-    expect(await contract.getBlockHeightForBlock(bn + blockPadding + 1000)).to.eq(2);
-  });
-
   it('expect to getStatus()', async () => {
     await mintBlocks(blockPadding);
     await mockSubmit();
@@ -595,11 +571,13 @@ describe('Chain', () => {
     ({ r, s, v, dataTimestamp } = await prepareData(validator, 1, dataTimestamp + 1, root));
     await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
-    await contractRegistry.mock.getAddress.withArgs(toBytes32('ValidatorRegistry')).returns(validatorRegistry.address);
+    await contractRegistry.mock.requireAndGetAddress
+      .withArgs(toBytes32('ValidatorRegistry'))
+      .returns(validatorRegistry.address);
     await validatorRegistry.mock.getNumberOfValidators.returns(1);
     await validatorRegistry.mock.addresses.withArgs(0).returns(validatorAddress);
     await validatorRegistry.mock.validators.withArgs(validatorAddress).returns(validatorAddress, 'abc');
-    await contractRegistry.mock.getAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
+    await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
     await stakingBank.mock.totalSupply.returns(123);
     await stakingBank.mock.balanceOf.withArgs(validatorAddress).returns(321);
 

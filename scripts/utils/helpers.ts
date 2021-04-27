@@ -47,7 +47,7 @@ export const pressToContinue = (charToPress = 'y', callback: () => void): void =
   console.log('-'.repeat(80));
 
   const stdin = process.stdin;
-  const {setRawMode} = stdin;
+  const { setRawMode } = stdin;
 
   if (setRawMode === undefined) {
     callback();
