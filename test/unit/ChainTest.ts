@@ -525,6 +525,7 @@ describe('Chain', () => {
     describe('with FCD', () => {
       const fcdKeys = [toBytes32('a'), toBytes32('b')];
       const fcdValues = [1, 2];
+      let submittedDataTimestamp: number;
 
       describe('when block submitted', () => {
         beforeEach(async () => {
@@ -538,15 +539,27 @@ describe('Chain', () => {
             fcdValues
           );
 
+          submittedDataTimestamp = dataTimestamp;
+
           await expect(
             contract.connect(validator).submit(dataTimestamp, root, fcdKeys, fcdValues, [v], [r], [s])
           ).to.emit(contract, 'LogMint');
         });
 
-        it('expect to get First Class Data', async () => {
-          const fcds = await contract.getCurrentValues([fcdKeys[0]]);
-          expect(fcds[0]).to.eql([BigNumber.from(fcdValues[0])]);
-          expect(fcds[1][0]).to.gt(0);
+        it('expect to get FCD by key', async () => {
+          const fcd = await contract.getCurrentValue(fcdKeys[0]);
+          expect(fcd).to.eql([BigNumber.from(fcdValues[0]), BigNumber.from(submittedDataTimestamp)]);
+        });
+
+        it('expect to get many FCDs', async () => {
+          const fcds = await contract.getCurrentValues(fcdKeys);
+
+          const expected = [
+            [BigNumber.from(fcdValues[0]), BigNumber.from(fcdValues[1])],
+            [BigNumber.from(submittedDataTimestamp), BigNumber.from(submittedDataTimestamp)],
+          ];
+
+          expect(fcds).to.eql(expected);
         });
 
         it('expect to validate proof for selected key-value pair', async () => {

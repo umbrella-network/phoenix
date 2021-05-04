@@ -377,7 +377,6 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     return blocks[_blockHeight].votes[_voter];
   }
 
-  // it will revert when any keys not exists
   function getCurrentValues(bytes32[] calldata _keys)
   external view returns (uint256[] memory values, uint256[] memory timestamps) {
     timestamps = new uint256[](_keys.length);
@@ -390,7 +389,6 @@ contract Chain is ReentrancyGuard, Registrable, Ownable {
     }
   }
 
-  // it will revert when keys not exists
   function getCurrentValue(bytes32 _key) external view returns (uint256 value, uint256 timestamp) {
     NumericFCD storage numericFCD = numericFCDs[_key];
     return (numericFCD.value, numericFCD.dataTimestamp);
