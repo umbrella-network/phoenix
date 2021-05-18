@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Changed
 - use `uint32` for `dataTimestamp`
-- remove FCD from block and save only current values
+- remove FCD from block and save only last values
+- storage optimisation
 
 ## [1.0.3] - 2021-04-24
 ### Fixed
