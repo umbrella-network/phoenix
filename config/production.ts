@@ -12,7 +12,7 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      blockPadding: 6
+      padding: 60
     },
     validators: readValidators('https://validator.umb.network'),
   },
@@ -26,7 +26,7 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      blockPadding: 20
+      padding: 60
     },
     validators: readValidators('https://validator-bsc.umb.network'),
   }

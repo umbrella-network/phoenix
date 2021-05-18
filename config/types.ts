@@ -13,7 +13,7 @@ export interface Config {
     symbol: string
   },
   chain: {
-    blockPadding: number
+    padding: number
   },
   validators: ValidatorConfig[],
 }

@@ -11,7 +11,7 @@ const cfg: Config = {
     symbol: 'UMB'
   },
   chain: {
-    blockPadding: 6
+    padding: 20
   },
   validators: readValidators('http://localhost:3000'),
 };
