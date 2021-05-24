@@ -3,7 +3,7 @@ import { use, expect } from 'chai';
 
 import { ContractFactory, Contract } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
-import { LeafKeyCoder, LeafValueCoder, LeafType } from '@umb-network/toolbox';
+import { LeafKeyCoder, LeafValueCoder } from '@umb-network/toolbox';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
@@ -29,38 +29,38 @@ describe('Tree', () => {
     it('expect to return hashed leaf', async () => {
       const tree = new SortedMerkleTree({});
       const k = LeafKeyCoder.encode('etc-usd');
-      const v = LeafValueCoder.encode(1234567890, LeafType.TYPE_INTEGER);
+      const v = LeafValueCoder.encode(1234567890);
 
-      expect(await contract.hashLeaf(k, v)).to.eq(tree.hashLeaf(k, v));
+      expect(await contract.hashLeaf(k, v)).to.eq(tree.leafHash(k, v));
     });
   });
 
-  describe('getHexRoot()', () => {
+  describe('getRoot()', () => {
     it('expect to have different root for different data', async () => {
-      const tree1 = new SortedMerkleTree({ a: LeafValueCoder.encode(1, LeafType.TYPE_INTEGER) });
-      const tree2 = new SortedMerkleTree({ a: LeafValueCoder.encode(2, LeafType.TYPE_INTEGER) });
-      expect(tree1.getHexRoot()).not.to.eq(tree2.getHexRoot());
+      const tree1 = new SortedMerkleTree({ a: LeafValueCoder.encode(1) });
+      const tree2 = new SortedMerkleTree({ a: LeafValueCoder.encode(2) });
+      expect(tree1.getRoot()).not.to.eq(tree2.getRoot());
     });
   });
 
   describe('with one element', () => {
     const key = 'eth-usd';
-    const data = { [key]: LeafValueCoder.encode(123, LeafType.TYPE_INTEGER) };
+    const data = { [key]: LeafValueCoder.encode(123) };
     const tree = new SortedMerkleTree(data);
 
     it('expect leaf === tree', async () => {
-      expect(tree.createLeafHash(key)).to.eq(tree.getHexRoot());
+      expect(tree.createLeafHash(key)).to.eq(tree.getRoot());
     });
 
     it('expect to validate proof off-chain', async () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(tree.verifyProof(tree.getProofForKey(key), tree.getHexRoot()!, tree.getLeafForKey(key))).to.be.true;
+      expect(tree.verifyProof(tree.getProofForKey(key), tree.getRoot()!, tree.getLeafForKey(key))).to.be.true;
     });
 
     it('expect to validate proof on-chain', async () => {
       const proof = tree.getProofForKey(key);
       const leaf = tree.createLeafHash(key);
-      expect(await contract.verifyProof(proof, tree.getHexRoot(), leaf)).to.be.true;
+      expect(await contract.verifyProof(proof, tree.getRoot(), leaf)).to.be.true;
     });
   });
 
@@ -68,20 +68,20 @@ describe('Tree', () => {
     const data: Record<string, Buffer> = {};
 
     const keys = [
-      'eth-eur',
-      'btc-eur',
-      'war-eur',
-      'ltc-eur',
-      'uni-eur',
-      'eth-usd',
-      'btc-usd',
-      'war-usd',
-      'ltc-usd',
-      'uni-usd',
+      'ETH-EUR',
+      'BTC-EUR',
+      'WAR-EUR',
+      'LTC-EUR',
+      'UNI-EUR',
+      'ETH-USD',
+      'BTC-USD',
+      'WAR-USD',
+      'LTC-USD',
+      'UNI-USD',
     ];
 
     keys.sort().forEach((k) => {
-      data[k] = LeafValueCoder.encode(Math.round(Math.random() * 1000), LeafType.TYPE_INTEGER);
+      data[k] = LeafValueCoder.encode(Math.round(Math.random() * 1000));
     });
 
     const tree = new SortedMerkleTree(data);
@@ -96,7 +96,7 @@ describe('Tree', () => {
 
       const treeReverse = new SortedMerkleTree(dataReverse);
 
-      expect(tree.getHexRoot()).to.eq(treeReverse.getHexRoot());
+      expect(tree.getRoot()).to.eq(treeReverse.getRoot());
     });
 
     it('expect to validate proof for all keys', async () => {
@@ -106,8 +106,8 @@ describe('Tree', () => {
         const proof = tree.getProofForKey(k);
         const leaf = tree.createLeafHash(k);
 
-        expect(tree.verifyProof(proof, tree.getHexRoot()!, leaf)).to.be.true;
-        awaits.push(contract.verifyProof(proof, tree.getHexRoot(), leaf));
+        expect(tree.verifyProof(proof, tree.getRoot()!, leaf)).to.be.true;
+        awaits.push(contract.verifyProof(proof, tree.getRoot(), leaf));
       });
 
       expect((await Promise.all(awaits)).every((result) => result)).to.be.true;

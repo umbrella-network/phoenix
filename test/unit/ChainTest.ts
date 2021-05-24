@@ -1,10 +1,10 @@
-import hre, { ethers } from 'hardhat';
+import { ethers } from 'hardhat';
 import { expect, use } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
-
-import { LeafKeyCoder, LeafType, LeafValueCoder } from '@umb-network/toolbox';
+import { LeafKeyCoder, LeafValueCoder } from '@umb-network/toolbox';
+import { remove0x } from '@umb-network/toolbox/dist/utils/helpers';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
 
@@ -15,8 +15,6 @@ import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.j
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 import { blockTimestamp, mintBlocks } from '../utils';
-
-const { toWei } = hre.web3.utils;
 
 use(waffleChai);
 
@@ -50,36 +48,43 @@ const setup = async () => {
 const inputs: Record<string, Buffer> = {};
 
 const keys = [
-  'eth-eur',
-  'btc-eur',
-  'war-eur',
-  'ltc-eur',
-  'uni-eur',
-  'eth-usd',
-  'btc-usd',
-  'war-usd',
-  'ltc-usd',
-  'uni-usd',
+  'ETH-EUR',
+  'BTC-EUR',
+  'WAR-EUR',
+  'LTC-EUR',
+  'UNI-EUR',
+  'ETH-USD',
+  'BTC-USD',
+  'WAR-USD',
+  'LTC-USD',
+  'UNI-USD',
 ];
 
 keys.forEach((k, i) => {
-  inputs[k] = LeafValueCoder.encode(i + 1, LeafType.TYPE_INTEGER);
+  inputs[k] = LeafValueCoder.encode(i + 1);
 });
 
 const tree = new SortedMerkleTree(inputs);
-const root = tree.getHexRoot();
+const root = tree.getRoot();
+
+const abiUintEncoder = (n: number | string, bits = 256): string =>
+  (typeof n === 'number' ? n.toString(16) : remove0x(n)).padStart(bits / 4, '0');
 
 const prepareData = async (
   signer: Signer,
   dataTimestamp: number,
   root: string | null,
   fcdKeys: string[] = [],
-  fcdValues: number[] = []
+  fcdValues: (number | string)[] = []
 ) => {
-  let testimony = '0x' + dataTimestamp.toString(16).padStart(8, '0') + root?.replace('0x', '');
+  let testimony = '0x' + abiUintEncoder(dataTimestamp, 32) + root?.replace('0x', '');
 
   for (let i = 0; i < fcdKeys.length; i++) {
-    testimony += fcdKeys[i].replace('0x', '') + fcdValues[i].toString(16).padStart(64, '0');
+    if (typeof fcdValues[i] === 'string' && !ethers.utils.isHexString(fcdValues[i])) {
+      throw Error(`if FCD is a string, then must be hex string: ${fcdValues[i]}`);
+    }
+
+    testimony += fcdKeys[i].replace('0x', '') + abiUintEncoder(fcdValues[i]);
   }
 
   const hashForSolidity = ethers.utils.keccak256(testimony);
@@ -193,87 +198,6 @@ describe('Chain', () => {
     });
   });
 
-  describe('.decodeLeafToNumber()', () => {
-    [
-      '0',
-      '1',
-      '2',
-      '999',
-      Number.MAX_SAFE_INTEGER.toString(10),
-      // @todo not supported yet max uint256
-      // '115792089237316195423570985008687907853269984665640564039457584007913129639935',
-      // '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
-    ].forEach((data) => {
-      it(`expect ${data} to be decoded properly to number`, async () => {
-        const bytes = LeafValueCoder.encode(data, LeafType.TYPE_INTEGER);
-        const result = await contract.decodeLeafToNumber(bytes);
-        expect(result).to.eq(data);
-      });
-    });
-
-    describe('throws when', () => {
-      it('bytes are empty', async () => {
-        await expect(contract.decodeLeafToNumber('0x00')).to.revertedWith(
-          'revert invalid leaf bytes - missing type metadata'
-        );
-      });
-
-      it('missing metadata type marker', async () => {
-        await expect(contract.decodeLeafToNumber('0x1111111111')).to.revertedWith(
-          'revert invalid leaf - missing type marker'
-        );
-      });
-
-      it('invalid type', async () => {
-        const bytes = LeafValueCoder.encode('1', LeafType.TYPE_FLOAT);
-
-        await expect(contract.decodeLeafToNumber(bytes)).to.revertedWith(
-          'revert invalid leaf - invalid type - expect 02:int'
-        );
-      });
-    });
-  });
-
-  describe('.decodeLeafToFloat()', () => {
-    Object.entries({
-      '0': '0',
-      '1': toWei('1', 'ether'),
-      '0.1': `1${'0'.repeat(17)}`,
-      '0.123456789': `123456789${'0'.repeat(9)}`,
-      '0.000000000000001': `1${'0'.repeat(3)}`,
-      '999': toWei('999', 'ether'),
-      '0.900719925474099': '900719925474099000',
-    }).forEach((data) => {
-      it(`expect ${data[0]} to be decoded correctly to float: ${data[1]}`, async () => {
-        const bytes = LeafValueCoder.encode(data[0], LeafType.TYPE_FLOAT);
-        const result = await contract.decodeLeafToFloat(bytes);
-        expect(result.toString()).to.eq(data[1]);
-      });
-    });
-
-    describe('throws when', () => {
-      it('bytes are empty', async () => {
-        await expect(contract.decodeLeafToFloat('0x00')).to.revertedWith(
-          'revert invalid leaf bytes - missing type metadata'
-        );
-      });
-
-      it('missing metadata type marker', async () => {
-        await expect(contract.decodeLeafToFloat('0x1111111111')).to.revertedWith(
-          'revert invalid leaf - missing type marker'
-        );
-      });
-
-      it('invalid type', async () => {
-        const bytes = LeafValueCoder.encode('1', LeafType.TYPE_INTEGER);
-
-        await expect(contract.decodeLeafToFloat(bytes)).to.revertedWith(
-          'revert invalid leaf - invalid type - expect 03:float'
-        );
-      });
-    });
-  });
-
   describe('.getLeaderIndex()', () => {
     [1, 2, 3, 4].forEach((numberOfValidators) => {
       it(`expect to return valid index for ${numberOfValidators}`, async () => {
@@ -357,7 +281,7 @@ describe('Chain', () => {
           .revertedWith('Mock on the method is not initialized');
       });
 
-      /* it('fail when data older than 25 minutes', async () => {
+      /* it('fails when data older than 25 minutes', async () => {
         await mockSubmit();
         const t = await blockTimestamp();
         const { r, s, v, dataTimestamp } = await prepareData(validator, t - 25 * 60 - 1, root);
@@ -414,11 +338,11 @@ describe('Chain', () => {
         });
 
         it('expect to save valid root', async () => {
-          expect((await contract.blocks(0)).root).to.eq(tree.getHexRoot());
+          expect((await contract.blocks(0)).root).to.eq(tree.getRoot());
         });
 
-        it('expect to get current FCD', async () => {
-          const bytes32 = `0x${'0'.repeat(64)}`;
+        it('expect to have no current FCD', async () => {
+          const bytes32 = `0x${abiUintEncoder(0)}`;
           const fcds = await contract.getCurrentValues([bytes32]);
           expect(fcds[0]).to.eql([BigNumber.from(0)]);
           expect(fcds[1]).to.eql([0]);
@@ -435,27 +359,12 @@ describe('Chain', () => {
         });
 
         describe('verify Proof', () => {
-          describe('.verifyProofForBlock()', () => {
-            it('expect to validate proof for selected key-value pair', async () => {
-              const k = 'btc-usd';
-              const v = inputs[k];
-              const proof = tree.getProofForKey(k);
+          const k = 'BTC-USD';
+          const v = inputs[k];
+          const proof = tree.getProofForKey(k);
 
-              expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
-            });
-          });
-        });
-
-        describe('verifyProofForBlockForNumber()', () => {
-          it('expect to validate proof for selected key-value pair for decoded number value', async () => {
-            const k = 'btc-usd';
-            const v = inputs[k];
-
-            const proof = tree.getProofForKey(k);
-            const result = await contract.verifyProofForBlockForNumber(0, proof, LeafKeyCoder.encode(k), v);
-
-            expect(result[0]).to.eq(true);
-            expect(result[1]).to.eq(LeafValueCoder.decode(inputs[k].toString('hex')));
+          it('.verifyProofForBlock()', async () => {
+            expect(await contract.verifyProofForBlock(0, proof, LeafKeyCoder.encode(k), v)).to.be.true;
           });
         });
 
@@ -514,6 +423,24 @@ describe('Chain', () => {
       const fcdValues = [1, 2];
       let submittedDataTimestamp: number;
 
+      it('accept max FCD value', async () => {
+        await mockSubmit();
+        const values = [1, '0x' + 'F'.repeat(56)];
+
+        const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root, fcdKeys, values);
+
+        await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not.be.reverted;
+      });
+
+      it('throw when FCD overflows', async () => {
+        await mockSubmit();
+        const values = [1, '0x01' + 'F'.repeat(56)];
+
+        const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root, fcdKeys, values);
+
+        await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.be.reverted;
+      });
+
       describe('when block submitted', () => {
         beforeEach(async () => {
           await mockSubmit();
@@ -549,7 +476,7 @@ describe('Chain', () => {
         });
 
         it('expect to validate proof for selected key-value pair', async () => {
-          const k = 'btc-usd';
+          const k = 'BTC-USD';
           const v = inputs[k];
           const proof = tree.getProofForKey(k);
 
