@@ -4,7 +4,7 @@ import {readValidators} from './utils';
 const production: GlobalConfig = {
   ethereum: {
     contractRegistry: {
-      address: '0x8d16D5D2859f4c54b226180A46F26D57A4d727A0'
+      address: '0x968A798Be3F73228c66De06f7D1109D8790FB64D'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
@@ -18,7 +18,7 @@ const production: GlobalConfig = {
   },
   smartchain: {
     contractRegistry: {
-      address: '0x3508848650Bb8eA55390fAEefA13312cb4D87E1d'
+      address: '0xa3A8D57DFeC72fe69FB0D7D1991e7B242De3603A'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
