@@ -5,8 +5,8 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
 
-import "./lib/LeafDecoder.sol";
 import "./interfaces/IStakingBank.sol";
 import "./interfaces/IValidatorRegistry.sol";
 
@@ -15,7 +15,7 @@ import "./Registry.sol";
 
 contract Chain is Registrable, Ownable {
   using SafeMath for uint256;
-  using LeafDecoder for bytes;
+  using ValueDecoder for bytes;
 
   // ========== STATE VARIABLES ========== //
 
@@ -27,13 +27,13 @@ contract Chain is Registrable, Ownable {
     uint128 affidavit;
   }
 
-  struct NumericFCD {
-    uint256 value;
+  struct FirstClassData {
+    uint224 value;
     uint32 dataTimestamp;
   }
 
   mapping(uint256 => Block) public blocks;
-  mapping(bytes32 => NumericFCD) public numericFCDs;
+  mapping(bytes32 => FirstClassData) public fcds;
 
   uint32 public blocksCount;
   uint32 public blocksCountOffset;
@@ -76,7 +76,8 @@ contract Chain is Registrable, Ownable {
     bytes memory testimony = abi.encodePacked(_dataTimestamp, _root);
 
     for (uint256 i = 0; i < _keys.length; i++) {
-      numericFCDs[_keys[i]] = NumericFCD(_values[i], _dataTimestamp);
+      require(uint224(_values[i]) == _values[i], "FCD overflow");
+      fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
 
@@ -105,7 +106,6 @@ contract Chain is Registrable, Ownable {
     blocks[lastBlockId + 1].root = _root;
     blocks[lastBlockId + 1].dataTimestamp = _dataTimestamp;
     blocks[lastBlockId + 1].affidavit = uint128(bytes16(affidavit));
-
     blocksCount++;
 
     emit LogMint(msg.sender, lastBlockId + 1, staked, power);
@@ -218,7 +218,7 @@ contract Chain is Registrable, Ownable {
     return validatorRegistry.addresses(validatorIndex);
   }
 
-  function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
+  function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public view returns (bool) {
     if (_root == bytes32(0)) {
       return false;
     }
@@ -226,7 +226,7 @@ contract Chain is Registrable, Ownable {
     return MerkleProof.verify(_proof, _root, _leaf);
   }
 
-  function hashLeaf(bytes memory _key, bytes memory _value) public pure returns (bytes32) {
+  function hashLeaf(bytes memory _key, bytes memory _value) public view returns (bytes32) {
     return keccak256(abi.encodePacked(_key, _value));
   }
 
@@ -236,7 +236,7 @@ contract Chain is Registrable, Ownable {
     bytes memory _key,
     bytes memory _value
   ) public view returns (bool) {
-    return verifyProof(_proof, blocks[_blockId].root, hashLeaf(_key, _value));
+    return verifyProof(_proof, blocks[_blockId].root, keccak256(abi.encodePacked(_key, _value)));
   }
 
   function bytesToBytes32Array(
@@ -280,35 +280,6 @@ contract Chain is Registrable, Ownable {
     }
   }
 
-  function decodeLeafToNumber(bytes memory _leaf) public pure returns (uint) {
-    return _leaf.leafToUint();
-  }
-
-  function decodeLeafToFloat(bytes memory _leaf) public pure returns (uint) {
-    return _leaf.leafTo18DecimalsFloat();
-  }
-
-  function verifyProofForBlockForNumber(
-    uint32 _blockId,
-    bytes32[] memory _proof,
-    bytes memory _key,
-    bytes memory _value
-  ) public view returns (bool, uint256) {
-    return (verifyProof(_proof, blocks[_blockId].root, hashLeaf(_key, _value)), _value.leafToUint());
-  }
-
-  function verifyProofForBlockForFloat(
-    uint256 _blockId,
-    bytes32[] memory _proof,
-    bytes memory _key,
-    bytes memory _value
-  ) public view returns (bool, uint256) {
-    return (
-      verifyProof(_proof, blocks[_blockId].root, hashLeaf(_key, _value)),
-      _value.leafTo18DecimalsFloat()
-    );
-  }
-
   function getBlockRoot(uint32 _blockId) external view returns (bytes32) {
     return blocks[_blockId].root;
   }
@@ -323,15 +294,15 @@ contract Chain is Registrable, Ownable {
     values = new uint256[](_keys.length);
 
     for (uint i=0; i<_keys.length; i++) {
-      NumericFCD storage numericFCD = numericFCDs[_keys[i]];
-      values[i] = numericFCD.value;
+      FirstClassData storage numericFCD = fcds[_keys[i]];
+      values[i] = uint256(numericFCD.value);
       timestamps[i] = numericFCD.dataTimestamp;
     }
   }
 
   function getCurrentValue(bytes32 _key) external view returns (uint256 value, uint256 timestamp) {
-    NumericFCD storage numericFCD = numericFCDs[_key];
-    return (numericFCD.value, numericFCD.dataTimestamp);
+    FirstClassData storage numericFCD = fcds[_key];
+    return (uint256(numericFCD.value), numericFCD.dataTimestamp);
   }
 
   // ========== EVENTS ========== //
