@@ -4,7 +4,7 @@ import { deployedContract } from './utils/deployedContracts';
 import { Contract } from 'ethers';
 
 import { deployValidatorRegistry, registerContract } from './deployers/contracts';
-import { getProvider, waitForTx } from './utils/helpers';
+import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
 
 const provider = getProvider();
 
@@ -48,9 +48,11 @@ const reDeployAndRegister = async () => {
   await registerContract([validatorRegistry.address]);
 };
 
-reDeployAndRegister()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+pressToContinue('y', () => {
+  reDeployAndRegister()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+});

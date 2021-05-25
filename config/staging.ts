@@ -12,7 +12,7 @@ const staging: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      blockPadding: 6
+      padding: 60
     },
     validators: readValidators('https://validator-dev.umb.network'),
   },
@@ -26,7 +26,7 @@ const staging: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      blockPadding: 6
+      padding: 60
     },
     validators: readValidators('https://validator-bsc-dev.umb.network'),
   }

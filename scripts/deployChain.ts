@@ -3,6 +3,7 @@ import configuration from '../config';
 require('custom-env').env(); // eslint-disable-line
 
 import { deployChain, registerContract } from './deployers/contracts';
+import { pressToContinue } from './utils/helpers';
 const config = configuration();
 
 const deployAndRegister = async () => {
@@ -11,9 +12,11 @@ const deployAndRegister = async () => {
   await registerContract([chain.address]);
 };
 
-deployAndRegister()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+pressToContinue('y', () => {
+  deployAndRegister()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+});

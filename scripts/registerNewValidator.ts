@@ -4,7 +4,7 @@ require('custom-env').env(); // eslint-disable-line
 
 import superagent from 'superagent';
 import { deployedContract } from './utils/deployedContracts';
-import { getProvider, waitForTx } from './utils/helpers';
+import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
 import { formatEther } from 'ethers/lib/utils';
 
 const provider = getProvider();
@@ -114,9 +114,11 @@ const registerNewValidator = async () => {
   console.log('mintApproveAndStake DONE');
 };
 
-registerNewValidator()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+pressToContinue('y', () => {
+  registerNewValidator()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+});
