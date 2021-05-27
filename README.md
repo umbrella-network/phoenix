@@ -120,6 +120,13 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 
 Please see this commit for steps to adopt EVM compatible blockchain: 
 
+### Distributor
+
+Only for testnets
+
+```shell
+hardhat compile && HARDHAT_NETWORK=polygon_staging npx hardhat run ./scripts/deployDistributor.ts
+```
 
 ### Connect with validators for staging and testing
 

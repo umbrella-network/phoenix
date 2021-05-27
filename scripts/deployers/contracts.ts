@@ -20,6 +20,31 @@ interface Validator {
   privateKey: string;
 }
 
+export const deployDistributor = async (recipients: string[]): Promise<Contract> => {
+  console.log('deploying Distributor...');
+  const Contract = await ethers.getContractFactory('Distributor');
+  const args = [recipients];
+
+  const contract = await Contract.deploy(...args);
+  await contract.deployed();
+
+  await verifyCode(contract.address, args);
+
+  return contract;
+};
+
+export const resolveValidators = async (): Promise<Validator[]> => {
+  return await Promise.all(
+    config.validators.map(async ({ privateKey, location }) => {
+      const wallet = new ethers.Wallet(privateKey, provider);
+      const balance = await wallet.getBalance();
+      console.log(`validator ${wallet.address} ETH balance:`, balance.toString());
+
+      return { location, wallet, balance, privateKey };
+    })
+  );
+};
+
 export const deployChain = async (
   contractRegistryAddress: string,
   chainName = ChainContractNames.Chain
@@ -236,15 +261,7 @@ export const deployAllContracts = async (
 
   console.log(config.validators);
 
-  const validators: Validator[] = await Promise.all(
-    config.validators.map(async ({ privateKey, location }) => {
-      const wallet = new ethers.Wallet(privateKey, provider);
-      const balance = await wallet.getBalance();
-      console.log(`validator ${wallet.address} ETH balance:`, balance.toString());
-
-      return { location, wallet, balance, privateKey };
-    })
-  );
+  const validators = await resolveValidators();
 
   if (isLocalNetwork()) {
     for (const { balance, wallet } of validators) {
