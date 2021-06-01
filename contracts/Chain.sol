@@ -37,11 +37,13 @@ contract Chain is Registrable, Ownable {
 
   uint32 public blocksCount;
   uint32 public blocksCountOffset;
+  uint256 public creationBlock;
   uint16 public padding;
 
   // ========== CONSTRUCTOR ========== //
 
   constructor(address _contractRegistry, uint16 _padding) public Registrable(_contractRegistry) {
+    creationBlock = block.number;
     padding = _padding;
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
 

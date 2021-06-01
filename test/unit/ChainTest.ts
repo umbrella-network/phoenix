@@ -132,6 +132,10 @@ describe('Chain', () => {
   });
 
   describe('when deployed', () => {
+    it('expect to have creationBlock', async () => {
+      expect(await contract.creationBlock()).to.gt(0);
+    });
+
     it('expect to have padding', async () => {
       expect(await contract.padding()).to.eq(timePadding);
     });
