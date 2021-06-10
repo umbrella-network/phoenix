@@ -4,7 +4,7 @@ import hre from 'hardhat';
 import { HttpNetworkUserConfig } from 'hardhat/types';
 import { ethers } from 'ethers';
 import '@nomiclabs/hardhat-web3';
-import { Provider } from '@ethersproject/providers';
+import { Provider, TransactionReceipt } from '@ethersproject/providers';
 
 export const sleep = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -20,9 +20,9 @@ export const getProvider = (): Provider => {
   return new ethers.providers.JsonRpcProvider((<HttpNetworkUserConfig>hre.config.networks[hre.network.name]).url);
 };
 
-export const waitForTx = async (txHash: string, provider: Provider): Promise<void> => {
+export const waitForTx = async (txHash: string, provider: Provider): Promise<TransactionReceipt | null> => {
   if (hre.network.name === 'buidlerevm') {
-    return;
+    return null;
   }
 
   console.log('waiting for tx to be mined...', txHash);
@@ -34,6 +34,7 @@ export const waitForTx = async (txHash: string, provider: Provider): Promise<voi
   }
 
   console.log('...success');
+  return receipt;
 };
 
 export const toBytes32 = (str: string): string => {

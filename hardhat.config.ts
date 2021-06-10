@@ -66,8 +66,8 @@ const config: HardhatUserConfig = {
     production: {
       url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://ropsten.infura.io/v3/${INFURA_ID}`,
       accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
-      chainId: NETWORK === NETWORKS.BSC ? 97 : 3,
-      gasPrice: NETWORK === NETWORKS.BSC ? 10000000000 : 1000000000
+      chainId: NETWORK === NETWORKS.BSC ? 56 : 3,
+      gasPrice: NETWORK === NETWORKS.BSC ? 5000000000 : 10000000000
     },
     docker: {
       url: 'http://eth:8545',

@@ -8,6 +8,7 @@ export interface Config {
     address: string
   },
   token: {
+    address?: string
     totalSupply: string,
     name: string,
     symbol: string
