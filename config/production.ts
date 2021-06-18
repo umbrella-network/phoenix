@@ -18,11 +18,12 @@ const production: GlobalConfig = {
   },
   smartchain: {
     contractRegistry: {
-      address: '0xa3A8D57DFeC72fe69FB0D7D1991e7B242De3603A'
+      address: '0x455acbbC2c15c086978083968a69B2e7E4d38d34'
     },
     token: {
+      address: '0x6fc13eace26590b80cccab1ba5d51890577d83b2',
       totalSupply: '1000000' + '0'.repeat(18),
-      name: 'Umbrella test token',
+      name: 'UMB token',
       symbol: 'UMB'
     },
     chain: {

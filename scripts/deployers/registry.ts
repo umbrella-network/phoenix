@@ -24,13 +24,13 @@ export const deployContractRegistry = async (): Promise<Contract> => {
   }
 
   const owner = await ownerWallet.getAddress();
-  console.log('DEPLOYING FROM ADDRESS:', owner);
+  console.log('DEPLOYING REGISTRY FROM ADDRESS:', owner);
 
   const RegistryContract = await ethers.getContractFactory('Registry');
   const registry = await RegistryContract.deploy();
   await registry.deployed();
 
-  console.log('Registry:', registry.address);
+  console.log('Registry deployed at', registry.address);
 
   await verifyContract(registry.address, 'Registry', '');
   return registry;

@@ -31,8 +31,22 @@ const getScanApiUrl = (): string | undefined => {
     if (NODE_ENV === ENVS.local) {
       return undefined;
     }
+    let prefix = '';
 
-    return 'https://api-testnet.bscscan.com/api';
+    switch (NODE_ENV) {
+      case 'live':
+      case 'production':
+        break;
+      case 'development':
+      case 'dev':
+      case 'staging':
+        prefix = '-testnet';
+        break;
+      default:
+        return undefined;
+    }
+
+    return `https://api${prefix}.bscscan.com/api`;
   }
 
   return undefined;
@@ -69,7 +83,7 @@ export const verifyContract = async (
 
   //Submit Source Code for Verification
   while (notok) {
-    console.log('waiting 5sec...');
+    console.log(`[${Math.trunc(Date.now() / 1000)}] waiting 5sec...`);
     await sleep(5000);
 
     const response = await superagent

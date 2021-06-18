@@ -2,10 +2,13 @@ require('custom-env').env(); // eslint-disable-line
 
 import { verifyContract } from '../utils/verifyContract';
 import { ethers } from 'hardhat';
-import { Contract, Wallet, BigNumber } from 'ethers';
+import { Contract, Wallet, BigNumber, Signer } from 'ethers';
 
 import configuration from '../../config';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
+import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
+import { TransactionReceipt } from '@ethersproject/providers';
+
 import { constructorAbi, getProvider, isLocalNetwork, toBytes32, waitForTx } from '../utils/helpers';
 
 const config = configuration();
@@ -26,6 +29,7 @@ export const deployChain = async (contractRegistryAddress: string): Promise<Cont
 
   const chain = await ChainContract.deploy(...chainArgs);
   await chain.deployed();
+  console.log('Chain deployed at', chain.address);
 
   await verifyContract(chain.address, 'Chain', constructorAbi(chainArgsTypes, chainArgs));
 
@@ -44,15 +48,16 @@ export const deployValidatorRegistry = async (): Promise<Contract> => {
 
 let contractRegistry: Contract;
 
-export const registerContract = async (addresses: string[]): Promise<void> => {
+export const registerContract = async (addresses: string[], names?: string[]): Promise<TransactionReceipt | null> => {
   if (!contractRegistry) {
     const [owner] = await ethers.getSigners();
     contractRegistry = new ethers.Contract(config.contractRegistry.address, Registry.abi, provider).connect(owner);
   }
 
-  const tx = await contractRegistry.importContracts(addresses);
-  await waitForTx(tx.hash, provider);
-  console.log('contracts registered');
+  const tx = await (names
+    ? contractRegistry.importAddresses(names, addresses)
+    : contractRegistry.importContracts(addresses));
+  return waitForTx(tx.hash, provider);
 };
 
 export const registerValidator = async (
@@ -72,11 +77,44 @@ export const registerValidator = async (
   console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
 
   console.log('setting up staking...');
-  tx = await token.mintApproveAndStake(stakingBank.address, id, `${validatorId + 1}${'0'.repeat(18)}`);
-  await waitForTx(tx.hash, provider);
+  if (config.token.address) {
+    const balance = await token.balanceOf(id);
+
+    if (balance.eq(0)) {
+      console.warn(`validator ${id} don't have UMB to stake.`);
+      return;
+    }
+
+    console.log(`validator ${id} balance: ${balance.toString()}`);
+
+    tx = await token.connect(validatorWallet).approve(stakingBank.address, balance);
+    await waitForTx(tx.hash, provider);
+
+    tx = await stakingBank.receiveApproval(id);
+    await waitForTx(tx.hash, provider);
+  } else {
+    tx = await token.mintApproveAndStake(stakingBank.address, id, `${validatorId + 1}${'0'.repeat(18)}`);
+    await waitForTx(tx.hash, provider);
+  }
 
   console.log('validator balance:', (await token.balanceOf(id)).toString());
   console.log('staked balance:', (await stakingBank.balanceOf(id)).toString());
+};
+
+const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
+  if (config.token.address) {
+    console.log('using real token', config.token.address);
+    return new Contract(config.token.address, ERC20.abi, signer);
+  }
+
+  console.log('deploying test token...');
+  const TokenContract = await ethers.getContractFactory('Token');
+  const tokenTypes = ['string', 'string'];
+  const tokenArgs = [config.token.name, config.token.symbol];
+  const token = await TokenContract.deploy(...tokenArgs);
+  await token.deployed();
+  await verifyContract(token.address, 'Token', constructorAbi(tokenTypes, tokenArgs));
+  return token;
 };
 
 export const deployAllContracts = async (
@@ -84,12 +122,9 @@ export const deployAllContracts = async (
   doRegistration = false
 ): Promise<{ chain: string; bank: string; validatorRegistry: string; token: string }> => {
   if (!config.validators.length) {
-    console.log(
-      'random PK',
-      ethers.Wallet.createRandom({
-        extraEntropy: Buffer.from(Math.random().toString(10)),
-      }).privateKey
-    );
+    const wallet = ethers.Wallet.createRandom({ extraEntropy: Buffer.from(Math.random().toString(10)) });
+    console.log('random wallet:', { pk: wallet.privateKey, address: wallet.address });
+
     throw new Error(
       'please setup (VALIDATOR_PK, VALIDATOR_LOCATION) or (VALIDATOR_?_PK, VALIDATOR_?_LOCATION) in .env'
     );
@@ -144,22 +179,16 @@ export const deployAllContracts = async (
     });
   }
 
-  console.log('deploying test token...');
-  const TokenContract = await ethers.getContractFactory('Token');
-  const tokenTypes = ['string', 'string'];
-  const tokenArgs = [config.token.name, config.token.symbol];
-  const token = await TokenContract.deploy(...tokenArgs);
-  await token.deployed();
+  const useDummyToken = !config.token.address;
+  const token = await resolveTokenContract(owner);
 
   if (contractRegistry) {
-    console.log('registering test token...');
-    await registerContract([token.address]);
+    console.log(`registering token... ${token.address} at ${toBytes32('UMB')}`);
+    await registerContract([token.address], useDummyToken ? undefined : [toBytes32('UMB')]);
     console.log('Token registered:', await contractRegistry.getAddressByString('UMB'));
   } else {
     console.log('Token deployed to:', token.address);
   }
-
-  await verifyContract(token.address, 'Token', constructorAbi(tokenTypes, tokenArgs));
 
   const validatorRegistry = await deployValidatorRegistry();
 
