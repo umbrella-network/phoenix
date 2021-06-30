@@ -18,7 +18,7 @@ const production: GlobalConfig = {
   },
   smartchain: {
     contractRegistry: {
-      address: '0x455acbbC2c15c086978083968a69B2e7E4d38d34'
+      address: '0xb2C6c4162c0d2B6963C62A9133331b4D0359AA34'
     },
     token: {
       address: '0x6fc13eace26590b80cccab1ba5d51890577d83b2',
