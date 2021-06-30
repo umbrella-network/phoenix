@@ -122,8 +122,8 @@ export const deployAllContracts = async (
   doRegistration = false
 ): Promise<{ chain: string; bank: string; validatorRegistry: string; token: string }> => {
   if (!config.validators.length) {
-    const wallet = ethers.Wallet.createRandom({ extraEntropy: Buffer.from(Math.random().toString(10)) });
-    console.log('random wallet:', { pk: wallet.privateKey, address: wallet.address });
+    const wallet = ethers.Wallet.createRandom({extraEntropy: Buffer.from(Math.random().toString(10))});
+    console.log('random wallet:', {pk: wallet.privateKey, address: wallet.address});
 
     throw new Error(
       'please setup (VALIDATOR_PK, VALIDATOR_LOCATION) or (VALIDATOR_?_PK, VALIDATOR_?_LOCATION) in .env'
