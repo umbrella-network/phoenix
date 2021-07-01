@@ -1,3 +1,6 @@
+import 'hardhat';
+import '@nomiclabs/hardhat-ethers';
+
 import { ethers } from 'hardhat';
 import { expect, use } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
@@ -15,6 +18,7 @@ import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.j
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 import { blockTimestamp, mintBlocks } from '../utils';
+import { ChainStatus } from '../types/ChainStatus';
 
 use(waffleChai);
 
@@ -327,10 +331,26 @@ describe('Chain', () => {
           const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
           previousDataTimestamp = dataTimestamp;
           await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
+          await mintBlocks(1);
         });
 
-        it('expect to blockId NOT change when minimal padding not reached', async () => {
-          expect(await contract.getBlockId()).to.eq(0);
+        it('expect blockId to change ONLY when minimal padding reached', async () => {
+          const lastDataTimestamp: number = await contract.getBlockTimestamp(0);
+
+          while ((await blockTimestamp()) <= lastDataTimestamp + timePadding) {
+            expect(await contract.getBlockId()).to.eq(0);
+            await mintBlocks(1);
+          }
+
+          expect(await contract.getBlockId()).to.eq(1);
+        });
+
+        it('expect getBlockIdAtTimestamp return valid ID', async () => {
+          const lastDataTimestamp: number = await contract.getBlockTimestamp(0);
+
+          expect(await contract.getBlockIdAtTimestamp(lastDataTimestamp)).to.eq(0);
+          expect(await contract.getBlockIdAtTimestamp(lastDataTimestamp + timePadding)).to.eq(0);
+          expect(await contract.getBlockIdAtTimestamp(lastDataTimestamp + timePadding + 1)).to.eq(1);
         });
 
         it('expect to have 1 block', async () => {
@@ -509,7 +529,7 @@ describe('Chain', () => {
 
     await mintBlocks(timePadding);
 
-    const status = await contract.getStatus();
+    const status: ChainStatus = await contract.getStatus();
 
     expect(status.lastDataTimestamp).to.eq(dataTimestamp, 'invalid lastDataTimestamp');
     expect(status.lastBlockId).to.eq(1, 'invalid block ID');
