@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.0.2] - 2021-06-30
+### Changed
+- deploy new contract registry on BSC mainnet 
+
 ## [2.0.1] - 2021-06-10
 ### Changed
 - adjust deployment process to support custom token
