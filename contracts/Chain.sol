@@ -149,6 +149,8 @@ contract Chain is Registrable, Ownable {
       (, locations[i]) = vr.validators(validators[i]);
     }
 
+    nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
+
     nextLeader = numberOfValidators > 0
       ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
       : address(0);
@@ -160,18 +162,21 @@ contract Chain is Registrable, Ownable {
     for (uint256 i = 0; i < numberOfValidators; i++) {
       powers[i] = stakingBank.balanceOf(validators[i]);
     }
-
-    nextBlockId = getBlockId();
   }
 
   function getBlockId() public view returns (uint32) {
+    return getBlockIdAtTimestamp(block.timestamp);
+  }
+
+  // this function does not works for past timestamps
+  function getBlockIdAtTimestamp(uint256 _timestamp) public view returns (uint32) {
     uint32 _blocksCount = blocksCount + blocksCountOffset;
 
     if (_blocksCount == 0) {
       return 0;
     }
 
-    if (blocks[_blocksCount - 1].dataTimestamp + padding < block.timestamp) {
+    if (blocks[_blocksCount - 1].dataTimestamp + padding < _timestamp) {
       return _blocksCount;
     }
 
