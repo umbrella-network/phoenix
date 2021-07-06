@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.0.4] - 2021-07-06
+### Changed
+- adjust range for future timestamp 
+
 ## [2.0.3] - 2021-07-01
 ### Fixed
 - Ensure that `getStatus()` returns `nextBlockId` and `nextLeader` for same timestamp
