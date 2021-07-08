@@ -285,24 +285,27 @@ describe('Chain', () => {
           .revertedWith('Mock on the method is not initialized');
       });
 
-      /* it('fails when data older than 25 minutes', async () => {
-        await mockSubmit();
-        const t = await blockTimestamp();
-        const { r, s, v, dataTimestamp } = await prepareData(validator, t - 25 * 60 - 1, root);
+      describe('check the future dataTimestamp', () => {
+        it('NOT failing when timestamp in acceptable range', async () => {
+          await mockSubmit();
+          const t = await blockTimestamp();
 
-        await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).to.be.revertedWith(
-          'data are older than 25 minutes'
-        );
-      }); // */
+          const { r, s, v, dataTimestamp } = await prepareData(validator, t + 4, root);
 
-      it('fail when data from future', async () => {
-        await mockSubmit();
-        const t = await blockTimestamp();
-        const { r, s, v, dataTimestamp } = await prepareData(validator, t + 65, root);
+          await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).not.to.be
+            .reverted;
+        });
 
-        await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).to.be.revertedWith(
-          'oh, so you can predict future'
-        );
+        it('throw when timestamp NOT in acceptable range', async () => {
+          await mockSubmit();
+          const t = await blockTimestamp();
+
+          const { r, s, v, dataTimestamp } = await prepareData(validator, t + 5, root);
+
+          await expect(
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
+          ).to.be.revertedWith('oh, so you can predict the future:                               4');
+        });
       });
 
       it('generates LogMint event', async () => {
