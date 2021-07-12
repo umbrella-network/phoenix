@@ -72,8 +72,10 @@ contract Chain is Registrable, Ownable {
     require(blocks[lastBlockId].dataTimestamp < _dataTimestamp, "can NOT submit older data");
     // we can't expect minter will have exactly the same timestamp
     // but for sure we can demand not to be off by a lot, that's why +3sec
-    require(_dataTimestamp <= block.timestamp + 3,
-      string(abi.encodePacked("oh, so you can predict the future:", _dataTimestamp - block.timestamp + 48)));
+    // temporary remove this condition, because recently on ropsten we see cases when minter/node
+    // can be even 100sec behind
+    // require(_dataTimestamp <= block.timestamp + 3,
+    //   string(abi.encodePacked("oh, so you can predict the future:", _dataTimestamp - block.timestamp + 48)));
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
     bytes memory testimony = abi.encodePacked(_dataTimestamp, _root);
