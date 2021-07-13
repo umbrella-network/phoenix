@@ -76,7 +76,7 @@ npm run local-minter
 Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
 
 ```shell
-npm run flatten:all && npm run deploy:all:[staging|production]
+npm run flatten:all && npm run deploy:all:[staging|sandbox|production]
 ```
 
 In case of any errors, please read error message. There should be some tips what's need to be fixed.

@@ -100,13 +100,18 @@ describe('Tree', () => {
     });
 
     it('expect to validate proof for all keys', async () => {
-      const awaits: any[] = [];
+      const awaits: boolean[] = [];
 
       Object.keys(data).forEach((k) => {
         const proof = tree.getProofForKey(k);
         const leaf = tree.createLeafHash(k);
+        const root = tree.getRoot();
 
-        expect(tree.verifyProof(proof, tree.getRoot()!, leaf)).to.be.true;
+        if (!root) {
+          throw Error('root is missing');
+        }
+
+        expect(tree.verifyProof(proof, root, leaf)).to.be.true;
         awaits.push(contract.verifyProof(proof, tree.getRoot(), leaf));
       });
 

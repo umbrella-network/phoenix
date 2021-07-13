@@ -63,6 +63,12 @@ const config: HardhatUserConfig = {
       chainId: NETWORK === NETWORKS.BSC ? 97 : 42,
       gasPrice: NETWORK === NETWORKS.BSC ? 10000000000 : 1000000000
     },
+    sandbox: {
+      url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://kovan.infura.io/v3/${INFURA_ID}`,
+      accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
+      chainId: NETWORK === NETWORKS.BSC ? 97 : 42,
+      gasPrice: NETWORK === NETWORKS.BSC ? 10000000000 : 1000000000
+    },
     production: {
       url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://ropsten.infura.io/v3/${INFURA_ID}`,
       accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],

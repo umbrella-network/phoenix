@@ -4,7 +4,7 @@ import {readValidators} from './utils';
 const staging: GlobalConfig = {
   ethereum: {
     contractRegistry: {
-      address: '0x4545e91d2e3647808670DD045eA5f4079B436EbC'
+      address: ''
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
@@ -14,14 +14,14 @@ const staging: GlobalConfig = {
     chain: {
       padding: 60
     },
-    validators: readValidators('https://validator-dev.umb.network'),
+    validators: readValidators('https://validator.sbx.umb.network'),
   },
   smartchain: {
     distributor: {
       address: '0x2BB2B0df0DB14EAfd5FCaBc46Fd543F7a6dFF8E9'
     },
     contractRegistry: {
-      address: '0x8f98d3B5C911206C1Ac08B9938875620A03BCd59'
+      address: '0xE1cDcE9A678E84Aa73d3266176C6E11b3eDc4f67'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
@@ -31,7 +31,7 @@ const staging: GlobalConfig = {
     chain: {
       padding: 60
     },
-    validators: readValidators('https://validator-bsc-dev.umb.network'),
+    validators: readValidators('https://validator-bsc.sbx.umb.network'),
   }
 };
 

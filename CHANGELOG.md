@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.0.6] - 2021-07-13
+### Added 
+- support sandbox environment
+
 ## [2.0.5] - 2021-07-12
 ### Removed
 - temporary remove condition about submitting block with future timestamp
