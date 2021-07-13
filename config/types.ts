@@ -4,6 +4,9 @@ export interface ValidatorConfig {
 }
 
 export interface Config {
+  distributor?: {
+    address: string
+  },
   contractRegistry: {
     address: string
   },
