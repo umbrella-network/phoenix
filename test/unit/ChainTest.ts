@@ -65,7 +65,7 @@ const keys = [
 ];
 
 keys.forEach((k, i) => {
-  inputs[k] = LeafValueCoder.encode(i + 1);
+  inputs[k] = LeafValueCoder.encode(i + 1, 'label');
 });
 
 const tree = new SortedMerkleTree(inputs);

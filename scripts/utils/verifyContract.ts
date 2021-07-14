@@ -40,6 +40,7 @@ const getScanApiUrl = (): string | undefined => {
       case 'development':
       case 'dev':
       case 'staging':
+      case 'sandbox':
         prefix = '-testnet';
         break;
       default:
