@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.0.7] - 2021-07-13
+### Fixed
+- fix code verification contract 
+
 ## [2.0.6] - 2021-07-13
 ### Added 
 - support sandbox environment
