@@ -29,7 +29,7 @@ describe('Tree', () => {
     it('expect to return hashed leaf', async () => {
       const tree = new SortedMerkleTree({});
       const k = LeafKeyCoder.encode('etc-usd');
-      const v = LeafValueCoder.encode(1234567890);
+      const v = LeafValueCoder.encode(1234567890, 'label');
 
       expect(await contract.hashLeaf(k, v)).to.eq(tree.leafHash(k, v));
     });
@@ -37,15 +37,15 @@ describe('Tree', () => {
 
   describe('getRoot()', () => {
     it('expect to have different root for different data', async () => {
-      const tree1 = new SortedMerkleTree({ a: LeafValueCoder.encode(1) });
-      const tree2 = new SortedMerkleTree({ a: LeafValueCoder.encode(2) });
+      const tree1 = new SortedMerkleTree({ a: LeafValueCoder.encode(1, 'label') });
+      const tree2 = new SortedMerkleTree({ a: LeafValueCoder.encode(2, 'lable') });
       expect(tree1.getRoot()).not.to.eq(tree2.getRoot());
     });
   });
 
   describe('with one element', () => {
     const key = 'eth-usd';
-    const data = { [key]: LeafValueCoder.encode(123) };
+    const data = { [key]: LeafValueCoder.encode(123, 'label') };
     const tree = new SortedMerkleTree(data);
 
     it('expect leaf === tree', async () => {
@@ -81,7 +81,7 @@ describe('Tree', () => {
     ];
 
     keys.sort().forEach((k) => {
-      data[k] = LeafValueCoder.encode(Math.round(Math.random() * 1000));
+      data[k] = LeafValueCoder.encode(Math.round(Math.random() * 1000), 'label');
     });
 
     const tree = new SortedMerkleTree(data);
