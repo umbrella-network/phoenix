@@ -17,14 +17,13 @@ interface Validator {
 interface ValidatorInfo {
   validator: string;
   contractRegistryAddress: string;
-  validatorRegistryAddress: string;
   chainContractAddress: string;
   version: string;
   environment: string;
   name: string;
 }
 
-let validatorRegistry: Contract;
+let stakingBank: Contract;
 
 const resolveValidatorInfo = async (location: string): Promise<ValidatorInfo> => {
   const res = await superagent.get(`${location}/info`);
@@ -59,7 +58,7 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
   console.log(`validator balance: ${formatEther(balance)} OK`);
 
-  const registeredValidator = await validatorRegistry.validators(info.validator);
+  const registeredValidator = await stakingBank.validators(info.validator);
 
   if (registeredValidator.id !== ethers.constants.AddressZero) {
     throw Error(`validator ${info.validator} already registered`);
@@ -78,8 +77,7 @@ const registerNewValidator = async () => {
 
   console.log(`Adding new validator based on location: ${location} with stake of ${stake} UMB`);
 
-  const stakingBank = await deployedContract('StakingBank');
-  validatorRegistry = await deployedContract('ValidatorRegistry');
+  stakingBank = await deployedContract('StakingBank');
   const token = await deployedContract('UMB');
 
   const info = await resolveValidatorInfo(location);
@@ -95,17 +93,16 @@ const registerNewValidator = async () => {
   }
 
   console.log('new validator:', validator);
-  console.log('validator registry:', validatorRegistry.address);
   console.log('stakingBank:', stakingBank.address);
   console.log('token:', token.address);
 
-  const registeredValidator = await validatorRegistry.validators(validator.id);
+  const registeredValidator = await stakingBank.validators(validator.id);
 
   if (registeredValidator.id !== ethers.constants.AddressZero) {
     throw Error(`validator ${validator.id} already registered`);
   }
 
-  let tx = await validatorRegistry.create(validator.id, validator.location);
+  let tx = await stakingBank.create(validator.id, validator.location);
   await waitForTx(tx.hash, provider);
   console.log('new validator created, now staking...');
 

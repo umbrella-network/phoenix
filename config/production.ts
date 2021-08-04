@@ -12,7 +12,11 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60
+      padding: 60,
+      demo: false
+    },
+    stakingBank: {
+      minAmountForStake: 100n * BigInt(1e18),
     },
     validators: readValidators('https://validator.umb.network'),
   },
@@ -27,7 +31,11 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60
+      padding: 60,
+      demo: false
+    },
+    stakingBank: {
+      minAmountForStake: 100n * BigInt(1e18),
     },
     validators: readValidators('https://validator-bsc.umb.network'),
   }

@@ -11,7 +11,11 @@ const cfg: Config = {
     symbol: 'UMB'
   },
   chain: {
-    padding: 20
+    padding: 20,
+    demo: true
+  },
+  stakingBank: {
+    minAmountForStake: 1n * BigInt(1e18),
   },
   validators: readValidators('http://localhost:3000'),
 };

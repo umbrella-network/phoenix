@@ -18,7 +18,11 @@ export interface Config {
   },
   chain: {
     padding: number
+    demo: boolean
   },
+  stakingBank: {
+    minAmountForStake: bigint
+  }
   validators: ValidatorConfig[],
 }
 
