@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
 
 import "./interfaces/IStakingBank.sol";
-import "./interfaces/IValidatorRegistry.sol";
 
 import "./extensions/Registrable.sol";
 import "./Registry.sol";
@@ -144,14 +143,17 @@ contract Chain is Registrable, Ownable {
     lastBlockId = getLatestBlockId();
     lastDataTimestamp = blocks[lastBlockId].dataTimestamp;
 
-    IValidatorRegistry vr = validatorRegistryContract();
-    uint256 numberOfValidators = vr.getNumberOfValidators();
+    IStakingBank stakingBank = stakingBankContract();
+    staked = stakingBank.totalSupply();
+    uint256 numberOfValidators = stakingBank.getNumberOfValidators();
+    powers = new uint256[](numberOfValidators);
     validators = new address[](numberOfValidators);
     locations = new string[](numberOfValidators);
 
     for (uint256 i = 0; i < numberOfValidators; i++) {
-      validators[i] = vr.addresses(i);
-      (, locations[i]) = vr.validators(validators[i]);
+      validators[i] = stakingBank.addresses(i);
+      (, locations[i]) = stakingBank.validators(validators[i]);
+      powers[i] = stakingBank.balanceOf(validators[i]);
     }
 
     nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
@@ -159,14 +161,6 @@ contract Chain is Registrable, Ownable {
     nextLeader = numberOfValidators > 0
       ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
       : address(0);
-
-    IStakingBank stakingBank = stakingBankContract();
-    powers = new uint256[](numberOfValidators);
-    staked = stakingBank.totalSupply();
-
-    for (uint256 i = 0; i < numberOfValidators; i++) {
-      powers[i] = stakingBank.balanceOf(validators[i]);
-    }
   }
 
   function getBlockId() public view returns (uint32) {
@@ -215,9 +209,9 @@ contract Chain is Registrable, Ownable {
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
   function getLeaderAddressAtTime(uint256 _timestamp) public view returns (address) {
-    IValidatorRegistry validatorRegistry = validatorRegistryContract();
+    IStakingBank stakingBank = stakingBankContract();
 
-    uint256 numberOfValidators = validatorRegistry.getNumberOfValidators();
+    uint256 numberOfValidators = stakingBank.getNumberOfValidators();
 
     if (numberOfValidators == 0) {
       return address(0x0);
@@ -225,10 +219,10 @@ contract Chain is Registrable, Ownable {
 
     uint256 validatorIndex = getLeaderIndex(numberOfValidators, _timestamp);
 
-    return validatorRegistry.addresses(validatorIndex);
+    return stakingBank.addresses(validatorIndex);
   }
 
-  function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public view returns (bool) {
+  function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
     if (_root == bytes32(0)) {
       return false;
     }
@@ -236,7 +230,7 @@ contract Chain is Registrable, Ownable {
     return MerkleProof.verify(_proof, _root, _leaf);
   }
 
-  function hashLeaf(bytes memory _key, bytes memory _value) public view returns (bytes32) {
+  function hashLeaf(bytes memory _key, bytes memory _value) public pure returns (bytes32) {
     return keccak256(abi.encodePacked(_key, _value));
   }
 

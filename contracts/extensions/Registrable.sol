@@ -4,7 +4,6 @@ pragma solidity 0.6.8;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IRegistry.sol";
 import "../interfaces/IStakingBank.sol";
-import "../interfaces/IValidatorRegistry.sol";
 
 abstract contract Registrable {
   IRegistry public contractRegistry;
@@ -34,10 +33,6 @@ abstract contract Registrable {
   // ========== VIEWS ========== //
 
   function getName() virtual external pure returns (bytes32);
-
-  function validatorRegistryContract() public view returns (IValidatorRegistry) {
-    return IValidatorRegistry(contractRegistry.requireAndGetAddress("ValidatorRegistry"));
-  }
 
   function stakingBankContract() public view returns (IStakingBank) {
     return IStakingBank(contractRegistry.requireAndGetAddress("StakingBank"));
