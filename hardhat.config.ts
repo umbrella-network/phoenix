@@ -5,6 +5,7 @@ import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-web3';
 import '@nomiclabs/hardhat-solhint';
+import '@nomiclabs/hardhat-etherscan';
 import 'solidity-coverage';
 
 import 'hardhat-deploy';
@@ -21,7 +22,9 @@ const {
   BSC_RPC_PROVIDER,
   DEPLOYER_PK,
   HARDHAT_MINING_AUTO = 'true',
-  HARDHAT_MINING_INTERVAL = '5000'
+  HARDHAT_MINING_INTERVAL = '5000',
+  BSCSCAN_API,
+  ETHERSCAN_API
 } = process.env;
 
 const balance = '1000' + '0'.repeat(18);
@@ -78,6 +81,11 @@ const config: HardhatUserConfig = {
     docker: {
       url: 'http://eth:8545',
     },
+  },
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://bscscan.com/
+    apiKey: NETWORK === NETWORKS.BSC ? BSCSCAN_API : ETHERSCAN_API
   },
   gasReporter: {
     gasPrice: 1,

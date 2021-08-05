@@ -97,9 +97,9 @@ describe('ValidatorRegistry', () => {
 
       describe('when stake', () => {
         beforeEach('expect to stake', async () => {
-          contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('UMB')).returns(token.address);
-          token.mock.allowance.withArgs(validatorAddress, contract.address).returns(25);
-          token.mock.transferFrom.withArgs(validatorAddress, contract.address, 25).returns(true);
+          await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('UMB')).returns(token.address);
+          await token.mock.allowance.withArgs(validatorAddress, contract.address).returns(25);
+          await token.mock.transferFrom.withArgs(validatorAddress, contract.address, 25).returns(true);
 
           expect(await contract.totalSupply()).to.eq(0);
           await contract.receiveApproval(validatorAddress);
@@ -111,12 +111,12 @@ describe('ValidatorRegistry', () => {
 
         it('can not transfer tokens', async () => {
           await expect(contract.connect(validator1).transfer(validator2Address, 10)).to.revertedWith(
-            'staked tokens can not be transfered'
+            'staked tokens can not be transferred'
           );
         });
 
         it('expect to unstake when removed', async () => {
-          token.mock.transfer.withArgs(validatorAddress, 25).returns(true);
+          await token.mock.transfer.withArgs(validatorAddress, 25).returns(true);
 
           await expect(contract.remove(validatorAddress))
             .to.emit(contract, 'LogValidatorRemoved')

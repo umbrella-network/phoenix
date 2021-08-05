@@ -13,7 +13,6 @@ import SortedMerkleTree from '../../lib/SortedMerkleTree';
 
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import ValidatorRegistry from '../../artifacts/contracts/ValidatorRegistry.sol/ValidatorRegistry.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
@@ -28,7 +27,6 @@ const setup = async () => {
   const [owner, validator] = await ethers.getSigners();
   const token = await deployMockContract(owner, Token.abi);
   const contractRegistry = await deployMockContract(owner, Registry.abi);
-  const validatorRegistry = await deployMockContract(owner, ValidatorRegistry.abi);
   const stakingBank = await deployMockContract(owner, StakingBank.abi);
   const contractFactory = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
@@ -42,7 +40,6 @@ const setup = async () => {
     validatorAddress: await validator.getAddress(),
     token,
     contractRegistry,
-    validatorRegistry,
     stakingBank,
     contract,
     contractFactory,
@@ -105,7 +102,6 @@ describe('Chain', () => {
     validator: Signer,
     validatorAddress: string,
     contractRegistry: Contract,
-    validatorRegistry: Contract,
     stakingBank: Contract,
     contract: Contract,
     contractFactory: ContractFactory;
@@ -128,7 +124,6 @@ describe('Chain', () => {
       validator,
       validatorAddress,
       contractRegistry,
-      validatorRegistry,
       stakingBank,
       contract,
       contractFactory,
@@ -149,11 +144,9 @@ describe('Chain', () => {
     });
 
     it('not throw on status', async () => {
-      await contractRegistry.mock.requireAndGetAddress
-        .withArgs(toBytes32('ValidatorRegistry'))
-        .returns(validatorRegistry.address);
+      await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
 
-      await validatorRegistry.mock.getNumberOfValidators.returns(0);
+      await stakingBank.mock.getNumberOfValidators.returns(0);
       await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
       await stakingBank.mock.totalSupply.returns(0);
 
@@ -171,9 +164,7 @@ describe('Chain', () => {
     });
 
     it('expect to throw when call from NOT an owner', async () => {
-      await expect(contract.connect(validator).setPadding(9)).to.revertedWith(
-        'revert Ownable: caller is not the owner'
-      );
+      await expect(contract.connect(validator).setPadding(9)).to.revertedWith('caller is not the owner');
     });
   });
 
@@ -371,7 +362,7 @@ describe('Chain', () => {
         it('expect to have no current FCD', async () => {
           const bytes32 = `0x${abiUintEncoder(0)}`;
           const fcds = await contract.getCurrentValues([bytes32]);
-          expect(fcds[0]).to.eql([BigNumber.from(0)]);
+          expect(fcds[0].map((f: BigNumber) => f.toString())).to.eql(['0']);
           expect(fcds[1]).to.eql([0]);
         });
 
@@ -413,7 +404,7 @@ describe('Chain', () => {
             const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
             await expect(
               contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-            ).to.revertedWith('revert do not spam');
+            ).to.revertedWith('do not spam');
           });
 
           describe('when minimal padding reached', () => {
@@ -437,7 +428,7 @@ describe('Chain', () => {
                 const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
                 await expect(
                   contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-                ).to.revertedWith('revert do not spam');
+                ).to.revertedWith('do not spam');
               });
             });
           });
@@ -488,18 +479,22 @@ describe('Chain', () => {
 
         it('expect to get FCD by key', async () => {
           const fcd = await contract.getCurrentValue(fcdKeys[0]);
-          expect(fcd).to.eql([BigNumber.from(fcdValues[0]), BigNumber.from(submittedDataTimestamp)]);
+          expect(fcd.map((f: BigNumber) => f.toString())).to.eql([
+            fcdValues[0].toFixed(0),
+            submittedDataTimestamp.toFixed(0),
+          ]);
         });
 
         it('expect to get many FCDs', async () => {
           const fcds = await contract.getCurrentValues(fcdKeys);
 
           const expected = [
-            [BigNumber.from(fcdValues[0]), BigNumber.from(fcdValues[1])],
+            [fcdValues[0].toFixed(0), fcdValues[1].toFixed(0)],
             [submittedDataTimestamp, submittedDataTimestamp],
           ];
 
-          expect(fcds).to.eql(expected);
+          expect(fcds[0].map((f: BigNumber) => f.toString())).to.eql(expected[0]);
+          expect(fcds[1]).to.eql(expected[1]);
         });
 
         it('expect to validate proof for selected key-value pair', async () => {
@@ -524,12 +519,10 @@ describe('Chain', () => {
     ({ r, s, v, dataTimestamp } = await prepareData(validator, dataTimestamp + 1, root));
     await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
-    await contractRegistry.mock.requireAndGetAddress
-      .withArgs(toBytes32('ValidatorRegistry'))
-      .returns(validatorRegistry.address);
-    await validatorRegistry.mock.getNumberOfValidators.returns(1);
-    await validatorRegistry.mock.addresses.withArgs(0).returns(validatorAddress);
-    await validatorRegistry.mock.validators.withArgs(validatorAddress).returns(validatorAddress, 'abc');
+    await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
+    await stakingBank.mock.getNumberOfValidators.returns(1);
+    await stakingBank.mock.addresses.withArgs(0).returns(validatorAddress);
+    await stakingBank.mock.validators.withArgs(validatorAddress).returns(validatorAddress, 'abc');
     await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
     await stakingBank.mock.totalSupply.returns(123);
     await stakingBank.mock.balanceOf.withArgs(validatorAddress).returns(321);
@@ -543,7 +536,7 @@ describe('Chain', () => {
     expect(status.nextBlockId).to.eq(2, 'invalid block ID');
     expect(status.nextLeader).to.eq(validatorAddress, 'invalid validator');
     expect(status.validators).to.eql([validatorAddress], 'invalid validators list');
-    expect(status.powers).to.eql([BigNumber.from(321)], 'invalid powers');
+    expect(status.powers.map((p) => p.toString())).to.eql(['321'], 'invalid powers');
     expect(status.locations).to.eql(['abc'], 'invalid locations');
     expect(status.staked).to.eq(123, 'invalid staked');
   });

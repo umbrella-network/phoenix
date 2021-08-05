@@ -1,12 +1,15 @@
+import configuration from '../config';
+
 require('custom-env').env(); // eslint-disable-line
 
 import { deployedContract } from './utils/deployedContracts';
 import { Contract } from 'ethers';
 
-import { deployValidatorRegistry, registerContract } from './deployers/contracts';
+import { deployStakingBank, registerContract } from './deployers/contracts';
 import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
 
 const provider = getProvider();
+const config = configuration();
 
 interface Validator {
   id: string;
@@ -14,13 +17,13 @@ interface Validator {
 }
 
 const existingValidators = async (): Promise<Validator[]> => {
-  const validatorRegistry = await deployedContract('ValidatorRegistry');
+  const stakingBank = await deployedContract('StakingBank');
   const validators: Validator[] = [];
-  const validatorsCount = await validatorRegistry.getNumberOfValidators();
+  const validatorsCount = await stakingBank.getNumberOfValidators();
 
   for (let i = 0; i < validatorsCount; i++) {
-    const address = await validatorRegistry.addresses(i);
-    const { id, location } = await validatorRegistry.validators(address);
+    const address = await stakingBank.addresses(i);
+    const { id, location } = await stakingBank.validators(address);
     validators.push({ id, location });
   }
 
@@ -30,10 +33,10 @@ const existingValidators = async (): Promise<Validator[]> => {
   return validators;
 };
 
-const migrateValidators = async (validatorRegistry: Contract, validators: Validator[]): Promise<void> => {
+const migrateValidators = async (stakingBank: Contract, validators: Validator[]): Promise<void> => {
   for (const validator of validators) {
     console.log('re-creating', validator);
-    const tx = await validatorRegistry.create(validator.id, validator.location);
+    const tx = await stakingBank.create(validator.id, validator.location);
     await waitForTx(tx.hash, provider);
   }
 
@@ -42,10 +45,10 @@ const migrateValidators = async (validatorRegistry: Contract, validators: Valida
 
 const reDeployAndRegister = async () => {
   const validators = await existingValidators();
-  const validatorRegistry = await deployValidatorRegistry();
-  console.log('ValidatorRegistry updated:', validatorRegistry.address);
-  await migrateValidators(validatorRegistry, validators);
-  await registerContract([validatorRegistry.address]);
+  const stakingBank = await deployStakingBank(config.contractRegistry.address);
+  console.log('StakingBank updated:', stakingBank.address);
+  await migrateValidators(stakingBank, validators);
+  await registerContract([stakingBank.address]);
 };
 
 pressToContinue('y', () => {
