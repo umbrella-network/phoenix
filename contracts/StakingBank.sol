@@ -44,19 +44,21 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   }
 
   function _transfer(address sender, address recipient, uint256 amount) internal override {
-    revert("staked tokens can not be transfered");
+    revert("staked tokens can not be transferred");
   }
 
-  function receiveApproval(address _from) override external nonReentrant returns (bool success) {
-    require(validators[_from].id != address(0x0), "validator does not exist in registry");
+  function stake(uint256 _value) external nonReentrant {
     ERC20 token = tokenContract();
 
+    _stake(token, msg.sender, _value);
+  }
+
+
+  function receiveApproval(address _from) override external nonReentrant returns (bool success) {
+    ERC20 token = tokenContract();
     uint256 allowance = token.allowance(_from, address(this));
 
-    require(allowance > 0, "contract not allowed to spend tokens");
-
-    token.safeTransferFrom(_from, address(this), allowance);
-    _mint(_from, allowance);
+    _stake(token, _from, allowance);
 
     return true;
   }
@@ -67,6 +69,14 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
 
     _unstake(msg.sender, _value);
     return true;
+  }
+
+  function _stake(ERC20 _token, address _from, uint256 _amount) internal {
+    require(_amount > 0, "_amount is empty");
+    require(validators[_from].id != address(0x0), "validator does not exist in registry");
+
+    _token.safeTransferFrom(_from, address(this), _amount);
+    _mint(_from, _amount);
   }
 
   function _unstake(address _validator, uint256 _value) internal {
