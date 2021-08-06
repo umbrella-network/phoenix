@@ -2,7 +2,6 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
@@ -13,7 +12,6 @@ import "./extensions/Registrable.sol";
 import "./Registry.sol";
 
 contract Chain is Registrable, Ownable {
-  using SafeMath for uint256;
   using ValueDecoder for bytes;
 
   // ========== STATE VARIABLES ========== //
@@ -37,11 +35,13 @@ contract Chain is Registrable, Ownable {
   uint32 public blocksCount;
   uint32 public blocksCountOffset;
   uint16 public padding;
+  bool public demo;
 
   // ========== CONSTRUCTOR ========== //
 
-  constructor(address _contractRegistry, uint16 _padding) public Registrable(_contractRegistry) {
+  constructor(address _contractRegistry, uint16 _padding, bool _demo) public Registrable(_contractRegistry) {
     padding = _padding;
+    demo = _demo;
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
 
     if (address(oldChain) != address(0x0)) {
@@ -92,7 +92,9 @@ contract Chain is Registrable, Ownable {
     uint256 staked = stakingBank.totalSupply();
     address prevSigner = address(0x0);
 
-    for (uint256 i = 0; i < _v.length; i++) {
+    uint256 i = 0;
+
+    for (; i < _v.length; i++) {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
@@ -101,11 +103,11 @@ contract Chain is Registrable, Ownable {
       if (balance == 0) continue;
 
       emit LogVoter(lastBlockId + 1, signer, balance);
-      power = power.add(balance);
+      power += balance; // no need for safe math, if we overflow then we will not have enough power
     }
 
-    // TODO to optimise, break the loop when get enough power
-    require(power.mul(100) >= staked.mul(66), "not enough power was gathered");
+    require(i > 1 || demo, "not enough participants");
+    require(power * 100 / staked >= 66, "not enough power was gathered");
 
     blocks[lastBlockId + 1].root = _root;
     blocks[lastBlockId + 1].dataTimestamp = _dataTimestamp;

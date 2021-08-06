@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - merge `StakingBank` and `ValidatorRegistry`
 
+### Added
+- add requirement for more than one signature
+
 ## [2.0.7] - 2021-07-13
 ### Fixed
 - fix code verification contract 

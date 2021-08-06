@@ -18,6 +18,7 @@ export interface Config {
   },
   chain: {
     padding: number
+    demo: boolean
   },
   validators: ValidatorConfig[],
 }

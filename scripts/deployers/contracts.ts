@@ -24,7 +24,7 @@ interface Validator {
 export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
   console.log('deploying Chain...');
   const ChainContract = await ethers.getContractFactory('Chain');
-  const chainArgs = [contractRegistryAddress, config.chain.padding];
+  const chainArgs = [contractRegistryAddress, config.chain.padding, config.chain.demo];
 
   const chain = await ChainContract.deploy(...chainArgs);
   await chain.deployed();
