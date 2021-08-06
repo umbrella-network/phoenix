@@ -25,22 +25,55 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   mapping(address => Validator) override public validators;
 
   address[] override public addresses;
+  uint256 public minAmountForStake; // minimum amount of tokens that we accept for staking
+  uint256 public topLimit;  // in %
 
   event LogValidatorRegistered(address id);
   event LogValidatorUpdated(address id);
   event LogValidatorRemoved(address id);
+  event LogMinAmountForStake(uint256 minAmountForStake);
+  event LogTopLimit(uint256 topLimit);
 
-  constructor(address _contractRegistry, string memory _name, string memory _symbol)
+  constructor(
+    address _contractRegistry,
+    uint256 _minAmountForStake,
+    uint256 _topLimit,
+    string memory _name,
+    string memory _symbol
+  )
   public
   Registrable(_contractRegistry)
   ERC20(
       string(abi.encodePacked("staked ", _name)),
       string(abi.encodePacked("sb", _symbol))
     ) {
+
+    _setMinAmountForStake(_minAmountForStake);
+    _setTopLimit(_topLimit);
   }
 
   function getName() override external pure returns (bytes32) {
     return "StakingBank";
+  }
+
+  function setMinAmountForStake(uint256 _minAmountForStake) external onlyOwner {
+    _setMinAmountForStake(_minAmountForStake);
+  }
+
+  function setTopLimit(uint256 _topLimit) external onlyOwner {
+    _setTopLimit(_topLimit);
+  }
+
+  function _setMinAmountForStake(uint256 _minAmountForStake) internal {
+    require(_minAmountForStake > 0, "_minAmountForStake must be positive");
+    minAmountForStake = _minAmountForStake;
+    emit LogMinAmountForStake(_minAmountForStake);
+  }
+
+  function _setTopLimit(uint256 _topLimit) internal {
+    require(_topLimit > 0 && _topLimit <= 100, "_topLimit must be in %");
+    topLimit = _topLimit;
+    emit LogTopLimit(_topLimit);
   }
 
   // solhint-disable-next-line no-unused-vars
@@ -53,7 +86,6 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
 
     _stake(token, msg.sender, _value);
   }
-
 
   function receiveApproval(address _from) override external nonReentrant returns (bool success) {
     ERC20 token = tokenContract();
@@ -73,7 +105,12 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   }
 
   function _stake(ERC20 _token, address _from, uint256 _amount) internal {
-    require(_amount > 0, "_amount is empty");
+    require(_amount >= minAmountForStake, "_amount is too low");
+
+    uint256 total = totalSupply() + _amount;
+    uint256 balance = balanceOf(_from);
+    require((balance + _amount) * 100 / total <= topLimit, "can not stake more than topLimit");
+
     require(validators[_from].id != address(0x0), "validator does not exist in registry");
 
     _token.safeTransferFrom(_from, address(this), _amount);
