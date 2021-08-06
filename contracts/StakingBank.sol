@@ -43,6 +43,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
     return "StakingBank";
   }
 
+  // solhint-disable-next-line no-unused-vars
   function _transfer(address sender, address recipient, uint256 amount) internal override {
     revert("staked tokens can not be transferred");
   }
