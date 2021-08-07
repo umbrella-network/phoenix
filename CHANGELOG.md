@@ -6,8 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 ### Added
-- add limit for staking
-- add requirement for more than one signature
+- add requirement for number of signatures
 
 ### Changed
 - merge `StakingBank` and `ValidatorRegistry`

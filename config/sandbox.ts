@@ -13,7 +13,7 @@ const staging: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      demo: true
+      requiredSignatures: 1
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),
@@ -34,7 +34,7 @@ const staging: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      demo: true
+      requiredSignatures: 1
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),

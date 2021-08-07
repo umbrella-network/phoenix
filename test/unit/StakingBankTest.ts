@@ -19,6 +19,7 @@ async function fixture(minAmount = defaultMinAmount) {
   const [owner, validator1, validator2] = await ethers.getSigners();
   const contractRegistry = await deployMockContract(owner, Registry.abi);
   const token = await deployMockContract(owner, Token.abi);
+  await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('UMB')).returns(token.address);
   const contractFactory = new ContractFactory(StakingBank.abi, StakingBank.bytecode, owner);
 
   await token.mock.name.returns('abc');
@@ -71,12 +72,11 @@ describe('StakingBank', () => {
 describe('ValidatorRegistry', () => {
   let contract: Contract;
   let token: MockContract;
-  let contractRegistry: MockContract;
   let validatorAddress: string, validator2Address: string;
   let validator1: Signer;
 
   beforeEach(async () => {
-    ({ validatorAddress, validator2Address, contract, validator1, token, contractRegistry } = await fixture());
+    ({ validatorAddress, validator2Address, contract, validator1, token } = await fixture());
   });
 
   describe('when deployed', () => {
@@ -116,7 +116,6 @@ describe('ValidatorRegistry', () => {
 
       it('throw when stake less than required minimum', async () => {
         const toStake = defaultMinAmount - 1;
-        await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('UMB')).returns(token.address);
         await token.mock.allowance.withArgs(validatorAddress, contract.address).returns(toStake);
         await token.mock.transferFrom.withArgs(validatorAddress, contract.address, toStake).returns(true);
 
@@ -127,7 +126,6 @@ describe('ValidatorRegistry', () => {
 
       it('expect to receiveApproval when amount is at least minimum', async () => {
         const toStake = defaultMinAmount;
-        await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('UMB')).returns(token.address);
         await token.mock.allowance.withArgs(validatorAddress, contract.address).returns(toStake);
         await token.mock.transferFrom.withArgs(validatorAddress, contract.address, toStake).returns(true);
 
@@ -137,7 +135,6 @@ describe('ValidatorRegistry', () => {
 
       it('expect to stake when amount is at least minimum', async () => {
         const toStake = defaultMinAmount;
-        await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('UMB')).returns(token.address);
         await token.mock.allowance.withArgs(validatorAddress, contract.address).returns(toStake);
         await token.mock.transferFrom.withArgs(validatorAddress, contract.address, toStake).returns(true);
 
@@ -145,11 +142,10 @@ describe('ValidatorRegistry', () => {
         await expect(contract.connect(validator1).stake(toStake)).not.throw;
       });
 
-      describe('when stake', () => {
-        const staked = defaultMinAmount;
+      describe('when staked', () => {
+        const staked = defaultMinAmount + 1;
 
         beforeEach('expect to stake', async () => {
-          await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('UMB')).returns(token.address);
           await token.mock.allowance.withArgs(validatorAddress, contract.address).returns(staked);
           await token.mock.transferFrom.withArgs(validatorAddress, contract.address, staked).returns(true);
 
@@ -159,6 +155,24 @@ describe('ValidatorRegistry', () => {
 
         it('expect to have totalSupply', async () => {
           expect(await contract.totalSupply()).to.eq(staked);
+        });
+
+        it('expect to withdraw', async () => {
+          await token.mock.transfer.withArgs(validatorAddress, 1).returns(true);
+
+          await contract.connect(validator1).withdraw(1);
+          expect(await contract.totalSupply()).to.eq(staked - 1);
+        });
+
+        it('expect to withdraw all', async () => {
+          await token.mock.transfer.withArgs(validatorAddress, staked).returns(true);
+
+          await contract.connect(validator1).exit();
+          expect(await contract.totalSupply()).to.eq(0);
+        });
+
+        it('expect to throw when minAmountForStake is not left as staked amount', async () => {
+          await expect(contract.connect(validator1).withdraw(2)).to.revertedWith('minAmountForStake must be available');
         });
 
         it('can not transfer tokens', async () => {

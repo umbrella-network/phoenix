@@ -23,7 +23,7 @@ use(waffleChai);
 
 const timePadding = 100;
 
-const setup = async (demo = true) => {
+const setup = async (requiredSignatures = 1) => {
   const [owner, validator, validator2] = await ethers.getSigners();
   const token = await deployMockContract(owner, Token.abi);
   const contractRegistry = await deployMockContract(owner, Registry.abi);
@@ -32,7 +32,7 @@ const setup = async (demo = true) => {
 
   await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(ethers.constants.AddressZero);
 
-  const contract = await contractFactory.deploy(contractRegistry.address, timePadding, demo);
+  const contract = await contractFactory.deploy(contractRegistry.address, timePadding, requiredSignatures);
 
   return {
     owner,
@@ -146,11 +146,11 @@ describe('Chain', () => {
         stakingBank,
         contract,
         contractFactory,
-      } = await setup(false));
+      } = await setup(2));
     });
 
     it('throws when not enough participants', async () => {
-      await expect(executeSubmit(0, await blockTimestamp())).to.revertedWith('participant');
+      await expect(executeSubmit(0, await blockTimestamp())).to.revertedWith('not enough signatures');
     });
 
     it('accept block from 2 participants', async () => {
@@ -596,6 +596,7 @@ describe('Chain', () => {
       expect(status.powers.map((p) => p.toString())).to.eql(['321'], 'invalid powers');
       expect(status.locations).to.eql(['abc'], 'invalid locations');
       expect(status.staked).to.eq(123, 'invalid staked');
+      expect(status.minSignatures).to.eq(1, 'invalid requiredSignatures');
     });
 
     describe('update/replace contract', () => {
@@ -613,7 +614,7 @@ describe('Chain', () => {
         await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
         await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(contract.address);
-        newChain = await contractFactory.deploy(contractRegistry.address, timePadding, false);
+        newChain = await contractFactory.deploy(contractRegistry.address, timePadding, 1);
       });
 
       it('expect to have no blocks', async () => {

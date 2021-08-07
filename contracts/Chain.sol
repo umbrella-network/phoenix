@@ -35,13 +35,17 @@ contract Chain is Registrable, Ownable {
   uint32 public blocksCount;
   uint32 public blocksCountOffset;
   uint16 public padding;
-  bool public demo;
+  uint16 public immutable requiredSignatures;
 
   // ========== CONSTRUCTOR ========== //
 
-  constructor(address _contractRegistry, uint16 _padding, bool _demo) public Registrable(_contractRegistry) {
+  constructor(
+    address _contractRegistry,
+    uint16 _padding,
+    uint16 _requiredSignatures
+  ) public Registrable(_contractRegistry) {
     padding = _padding;
-    demo = _demo;
+    requiredSignatures = _requiredSignatures;
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
 
     if (address(oldChain) != address(0x0)) {
@@ -106,7 +110,7 @@ contract Chain is Registrable, Ownable {
       power += balance; // no need for safe math, if we overflow then we will not have enough power
     }
 
-    require(i > 1 || demo, "not enough participants");
+    require(i >= requiredSignatures, "not enough signatures");
     require(power * 100 / staked >= 66, "not enough power was gathered");
 
     blocks[lastBlockId + 1].root = _root;
@@ -138,12 +142,14 @@ contract Chain is Registrable, Ownable {
     address[] memory validators,
     uint256[] memory powers,
     string[] memory locations,
-    uint256 staked
+    uint256 staked,
+    uint16 minSignatures
   ) {
     blockNumber = block.number;
     timePadding = padding;
     lastBlockId = getLatestBlockId();
     lastDataTimestamp = blocks[lastBlockId].dataTimestamp;
+    minSignatures = requiredSignatures;
 
     IStakingBank stakingBank = stakingBankContract();
     staked = stakingBank.totalSupply();

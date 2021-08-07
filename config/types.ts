@@ -18,7 +18,7 @@ export interface Config {
   },
   chain: {
     padding: number
-    demo: boolean
+    requiredSignatures: number
   },
   stakingBank: {
     minAmountForStake: bigint

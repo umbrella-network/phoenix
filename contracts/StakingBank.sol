@@ -25,6 +25,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
 
   mapping(address => Validator) override public validators;
 
+  ERC20 public immutable token;
   address[] override public addresses;
   uint256 public minAmountForStake; // minimum amount of tokens that we accept for staking
 
@@ -45,7 +46,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
       string(abi.encodePacked("staked ", _name)),
       string(abi.encodePacked("sb", _symbol))
     ) {
-
+    token = tokenContract();
     _setMinAmountForStake(_minAmountForStake);
   }
 
@@ -69,16 +70,13 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   }
 
   function stake(uint256 _value) external nonReentrant {
-    ERC20 token = tokenContract();
-
-    _stake(token, msg.sender, _value);
+    _stake(msg.sender, _value);
   }
 
   function receiveApproval(address _from) override external nonReentrant returns (bool success) {
-    ERC20 token = tokenContract();
     uint256 allowance = token.allowance(_from, address(this));
 
-    _stake(token, _from, allowance);
+    _stake(_from, allowance);
 
     return true;
   }
@@ -86,16 +84,23 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   function withdraw(uint256 _value) override external nonReentrant returns (bool success) {
     uint256 balance = balanceOf(msg.sender);
     require(balance >= _value, "can't withdraw more than balance");
+    require(balance - _value >= minAmountForStake, "minAmountForStake must be available, use exit to withdraw all");
 
     _unstake(msg.sender, _value);
     return true;
   }
 
-  function _stake(ERC20 _token, address _from, uint256 _amount) internal {
+  function exit() external nonReentrant returns (bool success) {
+    uint256 balance = balanceOf(msg.sender);
+    _unstake(msg.sender, balance);
+    return true;
+  }
+
+  function _stake(address _from, uint256 _amount) internal {
     require(_amount >= minAmountForStake, "_amount is too low");
     require(validators[_from].id != address(0x0), "validator does not exist in registry");
 
-    _token.safeTransferFrom(_from, address(this), _amount);
+    token.safeTransferFrom(_from, address(this), _amount);
     _mint(_from, _amount);
   }
 
@@ -103,7 +108,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
     require(_value > 0, "empty withdraw value");
 
     _burn(_validator, _value);
-    tokenContract().safeTransfer(_validator, _value);
+    token.safeTransfer(_validator, _value);
   }
 
   function create(address _id, string calldata _location) override external onlyOwner {

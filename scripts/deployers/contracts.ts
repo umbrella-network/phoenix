@@ -9,7 +9,7 @@ import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import { TransactionReceipt } from '@ethersproject/providers';
 
-import { getProvider, isLocalNetwork, toBytes32, waitForTx } from '../utils/helpers';
+import { getProvider, isLocalNetwork, waitForTx } from '../utils/helpers';
 
 const config = configuration();
 const provider = getProvider();
@@ -24,7 +24,7 @@ interface Validator {
 export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
   console.log('deploying Chain...');
   const ChainContract = await ethers.getContractFactory('Chain');
-  const chainArgs = [contractRegistryAddress, config.chain.padding, config.chain.demo];
+  const chainArgs = [contractRegistryAddress, config.chain.padding, config.chain.requiredSignatures];
 
   const chain = await ChainContract.deploy(...chainArgs);
   await chain.deployed();
@@ -87,11 +87,13 @@ export const registerValidator = async (stakingBank: Contract, token: Contract, 
   console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
 
   console.log('setting up staking...');
+  const stake = '100' + '0'.repeat(18);
+
   if (config.token.address) {
     const balance = await token.balanceOf(id);
 
-    if (balance.eq(0)) {
-      console.warn(`validator ${id} don't have UMB to stake.`);
+    if (balance.lt(stake)) {
+      console.warn(`validator ${id} don't have enough UMB to stake. min 100UMB.`);
       return;
     }
 
@@ -103,12 +105,24 @@ export const registerValidator = async (stakingBank: Contract, token: Contract, 
     tx = await stakingBank.receiveApproval(id);
     await waitForTx(tx.hash, provider);
   } else {
-    tx = await token.mintApproveAndStake(stakingBank.address, id, `${validatorId + 1}${'0'.repeat(18)}`);
+    tx = await token.mintApproveAndStake(stakingBank.address, id, stake);
     await waitForTx(tx.hash, provider);
   }
 
   console.log('validator balance:', (await token.balanceOf(id)).toString());
   console.log('staked balance:', (await stakingBank.balanceOf(id)).toString());
+};
+
+export const deployDummyToken = async (): Promise<Contract> => {
+  console.log('deploying test token...');
+  const TokenContract = await ethers.getContractFactory('Token');
+  const tokenArgs = [config.token.name, config.token.symbol];
+  const token = await TokenContract.deploy(...tokenArgs);
+  await token.deployed();
+  console.log('test token deployed');
+
+  await verifyCode(token.address, tokenArgs);
+  return token;
 };
 
 const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
@@ -117,13 +131,8 @@ const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
     return new Contract(config.token.address, ERC20.abi, signer);
   }
 
-  console.log('deploying test token...');
-  const TokenContract = await ethers.getContractFactory('Token');
-  const tokenArgs = [config.token.name, config.token.symbol];
-  const token = await TokenContract.deploy(...tokenArgs);
-  await token.deployed();
-  console.log('test token deployed');
-  await verifyCode(token.address, tokenArgs);
+  const token = await deployDummyToken();
+  await registerContract([token.address], undefined);
   return token;
 };
 
@@ -189,16 +198,7 @@ export const deployAllContracts = async (
     });
   }
 
-  const useDummyToken = !config.token.address;
   const token = await resolveTokenContract(owner);
-
-  if (contractRegistry) {
-    console.log(`registering token... ${token.address} at ${toBytes32('UMB')}`);
-    await registerContract([token.address], useDummyToken ? undefined : [toBytes32('UMB')]);
-    console.log('Token registered:', await contractRegistry.getAddressByString('UMB'));
-  } else {
-    console.log('Token deployed to:', token.address);
-  }
 
   const stakingBank = await deployStakingBank(contractRegistryAddress);
 

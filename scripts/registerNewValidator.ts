@@ -37,7 +37,7 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
   console.log(`address ${info.validator} OK`);
 
-  if (info.version !== '3.1.1') {
+  if (info.version !== '5.0.0') {
     throw Error(`${info.version} is not last version`);
   }
 
@@ -69,7 +69,7 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
 const registerNewValidator = async () => {
   const location = process.env.NEW_VALIDATOR_LOCATION as string;
-  const stake = parseInt(process.env.NEW_VALIDATOR_STAKE as string, 10);
+  const stake = BigInt(process.env.NEW_VALIDATOR_STAKE as string) * BigInt(1e18);
 
   if (!stake) {
     throw Error(`stake value invalid: ${stake} UMB`);
@@ -104,11 +104,18 @@ const registerNewValidator = async () => {
 
   let tx = await stakingBank.create(validator.id, validator.location);
   await waitForTx(tx.hash, provider);
-  console.log('new validator created, now staking...');
+  console.log('new validator created');
 
-  tx = await token.mintApproveAndStake(stakingBank.address, validator.id, stake.toString(10) + '0'.repeat(18));
-  await waitForTx(tx.hash, provider);
-  console.log('mintApproveAndStake DONE');
+  console.log('staking tokens');
+
+  try {
+    tx = await token.mintApproveAndStake(stakingBank.address, validator.id, stake.toString(10));
+    await waitForTx(tx.hash, provider);
+    console.log('mintApproveAndStake DONE');
+  } catch (e) {
+    console.log(e);
+    console.log('mintApproveAndStake not available, please stake manually');
+  }
 };
 
 pressToContinue('y', () => {

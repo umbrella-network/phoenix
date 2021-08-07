@@ -12,7 +12,7 @@ const cfg: Config = {
   },
   chain: {
     padding: 20,
-    demo: true
+    requiredSignatures: 1
   },
   stakingBank: {
     minAmountForStake: 1n * BigInt(1e18),

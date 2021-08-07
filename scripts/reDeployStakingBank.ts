@@ -17,6 +17,8 @@ interface Validator {
 }
 
 const existingValidators = async (): Promise<Validator[]> => {
+  console.log('Existing validators:');
+
   const stakingBank = await deployedContract('StakingBank');
   const validators: Validator[] = [];
   const validatorsCount = await stakingBank.getNumberOfValidators();
@@ -27,13 +29,16 @@ const existingValidators = async (): Promise<Validator[]> => {
     validators.push({ id, location });
   }
 
-  console.log('Existing validators:');
   console.log(validators);
-
   return validators;
 };
 
 const migrateValidators = async (stakingBank: Contract, validators: Validator[]): Promise<void> => {
+  if (!validators.length) {
+    console.log('nothing to migrate');
+    return;
+  }
+
   for (const validator of validators) {
     console.log('re-creating', validator);
     const tx = await stakingBank.create(validator.id, validator.location);
@@ -44,10 +49,20 @@ const migrateValidators = async (stakingBank: Contract, validators: Validator[])
 };
 
 const reDeployAndRegister = async () => {
-  const validators = await existingValidators();
+  let validators: Validator[] = [];
+
+  try {
+    validators = await existingValidators();
+  } catch (e) {
+    // console.log(e);
+    console.log('can not pull validators, most likely ABI changed');
+    throw '\nin order to continue, comment out this error, run again and then add validators\n';
+  }
+
   const stakingBank = await deployStakingBank(config.contractRegistry.address);
   console.log('StakingBank updated:', stakingBank.address);
   await migrateValidators(stakingBank, validators);
+  console.log('registering StakingBank...');
   await registerContract([stakingBank.address]);
 };
 
