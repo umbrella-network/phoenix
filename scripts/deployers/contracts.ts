@@ -1,6 +1,6 @@
 require('custom-env').env(); // eslint-disable-line
 
-import { verifyContract } from '../utils/verifyContract';
+import { verifyCode } from '../utils/verifyContract';
 import { ethers } from 'hardhat';
 import { Contract, Wallet, BigNumber, Signer } from 'ethers';
 
@@ -9,7 +9,7 @@ import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import { TransactionReceipt } from '@ethersproject/providers';
 
-import { constructorAbi, getProvider, isLocalNetwork, toBytes32, waitForTx } from '../utils/helpers';
+import { getProvider, isLocalNetwork, waitForTx } from '../utils/helpers';
 
 const config = configuration();
 const provider = getProvider();
@@ -24,26 +24,41 @@ interface Validator {
 export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
   console.log('deploying Chain...');
   const ChainContract = await ethers.getContractFactory('Chain');
-  const chainArgs = [contractRegistryAddress, config.chain.padding];
-  const chainArgsTypes = ['address', 'uint256'];
+  const chainArgs = [contractRegistryAddress, config.chain.padding, config.chain.requiredSignatures];
 
   const chain = await ChainContract.deploy(...chainArgs);
   await chain.deployed();
   console.log('Chain deployed at', chain.address);
 
-  await verifyContract(chain.address, 'Chain', constructorAbi(chainArgsTypes, chainArgs));
+  await verifyCode(chain.address, chainArgs);
 
   return chain;
 };
 
-export const deployValidatorRegistry = async (): Promise<Contract> => {
-  console.log('deploying ValidatorRegistry...');
-  const ValidatorRegistryContract = await ethers.getContractFactory('ValidatorRegistry');
-  const validatorRegistry = await ValidatorRegistryContract.deploy();
-  await validatorRegistry.deployed();
+export const deployStakingBank = async (contractRegistryAddress: string): Promise<Contract> => {
+  console.log('deploying StakingBank...');
+  const StakingBankContract = await ethers.getContractFactory('StakingBank');
 
-  await verifyContract(validatorRegistry.address, 'ValidatorRegistry', '');
-  return validatorRegistry;
+  const stakingBankArgs = [
+    contractRegistryAddress,
+    config.stakingBank.minAmountForStake,
+    config.token.name,
+    config.token.symbol,
+  ];
+
+  const stakingBank = await StakingBankContract.deploy(...stakingBankArgs);
+  await stakingBank.deployed();
+
+  if (contractRegistry) {
+    await registerContract([stakingBank.address]);
+    console.log('stakingBank registered', await contractRegistry.getAddress(await stakingBank.getName()));
+  } else {
+    console.log('StakingBank deployed to:', stakingBank.address);
+  }
+
+  await verifyCode(stakingBank.address, stakingBankArgs);
+
+  return stakingBank;
 };
 
 let contractRegistry: Contract;
@@ -60,28 +75,25 @@ export const registerContract = async (addresses: string[], names?: string[]): P
   return waitForTx(tx.hash, provider);
 };
 
-export const registerValidator = async (
-  validatorRegistry: Contract,
-  stakingBank: Contract,
-  token: Contract,
-  validatorId: number
-): Promise<void> => {
+export const registerValidator = async (stakingBank: Contract, token: Contract, validatorId: number): Promise<void> => {
   const validator = config.validators[validatorId];
   const validatorWallet = new ethers.Wallet(validator.privateKey, provider);
   const id = await validatorWallet.getAddress();
 
-  let tx = await validatorRegistry.create(id, validator.location);
+  let tx = await stakingBank.create(id, validator.location);
   await waitForTx(tx.hash, provider);
 
-  const validatorData = await validatorRegistry.validators(id);
+  const validatorData = await stakingBank.validators(id);
   console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
 
   console.log('setting up staking...');
+  const stake = '100' + '0'.repeat(18);
+
   if (config.token.address) {
     const balance = await token.balanceOf(id);
 
-    if (balance.eq(0)) {
-      console.warn(`validator ${id} don't have UMB to stake.`);
+    if (balance.lt(stake)) {
+      console.warn(`validator ${id} don't have enough UMB to stake. min 100UMB.`);
       return;
     }
 
@@ -93,12 +105,24 @@ export const registerValidator = async (
     tx = await stakingBank.receiveApproval(id);
     await waitForTx(tx.hash, provider);
   } else {
-    tx = await token.mintApproveAndStake(stakingBank.address, id, `${validatorId + 1}${'0'.repeat(18)}`);
+    tx = await token.mintApproveAndStake(stakingBank.address, id, stake);
     await waitForTx(tx.hash, provider);
   }
 
   console.log('validator balance:', (await token.balanceOf(id)).toString());
   console.log('staked balance:', (await stakingBank.balanceOf(id)).toString());
+};
+
+export const deployDummyToken = async (): Promise<Contract> => {
+  console.log('deploying test token...');
+  const TokenContract = await ethers.getContractFactory('Token');
+  const tokenArgs = [config.token.name, config.token.symbol];
+  const token = await TokenContract.deploy(...tokenArgs);
+  await token.deployed();
+  console.log('test token deployed');
+
+  await verifyCode(token.address, tokenArgs);
+  return token;
 };
 
 const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
@@ -107,20 +131,15 @@ const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
     return new Contract(config.token.address, ERC20.abi, signer);
   }
 
-  console.log('deploying test token...');
-  const TokenContract = await ethers.getContractFactory('Token');
-  const tokenTypes = ['string', 'string'];
-  const tokenArgs = [config.token.name, config.token.symbol];
-  const token = await TokenContract.deploy(...tokenArgs);
-  await token.deployed();
-  await verifyContract(token.address, 'Token', constructorAbi(tokenTypes, tokenArgs));
+  const token = await deployDummyToken();
+  await registerContract([token.address], undefined);
   return token;
 };
 
 export const deployAllContracts = async (
   registryAddress = '',
   doRegistration = false
-): Promise<{ chain: string; bank: string; validatorRegistry: string; token: string }> => {
+): Promise<{ chain: string; bank: string; token: string }> => {
   if (!config.validators.length) {
     const wallet = ethers.Wallet.createRandom({ extraEntropy: Buffer.from(Math.random().toString(10)) });
     console.log('random wallet:', { pk: wallet.privateKey, address: wallet.address });
@@ -179,44 +198,9 @@ export const deployAllContracts = async (
     });
   }
 
-  const useDummyToken = !config.token.address;
   const token = await resolveTokenContract(owner);
 
-  if (contractRegistry) {
-    console.log(`registering token... ${token.address} at ${toBytes32('UMB')}`);
-    await registerContract([token.address], useDummyToken ? undefined : [toBytes32('UMB')]);
-    console.log('Token registered:', await contractRegistry.getAddressByString('UMB'));
-  } else {
-    console.log('Token deployed to:', token.address);
-  }
-
-  const validatorRegistry = await deployValidatorRegistry();
-
-  if (contractRegistry) {
-    const tx = await contractRegistry.importAddresses([toBytes32('ValidatorRegistry')], [validatorRegistry.address]);
-    await waitForTx(tx.hash, provider);
-    console.log('validatorRegistry registered', await contractRegistry.getAddressByString('ValidatorRegistry'));
-  } else {
-    console.log('ValidatorRegistry deployed to:', validatorRegistry.address);
-  }
-
-  console.log('deploying StakingBank...');
-  const StakingBankContract = await ethers.getContractFactory('StakingBank');
-
-  const stakingBankArgs = [contractRegistryAddress, config.token.name, config.token.symbol];
-  const stakingBankArgsTypes = ['address', 'string', 'string'];
-
-  const stakingBank = await StakingBankContract.deploy(...stakingBankArgs);
-  await stakingBank.deployed();
-
-  if (contractRegistry) {
-    await registerContract([stakingBank.address]);
-    console.log('stakingBank registered', await contractRegistry.getAddress(await stakingBank.getName()));
-  } else {
-    console.log('StakingBank deployed to:', stakingBank.address);
-  }
-
-  await verifyContract(stakingBank.address, 'StakingBank', constructorAbi(stakingBankArgsTypes, stakingBankArgs));
+  const stakingBank = await deployStakingBank(contractRegistryAddress);
 
   const chain = await deployChain(contractRegistryAddress);
 
@@ -228,7 +212,7 @@ export const deployAllContracts = async (
   }
 
   for (let i = 0; i < validators.length; i++) {
-    await registerValidator(validatorRegistry, stakingBank, token, i);
+    await registerValidator(stakingBank, token, i);
   }
 
   const leader = await chain.getLeaderAddress();
@@ -238,6 +222,5 @@ export const deployAllContracts = async (
     token: token.address,
     chain: chain.address,
     bank: stakingBank.address,
-    validatorRegistry: validatorRegistry.address,
   };
 };

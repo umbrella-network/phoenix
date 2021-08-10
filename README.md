@@ -87,12 +87,16 @@ In case of any errors, please read error message. There should be some tips what
 
 ```shell
 hardhat compile && npx hardhat run --network localhost ./scripts/deployChain.ts
-hardhat compile && npm run flatten:chain && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployChain.ts
-hardhat compile && npm run flatten:chain && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
+hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployChain.ts
+hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
 
-hardhat compile && npx hardhat run --network localhost ./scripts/reDeployValidatorRegistry.ts
-hardhat compile && npm run flatten:validator && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployValidatorRegistry.ts
-hardhat compile && npm run flatten:validator && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployValidatorRegistry.ts
+hardhat compile && npx hardhat run --network localhost ./scripts/reDeployStakingBank.ts
+hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployStakingBank.ts
+hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployStakingBank.ts
+
+hardhat compile && npx hardhat run --network localhost ./scripts/reDeployToken.ts
+hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployToken.ts
+hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployToken.ts
 
 hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/registerNewValidator.ts
 hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/registerNewValidator.ts

@@ -44,7 +44,9 @@ export const toBytes32 = (str: string): string => {
 
 export const pressToContinue = (charToPress = 'y', callback: () => void): void => {
   console.log('-'.repeat(80));
-  console.log(`\n\n\nCHECK IF NETWORK IS VALID, do you want to continue? (${charToPress})\n\n\n`);
+  const { NETWORK, HARDHAT_NETWORK } = process.env;
+  console.log('\n\n', { NETWORK, HARDHAT_NETWORK });
+  console.log(`\n\nCHECK IF NETWORK IS VALID, do you want to continue? (${charToPress})\n\n`);
   console.log('-'.repeat(80));
 
   const stdin = process.stdin;
@@ -54,6 +56,8 @@ export const pressToContinue = (charToPress = 'y', callback: () => void): void =
     callback();
     return;
   }
+
+  let choice = false;
 
   // without this, we would only get streams once enter is pressed
   // setRawMode(true);
@@ -66,6 +70,11 @@ export const pressToContinue = (charToPress = 'y', callback: () => void): void =
 
   // on any data into stdin
   stdin.on('data', function (key) {
+    if (choice) {
+      return;
+    }
+
+    choice = true;
     console.log({ key });
     stdin.setRawMode(false);
 

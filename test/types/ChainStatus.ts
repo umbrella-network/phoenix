@@ -11,4 +11,5 @@ export interface ChainStatus {
   powers: BigNumber[];
   locations: string[];
   staked: BigNumber;
+  minSignatures: number;
 }
