@@ -4,7 +4,7 @@ import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 
 import { getProvider, isLocalNetwork } from '../utils/helpers';
-import { verifyContract } from '../utils/verifyContract';
+import { verifyCode } from '../utils/verifyContract';
 
 const provider = getProvider();
 
@@ -24,7 +24,7 @@ export const deployContractRegistry = async (): Promise<Contract> => {
   }
 
   const owner = await ownerWallet.getAddress();
-  console.log('DEPLOYING REGISTRY FROM ADDRESS:', owner);
+  console.log('DEPLOYING CONTRACT REGISTRY FROM ADDRESS:', owner);
 
   const RegistryContract = await ethers.getContractFactory('Registry');
   const registry = await RegistryContract.deploy();
@@ -32,6 +32,6 @@ export const deployContractRegistry = async (): Promise<Contract> => {
 
   console.log('Registry deployed at', registry.address);
 
-  await verifyContract(registry.address, 'Registry', '');
+  await verifyCode(registry.address, []);
   return registry;
 };

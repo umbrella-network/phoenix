@@ -12,7 +12,11 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60
+      padding: 60,
+      requiredSignatures: 2
+    },
+    stakingBank: {
+      minAmountForStake: 100n * BigInt(1e18),
     },
     validators: readValidators('https://validator.umb.network'),
   },
@@ -21,13 +25,17 @@ const production: GlobalConfig = {
       address: '0xb2C6c4162c0d2B6963C62A9133331b4D0359AA34'
     },
     token: {
-      address: '0x6fc13eace26590b80cccab1ba5d51890577d83b2',
+      address: '0x846f52020749715f02aef25b5d1d65e48945649d',
       totalSupply: '1000000' + '0'.repeat(18),
       name: 'UMB token',
       symbol: 'UMB'
     },
     chain: {
-      padding: 60
+      padding: 60,
+      requiredSignatures: 2
+    },
+    stakingBank: {
+      minAmountForStake: 100n * BigInt(1e18),
     },
     validators: readValidators('https://validator-bsc.umb.network'),
   }

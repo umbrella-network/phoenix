@@ -12,7 +12,11 @@ const staging: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60
+      padding: 60,
+      requiredSignatures: 2
+    },
+    stakingBank: {
+      minAmountForStake: 100n * BigInt(1e18),
     },
     validators: readValidators('https://validator-dev.umb.network'),
   },
@@ -29,7 +33,11 @@ const staging: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60
+      padding: 60,
+      requiredSignatures: 2
+    },
+    stakingBank: {
+      minAmountForStake: 100n * BigInt(1e18),
     },
     validators: readValidators('https://validator-bsc-dev.umb.network'),
   }

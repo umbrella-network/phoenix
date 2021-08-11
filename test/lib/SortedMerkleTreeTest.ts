@@ -22,7 +22,7 @@ describe('Tree', () => {
     const chain = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
     await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(ethers.constants.AddressZero);
-    contract = await chain.deploy(contractRegistry.address, 1);
+    contract = await chain.deploy(contractRegistry.address, 1, 1);
   });
 
   describe('hashLeaf()', () => {
