@@ -31,6 +31,7 @@ const setup = async (requiredSignatures = 1) => {
   const contractFactory = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
   await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(ethers.constants.AddressZero);
+  await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
 
   const contract = await contractFactory.deploy(contractRegistry.address, timePadding, requiredSignatures);
 
@@ -109,7 +110,6 @@ describe('Chain', () => {
     contractFactory: ContractFactory;
 
   const mockSubmit = async (leader = validator, totalSupply = 1000, balance = 1000) => {
-    await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
     await stakingBank.mock.totalSupply.returns(totalSupply);
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
@@ -186,13 +186,7 @@ describe('Chain', () => {
       });
 
       it('not throw on status', async () => {
-        await contractRegistry.mock.requireAndGetAddress
-          .withArgs(toBytes32('StakingBank'))
-          .returns(stakingBank.address);
         await stakingBank.mock.getNumberOfValidators.returns(0);
-        await contractRegistry.mock.requireAndGetAddress
-          .withArgs(toBytes32('StakingBank'))
-          .returns(stakingBank.address);
         await stakingBank.mock.totalSupply.returns(0);
 
         await expect(contract.getStatus()).not.to.be.reverted;
@@ -576,11 +570,9 @@ describe('Chain', () => {
       ({ r, s, v, dataTimestamp } = await prepareData(validator, dataTimestamp + 1, root));
       await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
-      await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
       await stakingBank.mock.getNumberOfValidators.returns(1);
       await stakingBank.mock.addresses.withArgs(0).returns(validatorAddress);
       await stakingBank.mock.validators.withArgs(validatorAddress).returns(validatorAddress, 'abc');
-      await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
       await stakingBank.mock.totalSupply.returns(123);
       await stakingBank.mock.balanceOf.withArgs(validatorAddress).returns(321);
 

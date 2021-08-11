@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [3.1.0] - 2021-08-11
+### Changed
+- optimise gas by making some states immutable
+
+### Removed
+- affidavit from `Block` struct
+
 ## [3.0.0] - 2021-08-10
 ### Added
 - add requirement for number of signatures

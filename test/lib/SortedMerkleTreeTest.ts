@@ -10,6 +10,7 @@ import SortedMerkleTree from '../../lib/SortedMerkleTree';
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
+import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 
 use(waffleChai);
 
@@ -19,9 +20,12 @@ describe('Tree', () => {
   before(async () => {
     const [owner] = await ethers.getSigners();
     const contractRegistry = await deployMockContract(owner, Registry.abi);
+    const stakingBank = await deployMockContract(owner, StakingBank.abi);
     const chain = new ContractFactory(Chain.abi, Chain.bytecode, owner);
 
     await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(ethers.constants.AddressZero);
+    await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
+
     contract = await chain.deploy(contractRegistry.address, 1, 1);
   });
 
