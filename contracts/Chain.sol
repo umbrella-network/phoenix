@@ -21,7 +21,6 @@ contract Chain is Registrable, Ownable {
   struct Block {
     bytes32 root;
     uint32 dataTimestamp;
-    uint128 affidavit;
   }
 
   struct FirstClassData {
@@ -32,8 +31,9 @@ contract Chain is Registrable, Ownable {
   mapping(uint256 => Block) public blocks;
   mapping(bytes32 => FirstClassData) public fcds;
 
+  IStakingBank public immutable stakingBank;
   uint32 public blocksCount;
-  uint32 public blocksCountOffset;
+  uint32 public immutable blocksCountOffset;
   uint16 public padding;
   uint16 public immutable requiredSignatures;
 
@@ -48,10 +48,13 @@ contract Chain is Registrable, Ownable {
     requiredSignatures = _requiredSignatures;
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
 
-    if (address(oldChain) != address(0x0)) {
+    blocksCountOffset = address(oldChain) != address(0x0)
       // +1 because it might be situation when tx is already in progress in old contract
-      blocksCountOffset = oldChain.blocksCount() + oldChain.blocksCountOffset() + 1;
-    }
+      ? oldChain.blocksCount() + oldChain.blocksCountOffset() + 1
+      : 0;
+
+    // we not changing SB address that often, so lets save it once, it will save 10% gas
+    stakingBank = stakingBankContract();
   }
 
   // ========== MUTATIVE FUNCTIONS ========== //
@@ -92,7 +95,6 @@ contract Chain is Registrable, Ownable {
     bytes32 affidavit = keccak256(testimony);
     uint256 power = 0;
 
-    IStakingBank stakingBank = stakingBankContract();
     uint256 staked = stakingBank.totalSupply();
     address prevSigner = address(0x0);
 
@@ -113,9 +115,7 @@ contract Chain is Registrable, Ownable {
     require(i >= requiredSignatures, "not enough signatures");
     require(power * 100 / staked >= 66, "not enough power was gathered");
 
-    blocks[lastBlockId + 1].root = _root;
-    blocks[lastBlockId + 1].dataTimestamp = _dataTimestamp;
-    blocks[lastBlockId + 1].affidavit = uint128(bytes16(affidavit));
+    blocks[lastBlockId + 1] = Block(_root, _dataTimestamp);
     blocksCount++;
 
     emit LogMint(msg.sender, lastBlockId + 1, staked, power);
@@ -217,8 +217,6 @@ contract Chain is Registrable, Ownable {
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
   function getLeaderAddressAtTime(uint256 _timestamp) public view returns (address) {
-    IStakingBank stakingBank = stakingBankContract();
-
     uint256 numberOfValidators = stakingBank.getNumberOfValidators();
 
     if (numberOfValidators == 0) {
