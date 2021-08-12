@@ -5,8 +5,10 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import "./interfaces/IStakingBank.sol";
+import "./interfaces/IER721Mintable.sol";
 
 import "./extensions/Registrable.sol";
 import "./Registry.sol";
@@ -39,6 +41,10 @@ contract Chain is Registrable, Ownable {
 
   // ========== CONSTRUCTOR ========== //
 
+  address public relayToken;
+
+  address public homeGate;
+
   constructor(
     address _contractRegistry,
     uint16 _padding,
@@ -47,6 +53,12 @@ contract Chain is Registrable, Ownable {
     padding = _padding;
     requiredSignatures = _requiredSignatures;
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
+
+    relayToken = Registry(_contractRegistry).getAddress("RelayToken");
+
+    require(Ownable(relayToken).owner() == address(this), "Should be the owner");
+
+    homeGate = Registry(_contractRegistry).getAddress("HomeGate");
 
     blocksCountOffset = address(oldChain) != address(0x0)
       // +1 because it might be situation when tx is already in progress in old contract
@@ -74,6 +86,7 @@ contract Chain is Registrable, Ownable {
     bytes32[] memory _s
   ) public {
     uint32 lastBlockId = getLatestBlockId();
+
     require(blocks[lastBlockId].dataTimestamp + padding < block.timestamp, "do not spam");
     require(blocks[lastBlockId].dataTimestamp < _dataTimestamp, "can NOT submit older data");
     // we can't expect minter will have exactly the same timestamp
@@ -117,6 +130,16 @@ contract Chain is Registrable, Ownable {
 
     blocks[lastBlockId + 1] = Block(_root, _dataTimestamp);
     blocksCount++;
+
+    bytes32 affidavitEx = keccak256(abi.encodePacked(testimony, lastBlockId + 1));
+
+    uint32 tokenId;
+    assembly {
+      tokenId := mload(add(affidavitEx, 32))
+    }
+
+    // mint an NFT token
+    IER721Mintable(relayToken).mintTo(homeGate, tokenId);
 
     emit LogMint(msg.sender, lastBlockId + 1, staked, power);
   }
