@@ -5,10 +5,8 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import "./interfaces/IStakingBank.sol";
-import "./interfaces/IER721Mintable.sol";
 
 import "./extensions/Registrable.sol";
 import "./Registry.sol";
@@ -41,10 +39,6 @@ contract Chain is Registrable, Ownable {
 
   // ========== CONSTRUCTOR ========== //
 
-  address public relayToken;
-
-  address public homeGate;
-
   constructor(
     address _contractRegistry,
     uint16 _padding,
@@ -54,16 +48,10 @@ contract Chain is Registrable, Ownable {
     requiredSignatures = _requiredSignatures;
     Chain oldChain = Chain(Registry(_contractRegistry).getAddress("Chain"));
 
-    relayToken = Registry(_contractRegistry).getAddress("RelayToken");
-
-    require(Ownable(relayToken).owner() == address(this), "Should be the owner");
-
-    homeGate = Registry(_contractRegistry).getAddress("HomeGate");
-
     blocksCountOffset = address(oldChain) != address(0x0)
-      // +1 because it might be situation when tx is already in progress in old contract
-      ? oldChain.blocksCount() + oldChain.blocksCountOffset() + 1
-      : 0;
+    // +1 because it might be situation when tx is already in progress in old contract
+    ? oldChain.blocksCount() + oldChain.blocksCountOffset() + 1
+    : 0;
 
     // we not changing SB address that often, so lets save it once, it will save 10% gas
     stakingBank = stakingBankContract();
@@ -84,9 +72,8 @@ contract Chain is Registrable, Ownable {
     uint8[] memory _v,
     bytes32[] memory _r,
     bytes32[] memory _s
-  ) public {
+  ) public virtual {
     uint32 lastBlockId = getLatestBlockId();
-
     require(blocks[lastBlockId].dataTimestamp + padding < block.timestamp, "do not spam");
     require(blocks[lastBlockId].dataTimestamp < _dataTimestamp, "can NOT submit older data");
     // we can't expect minter will have exactly the same timestamp
@@ -131,16 +118,6 @@ contract Chain is Registrable, Ownable {
     blocks[lastBlockId + 1] = Block(_root, _dataTimestamp);
     blocksCount++;
 
-    bytes32 affidavitEx = keccak256(abi.encodePacked(testimony, lastBlockId + 1));
-
-    uint32 tokenId;
-    assembly {
-      tokenId := mload(add(affidavitEx, 32))
-    }
-
-    // mint an NFT token
-    IER721Mintable(relayToken).mintTo(homeGate, tokenId);
-
     emit LogMint(msg.sender, lastBlockId + 1, staked, power);
   }
 
@@ -174,7 +151,6 @@ contract Chain is Registrable, Ownable {
     lastDataTimestamp = blocks[lastBlockId].dataTimestamp;
     minSignatures = requiredSignatures;
 
-    IStakingBank stakingBank = stakingBankContract();
     staked = stakingBank.totalSupply();
     uint256 numberOfValidators = stakingBank.getNumberOfValidators();
     powers = new uint256[](numberOfValidators);
@@ -190,8 +166,8 @@ contract Chain is Registrable, Ownable {
     nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
 
     nextLeader = numberOfValidators > 0
-      ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
-      : address(0);
+    ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
+    : address(0);
   }
 
   function getBlockId() public view returns (uint32) {
@@ -225,7 +201,7 @@ contract Chain is Registrable, Ownable {
 
     // timePadding + 1 => because padding is a space between blocks, so next round starts on first block after padding
     uint256 validatorIndex = latestBlockId +
-      (_timestamp - blocks[latestBlockId].dataTimestamp) / (padding + 1);
+    (_timestamp - blocks[latestBlockId].dataTimestamp) / (padding + 1);
 
     return uint16(validatorIndex % _numberOfValidators);
   }
