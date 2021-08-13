@@ -616,7 +616,7 @@ describe('Chain', () => {
         await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
 
         await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(contract.address);
-        newChain = await contractFactory.deploy(contractRegistry.address, timePadding, 1, contractRegistry.address);
+        newChain = await contractFactory.deploy(contractRegistry.address, timePadding, 1);
       });
 
       it('expect to have no blocks', async () => {
