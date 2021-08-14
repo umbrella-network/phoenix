@@ -37,7 +37,7 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
   console.log(`address ${info.validator} OK`);
 
-  if (info.version !== '5.0.0') {
+  if (info.version !== '5.0.2') {
     throw Error(`${info.version} is not last version`);
   }
 
