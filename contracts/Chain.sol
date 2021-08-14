@@ -151,7 +151,6 @@ contract Chain is Registrable, Ownable {
     lastDataTimestamp = blocks[lastBlockId].dataTimestamp;
     minSignatures = requiredSignatures;
 
-    IStakingBank stakingBank = stakingBankContract();
     staked = stakingBank.totalSupply();
     uint256 numberOfValidators = stakingBank.getNumberOfValidators();
     powers = new uint256[](numberOfValidators);

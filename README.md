@@ -51,7 +51,9 @@ sudo ./install.sh
 
 - ganache: `npx ganache-cli --blockTime 15`
 - hardhat (recommended): `npm run node`
-
+  for hardhat you can set minting options in env variables eg 
+  - `HARDHAT_MINING_INTERVAL=1000` - this is block time 
+  - `HARDHAT_MINING_AUTO=false` - this will simulate mainnet (you will have to wait block time seconds to mint tx)
 2. Deploy to localhost
 
 ```shell script
@@ -76,7 +78,7 @@ npm run local-minter
 Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
 
 ```shell
-npm run flatten:all && npm run deploy:all:[staging|sandbox|production]
+npm run deploy:all:[staging|sandbox|production]
 ```
 
 In case of any errors, please read error message. There should be some tips what's need to be fixed.
@@ -85,20 +87,26 @@ In case of any errors, please read error message. There should be some tips what
 
 ### Update contract
 
+**NOTE**: in case script stuck on deployment, try to use another RPC endpoint
+
 ```shell
-hardhat compile && npx hardhat run --network localhost ./scripts/deployChain.ts
-hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployChain.ts
-hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
+hardhat compile && npx hardhat run --network localhost ./scripts/reDeployToken.ts
+hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployToken.ts
+hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/reDeployToken.ts
+hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployToken.ts
 
 hardhat compile && npx hardhat run --network localhost ./scripts/reDeployStakingBank.ts
 hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployStakingBank.ts
+hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/reDeployStakingBank.ts
 hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployStakingBank.ts
 
-hardhat compile && npx hardhat run --network localhost ./scripts/reDeployToken.ts
-hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployToken.ts
-hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployToken.ts
+hardhat compile && npx hardhat run --network localhost ./scripts/deployChain.ts
+hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployChain.ts
+hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/deployChain.ts
+hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
 
 hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/registerNewValidator.ts
+hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/registerNewValidator.ts
 hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/registerNewValidator.ts
 ```
 
