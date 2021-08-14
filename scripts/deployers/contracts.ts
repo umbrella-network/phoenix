@@ -21,18 +21,22 @@ interface Validator {
   privateKey: string;
 }
 
-export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
-  console.log('deploying Chain...');
-  const ChainContract = await ethers.getContractFactory('Chain');
+export const deployChain = async (contractRegistryAddress: string, chainName = 'Chain'): Promise<Contract> => {
+  console.log(`deploying ${chainName}...`);
+  const ChainContract = await ethers.getContractFactory(chainName);
   const chainArgs = [contractRegistryAddress, config.chain.padding, config.chain.requiredSignatures];
 
   const chain = await ChainContract.deploy(...chainArgs);
   await chain.deployed();
-  console.log('Chain deployed at', chain.address);
+  console.log('${chainName} deployed at', chain.address);
 
   await verifyCode(chain.address, chainArgs);
 
   return chain;
+};
+
+export const deployMainChain = async (contractRegistryAddress: string): Promise<Contract> => {
+  return deployChain(contractRegistryAddress, 'MainChain');
 };
 
 export const deployStakingBank = async (contractRegistryAddress: string): Promise<Contract> => {
