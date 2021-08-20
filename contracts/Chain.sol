@@ -24,7 +24,7 @@ contract Chain is BaseChain {
     address _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures
-  ) public BaseChain(_contractRegistry, _padding, _requiredSignatures) {
+  ) public BaseChain(_contractRegistry, _padding, _requiredSignatures, "Chain") {
     // we not changing SB address that often, so lets save it once, it will save 10% gas
     stakingBank = stakingBankContract();
   }
