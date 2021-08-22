@@ -2,7 +2,6 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
 
@@ -97,8 +96,10 @@ contract Chain is BaseChain {
     bytes32[] memory _s
   ) public { // it could be external, but for external we got stack too deep
     uint32 lastBlockId = getLatestBlockId();
-    require(blocks[lastBlockId].dataTimestamp + padding < block.timestamp, "do not spam");
-    require(blocks[lastBlockId].dataTimestamp < _dataTimestamp, "can NOT submit older data");
+    uint32 dataTimestamp = blocks[lastBlockId].extractTimestamp();
+
+    require(dataTimestamp + padding < block.timestamp, "do not spam");
+    require(dataTimestamp < _dataTimestamp, "can NOT submit older data");
     // we can't expect minter will have exactly the same timestamp
     // but for sure we can demand not to be off by a lot, that's why +3sec
     // temporary remove this condition, because recently on ropsten we see cases when minter/node
@@ -139,7 +140,7 @@ contract Chain is BaseChain {
     // we turn on power once we have proper DPoS
     // require(power * 100 / staked >= 66, "not enough power was gathered");
 
-    blocks[lastBlockId + 1] = Block(_root, _dataTimestamp);
+    blocks[lastBlockId + 1] = _root.makeSquashedRoot(_dataTimestamp);
     blocksCount++;
 
     emit LogMint(msg.sender, lastBlockId + 1, staked, power);
@@ -150,7 +151,7 @@ contract Chain is BaseChain {
 
     // timePadding + 1 => because padding is a space between blocks, so next round starts on first block after padding
     uint256 validatorIndex = latestBlockId +
-    (_timestamp - blocks[latestBlockId].dataTimestamp) / (padding + 1);
+      (_timestamp - blocks[latestBlockId].extractTimestamp()) / (padding + 1);
 
     return uint16(validatorIndex % _numberOfValidators);
   }

@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Foreign Chain
 
+### Changed
+- squash root and timestamp to save gas
+
 ## [3.2.0] - 2021-08-31
 ### Changed
 - turn off power until we have proper DPoS

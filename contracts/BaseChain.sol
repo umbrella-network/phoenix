@@ -2,7 +2,7 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "./lib/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
 
@@ -13,22 +13,18 @@ import "./Registry.sol";
 
 abstract contract BaseChain is Registrable, Ownable {
   using ValueDecoder for bytes;
+  using MerkleProof for bytes32;
 
   // ========== STATE VARIABLES ========== //
 
   bytes constant public ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
-
-  struct Block {
-    bytes32 root;
-    uint32 dataTimestamp;
-  }
 
   struct FirstClassData {
     uint224 value;
     uint32 dataTimestamp;
   }
 
-  mapping(uint256 => Block) public blocks;
+  mapping(uint256 => bytes32) public blocks;
   mapping(bytes32 => FirstClassData) public fcds;
 
   uint32 public blocksCount;
@@ -81,7 +77,7 @@ abstract contract BaseChain is Registrable, Ownable {
       return 0;
     }
 
-    if (blocks[_blocksCount - 1].dataTimestamp + padding < _timestamp) {
+    if (blocks[_blocksCount - 1].extractTimestamp() + padding < _timestamp) {
       return _blocksCount;
     }
 
@@ -97,7 +93,7 @@ abstract contract BaseChain is Registrable, Ownable {
       return false;
     }
 
-    return MerkleProof.verify(_proof, _root, _leaf);
+    return _root.verify(_proof, _leaf);
   }
 
   function hashLeaf(bytes memory _key, bytes memory _value) public pure returns (bytes32) {
@@ -110,7 +106,7 @@ abstract contract BaseChain is Registrable, Ownable {
     bytes memory _key,
     bytes memory _value
   ) public view returns (bool) {
-    return verifyProof(_proof, blocks[_blockId].root, keccak256(abi.encodePacked(_key, _value)));
+    return blocks[_blockId].verifySquashed(_proof, keccak256(abi.encodePacked(_key, _value)));
   }
 
   function bytesToBytes32Array(
@@ -144,10 +140,8 @@ abstract contract BaseChain is Registrable, Ownable {
     uint256 offset = 0;
 
     for (uint256 i = 0; i < _leaves.length; i++) {
-      results[i] = verifyProof(
-        bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]),
-        blocks[_blockIds[i]].root,
-        _leaves[i]
+      results[i] = blocks[_blockIds[i]].verifySquashed(
+        bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]), _leaves[i]
       );
 
       offset += _proofItemsCounter[i];
@@ -155,11 +149,11 @@ abstract contract BaseChain is Registrable, Ownable {
   }
 
   function getBlockRoot(uint32 _blockId) external view returns (bytes32) {
-    return blocks[_blockId].root;
+    return blocks[_blockId].extractRoot();
   }
 
   function getBlockTimestamp(uint32 _blockId) external view returns (uint32) {
-    return blocks[_blockId].dataTimestamp;
+    return blocks[_blockId].extractTimestamp();
   }
 
   function getCurrentValues(bytes32[] calldata _keys)

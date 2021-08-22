@@ -312,12 +312,14 @@ describe('Chain', () => {
 
         describe('when block submitted', () => {
           let previousDataTimestamp: number;
+          let dataTimestamp: number;
 
           beforeEach(async () => {
             await mockSubmit();
-            const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
-            previousDataTimestamp = dataTimestamp;
-            await contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]);
+            const { r, s, v, dataTimestamp: t } = await prepareData(validator, await blockTimestamp(), root);
+            dataTimestamp = t;
+            previousDataTimestamp = t;
+            await contract.connect(validator).submit(t, root, [], [], [v], [r], [s]);
             await mintBlocks(1);
           });
 
@@ -345,7 +347,7 @@ describe('Chain', () => {
           });
 
           it('expect to save valid root', async () => {
-            expect((await contract.blocks(0)).root).to.eq(tree.getRoot());
+            expect((await contract.blocks(0))).to.eq(tree.getRootSquashed(dataTimestamp));
           });
 
           it('expect to have no current FCD', async () => {
@@ -527,6 +529,10 @@ describe('Chain', () => {
       await stakingBank.mock.balanceOf.withArgs(validatorAddress).returns(321);
 
       await mintBlocks(timePadding);
+
+      console.log(root);
+      console.log(await contract.blocks(0));
+      console.log(await contract.blocks(1));
 
       const status: ChainStatus = await contract.getStatus();
 

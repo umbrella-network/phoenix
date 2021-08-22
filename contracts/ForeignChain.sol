@@ -39,9 +39,9 @@ contract ForeignChain is BaseChain {
     uint256[] calldata _values,
     uint32 _blockId
   ) external onlyReplicator {
-    uint lastDataTimestamp = blocks[lastBlockId].dataTimestamp;
+    uint lastDataTimestamp = blocks[lastBlockId].extractTimestamp();
 
-    require(blocks[_blockId].dataTimestamp == 0, "blockId already taken");
+    require(blocks[_blockId].extractTimestamp() == 0, "blockId already taken");
     require(lastDataTimestamp < _dataTimestamp, "can NOT submit older data");
     require(lastDataTimestamp + padding < block.timestamp, "do not spam");
     require(_keys.length == _values.length, "numbers of keys and values not the same");
@@ -51,7 +51,7 @@ contract ForeignChain is BaseChain {
       fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
     }
 
-    blocks[_blockId] = Block(_root, _dataTimestamp);
+    blocks[_blockId] = MerkleProof.makeSquashedRoot(_root, _dataTimestamp);
     lastBlockId = _blockId;
 
     emit LogBlockReplication(msg.sender, _blockId);
@@ -77,23 +77,24 @@ contract ForeignChain is BaseChain {
     blockNumber = block.number;
     timePadding = padding;
     lastId = lastBlockId;
-    lastDataTimestamp = blocks[lastId].dataTimestamp;
+    lastDataTimestamp = blocks[lastId].extractTimestamp();
     nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
   }
 
   // this function does not works for past timestamps
   function getBlockIdAtTimestamp(uint256 _timestamp) override public view  returns (uint32) {
-    uint32 _lastId = lastBlockId;
+    uint32 lastId = lastBlockId;
+    uint32 dataTimestamp = blocks[lastId].extractTimestamp();
 
-    if (blocks[_lastId].dataTimestamp == 0) {
+    if (dataTimestamp == 0) {
       return 0;
     }
 
-    if (blocks[_lastId].dataTimestamp + padding < _timestamp) {
-      return _lastId + 1;
+    if (dataTimestamp + padding < _timestamp) {
+      return lastId + 1;
     }
 
-    return _lastId;
+    return lastId;
   }
 
   function getLatestBlockId() override public view returns (uint32) {
