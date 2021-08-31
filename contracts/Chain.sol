@@ -113,7 +113,8 @@ contract Chain is Registrable, Ownable {
     }
 
     require(i >= requiredSignatures, "not enough signatures");
-    require(power * 100 / staked >= 66, "not enough power was gathered");
+    // we turn on power once we have proper DPoS
+    // require(power * 100 / staked >= 66, "not enough power was gathered");
 
     blocks[lastBlockId + 1] = Block(_root, _dataTimestamp);
     blocksCount++;
@@ -151,7 +152,6 @@ contract Chain is Registrable, Ownable {
     lastDataTimestamp = blocks[lastBlockId].dataTimestamp;
     minSignatures = requiredSignatures;
 
-    IStakingBank stakingBank = stakingBankContract();
     staked = stakingBank.totalSupply();
     uint256 numberOfValidators = stakingBank.getNumberOfValidators();
     powers = new uint256[](numberOfValidators);

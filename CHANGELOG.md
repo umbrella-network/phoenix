@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [3.2.0] - 2021-08-31
+### Changed
+- turn off power until we have proper DPoS
+- update readme with sandbox commands
+
 ## [3.1.0] - 2021-08-11
 ### Changed
 - optimise gas by making some states immutable
