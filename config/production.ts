@@ -32,7 +32,7 @@ const production: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      requiredSignatures: 2
+      requiredSignatures: 4
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),
