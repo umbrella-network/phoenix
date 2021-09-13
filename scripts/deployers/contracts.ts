@@ -22,7 +22,10 @@ interface Validator {
   privateKey: string;
 }
 
-export const deployChain = async (contractRegistryAddress: string, chainName = ChainContractNames.Chain): Promise<Contract> => {
+export const deployChain = async (
+  contractRegistryAddress: string,
+  chainName = ChainContractNames.Chain
+): Promise<Contract> => {
   console.log(`deploying ${chainName}...`);
   const ChainContract = await ethers.getContractFactory(chainName);
   const chainArgs = [contractRegistryAddress, config.chain.padding, config.chain.requiredSignatures];
@@ -60,7 +63,7 @@ export const deployChainAndRegister = async (chainName: ChainContractNames): Pro
     const currentChain = new ethers.Contract(address, Chain.abi, provider);
     const isForeign = await currentChain.isForeign();
 
-    console.log({isForeign, chainName});
+    console.log({ isForeign, chainName });
 
     if (isForeign && chainName !== ChainContractNames.ForeignChain) {
       throw Error(
@@ -68,7 +71,6 @@ export const deployChainAndRegister = async (chainName: ChainContractNames): Pro
       );
     }
   }
-
 
   const chain = await deployChain(config.contractRegistry.address, chainName);
   await registerContract([chain.address]);

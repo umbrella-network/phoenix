@@ -347,7 +347,7 @@ describe('Chain', () => {
           });
 
           it('expect to save valid root', async () => {
-            expect((await contract.blocks(0))).to.eq(tree.getRootSquashed(dataTimestamp));
+            expect(await contract.blocks(0)).to.eq(tree.getRootSquashed(dataTimestamp));
           });
 
           it('expect to have no current FCD', async () => {
