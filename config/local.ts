@@ -12,7 +12,8 @@ const cfg: Config = {
   },
   chain: {
     padding: 20,
-    requiredSignatures: 1
+    requiredSignatures: 1,
+    replicator: '0x620583C75BB474E06485893B795b0883b5816D10'
   },
   stakingBank: {
     minAmountForStake: 1n * BigInt(1e18),

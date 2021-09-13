@@ -19,6 +19,7 @@ export interface Config {
   chain: {
     padding: number
     requiredSignatures: number
+    replicator?: string
   },
   stakingBank: {
     minAmountForStake: bigint

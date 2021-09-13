@@ -4,7 +4,7 @@ import {readValidators} from './utils';
 const staging: GlobalConfig = {
   ethereum: {
     contractRegistry: {
-      address: '0x4545e91d2e3647808670DD045eA5f4079B436EbC'
+      address: '0x4C811e3A02c8c059669184d38A854036268dD857'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
@@ -12,8 +12,9 @@ const staging: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60,
-      requiredSignatures: 2
+      padding: 100,
+      requiredSignatures: 2,
+      replicator: '0x620583C75BB474E06485893B795b0883b5816D10'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),
@@ -34,7 +35,8 @@ const staging: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      requiredSignatures: 2
+      requiredSignatures: 2,
+      replicator: '0x620583C75BB474E06485893B795b0883b5816D10'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),

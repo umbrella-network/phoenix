@@ -3,7 +3,7 @@ require('custom-env').env(); // eslint-disable-line
 import { ChainContractNames, deployChainAndRegister } from './deployers/contracts';
 import { pressToContinue } from './utils/helpers';
 
-const deployAndRegister = async () => deployChainAndRegister(ChainContractNames.Chain);
+const deployAndRegister = async () => deployChainAndRegister(ChainContractNames.ForeignChain);
 
 pressToContinue('y', () => {
   deployAndRegister()

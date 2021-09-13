@@ -6,6 +6,7 @@ import { Contract, Wallet, BigNumber, Signer } from 'ethers';
 
 import configuration from '../../config';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
+import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import { TransactionReceipt } from '@ethersproject/providers';
 
@@ -21,18 +22,57 @@ interface Validator {
   privateKey: string;
 }
 
-export const deployChain = async (contractRegistryAddress: string): Promise<Contract> => {
-  console.log('deploying Chain...');
-  const ChainContract = await ethers.getContractFactory('Chain');
+export const deployChain = async (contractRegistryAddress: string, chainName = ChainContractNames.Chain): Promise<Contract> => {
+  console.log(`deploying ${chainName}...`);
+  const ChainContract = await ethers.getContractFactory(chainName);
   const chainArgs = [contractRegistryAddress, config.chain.padding, config.chain.requiredSignatures];
+
+  if (chainName === ChainContractNames.ForeignChain) {
+    if (!config.chain.replicator) {
+      const wallet = ethers.Wallet.createRandom({ extraEntropy: Buffer.from(Math.random().toString(10)) });
+      console.log('random wallet:', { pk: wallet.privateKey, address: wallet.address });
+
+      throw new Error('please setup `replicator` in config, you can use random wallet');
+    }
+
+    chainArgs.push(config.chain.replicator);
+  }
 
   const chain = await ChainContract.deploy(...chainArgs);
   await chain.deployed();
-  console.log('Chain deployed at', chain.address);
+  console.log(`${chainName} deployed at`, chain.address);
 
   await verifyCode(chain.address, chainArgs);
 
   return chain;
+};
+
+export enum ChainContractNames {
+  Chain = 'Chain',
+  ForeignChain = 'ForeignChain',
+}
+
+export const deployChainAndRegister = async (chainName: ChainContractNames): Promise<void> => {
+  const registry = new ethers.Contract(config.contractRegistry.address, Registry.abi, provider);
+  const address = await registry.getAddressByString('Chain');
+
+  if (address !== ethers.constants.AddressZero) {
+    const currentChain = new ethers.Contract(address, Chain.abi, provider);
+    const isForeign = await currentChain.isForeign();
+
+    console.log({isForeign, chainName});
+
+    if (isForeign && chainName !== ChainContractNames.ForeignChain) {
+      throw Error(
+        `One type of chain allowed per setup, isForeign: ${isForeign} in conflict with chainName: ${chainName}`
+      );
+    }
+  }
+
+
+  const chain = await deployChain(config.contractRegistry.address, chainName);
+  await registerContract([chain.address]);
+  console.log(`${chainName} registered at ${chain.address}`);
 };
 
 export const deployStakingBank = async (contractRegistryAddress: string): Promise<Contract> => {
@@ -132,7 +172,7 @@ const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
   }
 
   const token = await deployDummyToken();
-  await registerContract([token.address], undefined);
+  await registerContract([token.address]);
   return token;
 };
 
