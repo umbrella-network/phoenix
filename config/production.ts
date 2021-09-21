@@ -4,7 +4,7 @@ import {readValidators} from './utils';
 const production: GlobalConfig = {
   ethereum: {
     contractRegistry: {
-      address: '0x968A798Be3F73228c66De06f7D1109D8790FB64D'
+      address: '0xb81f69E38669e18cfF763D7ABB77bD8BC6092Ee4'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
@@ -13,7 +13,8 @@ const production: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      requiredSignatures: 2
+      requiredSignatures: 2,
+      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),
@@ -32,7 +33,8 @@ const production: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      requiredSignatures: 4
+      requiredSignatures: 4,
+      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),

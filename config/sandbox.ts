@@ -13,7 +13,8 @@ const staging: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      requiredSignatures: 1
+      requiredSignatures: 1,
+      replicator: '0x0760b24EC17dDf59893D7c16D75353dE24c00F14'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),
@@ -33,8 +34,9 @@ const staging: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60,
-      requiredSignatures: 1
+      padding: 20,
+      requiredSignatures: 1,
+      replicator: '0x0760b24EC17dDf59893D7c16D75353dE24c00F14'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),

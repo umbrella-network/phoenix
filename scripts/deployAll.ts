@@ -15,6 +15,8 @@ async function main() {
     console.log(
       '\n⚠️⚠️⚠️⚠️⚠️\n',
       `setup registry address in config file and run\n\n> npm run deploy:contracts:${process.env.NODE_ENV}`,
+      '\n OR \n',
+      '<deploy ForeignChain command>',
       '\n\nto finish deployment\n⚠️⚠️⚠️⚠️⚠️\n'
     );
   }

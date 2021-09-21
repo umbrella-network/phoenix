@@ -13,3 +13,12 @@ export interface ChainStatus {
   staked: BigNumber;
   minSignatures: number;
 }
+
+export interface ForeignChainStatus {
+  blockNumber: BigNumber;
+  timePadding: number;
+  lastDataTimestamp: number;
+  lastId: number;
+  nextBlockId: number;
+  minSignatures: number;
+}

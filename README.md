@@ -67,12 +67,6 @@ so you can copy it, set into env file and rerun command.
 **NOTE: _N E V E R_  use this keys in mainnet! For mainnet use dedicated wallets to generate PK.**  
 ⚠️⚠️⚠️
 
-If you choose hardhat node, then you can use minter for mining blocks - hardhat not minting automatically:
-
-```shell
-npm run local-minter
-```
-
 ### Live or Test nets
 
 Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
@@ -88,6 +82,8 @@ In case of any errors, please read error message. There should be some tips what
 ### Update contract
 
 **NOTE**: in case script stuck on deployment, try to use another RPC endpoint
+
+### Home Chain
 
 ```shell
 hardhat compile && npx hardhat run --network localhost ./scripts/reDeployToken.ts
@@ -108,6 +104,21 @@ hardhat compile && NODE_ENV=production npx hardhat run --network production ./sc
 hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/registerNewValidator.ts
 hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/registerNewValidator.ts
 hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/registerNewValidator.ts
+```
+
+### Foreign Chain
+
+```shell
+npm run deploy:all:[staging|sandbox|production]
+```
+
+then:
+
+```shell
+hardhat compile && npx hardhat run --network localhost ./scripts/deployForeignChain.ts
+hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployForeignChain.ts
+hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/deployForeignChain.ts
+hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/deployForeignChain.ts
 ```
 
 ### Connect with validators for staging and testing
