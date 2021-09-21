@@ -105,9 +105,7 @@ describe('Registry', () => {
       });
 
       it('expect to throw when address not exists', async () => {
-        await expect(contract.requireAndGetAddress(toBytes32('-----'))).to.be.revertedWith(
-          'revert Name not registered: -----'
-        );
+        await expect(contract.requireAndGetAddress(toBytes32('-----'))).to.be.reverted;
       });
     });
   });
