@@ -1,9 +1,10 @@
+import { ChainContractNames, deployChainAndRegister } from './deployers/contracts';
 import { pressToContinue } from './utils/helpers';
 
-import { deployAllContracts } from './deployers/contracts';
+const deployAndRegister = async () => deployChainAndRegister(ChainContractNames.ForeignChain);
 
 pressToContinue('y', () => {
-  deployAllContracts('', true)
+  deployAndRegister()
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);

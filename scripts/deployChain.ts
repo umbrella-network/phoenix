@@ -1,16 +1,7 @@
-import configuration from '../config';
-
-require('custom-env').env(); // eslint-disable-line
-
-import { deployChain, registerContract } from './deployers/contracts';
+import { ChainContractNames, deployChainAndRegister } from './deployers/contracts';
 import { pressToContinue } from './utils/helpers';
-const config = configuration();
 
-const deployAndRegister = async () => {
-  const chain = await deployChain(config.contractRegistry.address);
-  console.log('Chain updated:', chain.address, 'registering...');
-  await registerContract([chain.address]);
-};
+const deployAndRegister = async () => deployChainAndRegister(ChainContractNames.Chain);
 
 pressToContinue('y', () => {
   deployAndRegister()

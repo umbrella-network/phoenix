@@ -4,23 +4,24 @@ import {readValidators} from './utils';
 const production: GlobalConfig = {
   ethereum: {
     contractRegistry: {
-      address: '0x968A798Be3F73228c66De06f7D1109D8790FB64D'
+      address: '0x41a75b8504fdac22b2152b5cfcdaae01ff50947e'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
-      name: 'Umbrella test token',
+      name: 'not in use!',
       symbol: 'UMB'
     },
     chain: {
-      padding: 60,
-      requiredSignatures: 2
+      padding: 300,
+      requiredSignatures: 1,
+      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),
     },
     validators: readValidators('https://validator.umb.network'),
   },
-  smartchain: {
+  bsc: {
     contractRegistry: {
       address: '0xb2C6c4162c0d2B6963C62A9133331b4D0359AA34'
     },
@@ -32,7 +33,8 @@ const production: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      requiredSignatures: 4
+      requiredSignatures: 4,
+      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),

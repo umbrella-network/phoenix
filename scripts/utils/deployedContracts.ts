@@ -1,5 +1,3 @@
-require('custom-env').env(); // eslint-disable-line
-
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
 

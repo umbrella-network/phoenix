@@ -1,7 +1,4 @@
 import { ethers, Contract } from 'ethers';
-
-require('custom-env').env(); // eslint-disable-line
-
 import superagent from 'superagent';
 import { deployedContract } from './utils/deployedContracts';
 import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
@@ -37,7 +34,7 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
   console.log(`address ${info.validator} OK`);
 
-  if (info.version !== '5.0.9') {
+  if (info.version !== '5.1.0') {
     throw Error(`${info.version} is not last version`);
   }
 

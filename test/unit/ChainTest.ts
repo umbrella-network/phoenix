@@ -6,10 +6,7 @@ import { expect, use } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
-import { LeafKeyCoder, LeafValueCoder } from '@umb-network/toolbox';
-import { remove0x } from '@umb-network/toolbox/dist/utils/helpers';
-
-import SortedMerkleTree from '../../lib/SortedMerkleTree';
+import { LeafKeyCoder } from '@umb-network/toolbox';
 
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
@@ -18,10 +15,13 @@ import Token from '../../artifacts/contracts/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 import { blockTimestamp, mintBlocks } from '../utils';
 import { ChainStatus } from '../types/ChainStatus';
+import { abiUintEncoder, inputs, prepareData, tree } from './chainUtils';
 
 use(waffleChai);
 
 const timePadding = 100;
+
+const root = tree.getRoot();
 
 const setup = async (requiredSignatures = 1) => {
   const [owner, validator, validator2] = await ethers.getSigners();
@@ -48,57 +48,6 @@ const setup = async (requiredSignatures = 1) => {
   };
 };
 
-const inputs: Record<string, Buffer> = {};
-
-const keys = [
-  'ETH-EUR',
-  'BTC-EUR',
-  'WAR-EUR',
-  'LTC-EUR',
-  'UNI-EUR',
-  'ETH-USD',
-  'BTC-USD',
-  'WAR-USD',
-  'LTC-USD',
-  'UNI-USD',
-];
-
-keys.forEach((k, i) => {
-  inputs[k] = LeafValueCoder.encode(i + 1, 'label');
-});
-
-const tree = new SortedMerkleTree(inputs);
-const root = tree.getRoot();
-
-const abiUintEncoder = (n: number | string, bits = 256): string =>
-  (typeof n === 'number' ? n.toString(16) : remove0x(n)).padStart(bits / 4, '0');
-
-const prepareData = async (
-  signer: Signer,
-  dataTimestamp: number,
-  root: string | null,
-  fcdKeys: string[] = [],
-  fcdValues: (number | string)[] = []
-) => {
-  let testimony = '0x' + abiUintEncoder(dataTimestamp, 32) + root?.replace('0x', '');
-
-  for (let i = 0; i < fcdKeys.length; i++) {
-    if (typeof fcdValues[i] === 'string' && !ethers.utils.isHexString(fcdValues[i])) {
-      throw Error(`if FCD is a string, then must be hex string: ${fcdValues[i]}`);
-    }
-
-    testimony += fcdKeys[i].replace('0x', '') + abiUintEncoder(fcdValues[i]);
-  }
-
-  const hashForSolidity = ethers.utils.keccak256(testimony);
-  const affidavit = ethers.utils.arrayify(hashForSolidity);
-
-  const sig = await signer.signMessage(affidavit);
-  const { r, s, v } = ethers.utils.splitSignature(sig);
-
-  return { testimony, affidavit, sig, r, s, v, hashForSolidity, dataTimestamp };
-};
-
 describe('Chain', () => {
   let owner: Signer,
     validator: Signer,
@@ -114,6 +63,7 @@ describe('Chain', () => {
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
+  // note - DO NOT use this function if you want to catch eventexpect to getStatus()
   const executeSubmit = async (blockId: number, dataTimestamp: number, validators = [validator]) => {
     await mockSubmit();
 
@@ -582,7 +532,7 @@ describe('Chain', () => {
 
       expect(status.lastDataTimestamp).to.eq(dataTimestamp, 'invalid lastDataTimestamp');
       expect(status.lastBlockId).to.eq(1, 'invalid block ID');
-      expect(status.nextBlockId).to.eq(2, 'invalid block ID');
+      expect(status.nextBlockId).to.eq(2, 'invalid next block ID');
       expect(status.nextLeader).to.eq(validatorAddress, 'invalid validator');
       expect(status.validators).to.eql([validatorAddress], 'invalid validators list');
       expect(status.powers.map((p) => p.toString())).to.eql(['321'], 'invalid powers');

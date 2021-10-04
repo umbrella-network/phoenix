@@ -32,6 +32,18 @@ contract Registry is Ownable {
     }
   }
 
+  function atomicUpdate(address _newContract) external onlyOwner {
+    Registrable(_newContract).register();
+
+    bytes32 name = Registrable(_newContract).getName();
+    address oldContract = registry[name];
+    registry[name] = _newContract;
+
+    Registrable(oldContract).unregister();
+
+    emit LogRegistered(_newContract, name);
+  }
+
   // ========== VIEWS ========== //
 
   function requireAndGetAddress(bytes32 name) external view returns (address) {

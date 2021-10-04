@@ -1,7 +1,4 @@
 import { pressToContinue } from './utils/helpers';
-
-require('custom-env').env(); // eslint-disable-line
-
 import { deployContractRegistry } from './deployers/registry';
 
 pressToContinue('y', () => {
