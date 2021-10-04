@@ -1,7 +1,4 @@
 import configuration from '../config';
-
-require('custom-env').env(); // eslint-disable-line
-
 import { deployedContract } from './utils/deployedContracts';
 import { Contract } from 'ethers';
 

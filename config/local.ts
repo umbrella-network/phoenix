@@ -23,7 +23,7 @@ const cfg: Config = {
 
 const local: GlobalConfig = {
   ethereum: cfg,
-  smartchain: cfg
+  bsc: cfg,
 };
 
 export default local;

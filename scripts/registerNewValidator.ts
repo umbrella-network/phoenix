@@ -1,7 +1,4 @@
 import { ethers, Contract } from 'ethers';
-
-require('custom-env').env(); // eslint-disable-line
-
 import superagent from 'superagent';
 import { deployedContract } from './utils/deployedContracts';
 import { getProvider, pressToContinue, waitForTx } from './utils/helpers';

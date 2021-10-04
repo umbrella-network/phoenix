@@ -17,8 +17,10 @@ export enum ENVS {
   sandbox = 'sandbox'
 }
 
-const env = process.env.NODE_ENV || ENVS.local;
-const network = process.env.NETWORK || NETWORKS.ETH;
+const [blockchain, environment] = process.env.HARDHAT_NETWORK?.split('_') || [NETWORKS.ETH, ENVS.local];
+
+const network = blockchain || NETWORKS.ETH;
+const env = environment || ENVS.local;
 
 const configuration = (environment = env): Config => {
   switch (environment) {

@@ -29,5 +29,5 @@ export interface Config {
 
 export interface GlobalConfig {
   ethereum: Config,
-  smartchain: Config,
+  bsc: Config,
 }

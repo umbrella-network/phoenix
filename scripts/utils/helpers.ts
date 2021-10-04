@@ -1,5 +1,3 @@
-require('custom-env').env(); // eslint-disable-line
-
 import hre from 'hardhat';
 import { HttpNetworkUserConfig } from 'hardhat/types';
 import { ethers } from 'ethers';
@@ -14,14 +12,15 @@ export const constructorAbi = (types: string[], values: any[]): string => {
   return ethers.utils.defaultAbiCoder.encode(types, values).replace('0x', '');
 };
 
-export const isLocalNetwork = (): boolean => ['buidlerevm', 'localhost', 'docker'].includes(hre.network.name);
+export const isLocalNetwork = (): boolean =>
+  ['buidlerevm', 'localhost', 'docker', 'hardhat'].includes(hre.network.name);
 
 export const getProvider = (): Provider => {
   return new ethers.providers.JsonRpcProvider((<HttpNetworkUserConfig>hre.config.networks[hre.network.name]).url);
 };
 
 export const waitForTx = async (txHash: string, provider: Provider): Promise<TransactionReceipt | null> => {
-  if (hre.network.name === 'buidlerevm') {
+  if (isLocalNetwork()) {
     return null;
   }
 
@@ -44,8 +43,8 @@ export const toBytes32 = (str: string): string => {
 
 export const pressToContinue = (charToPress = 'y', callback: () => void): void => {
   console.log('-'.repeat(80));
-  const { NETWORK, HARDHAT_NETWORK } = process.env;
-  console.log('\n\n', { NETWORK, HARDHAT_NETWORK });
+  const { HARDHAT_NETWORK } = process.env;
+  console.log('\n\n', { HARDHAT_NETWORK });
   console.log(`\n\nCHECK IF NETWORK IS VALID, do you want to continue? (${charToPress})\n\n`);
   console.log('-'.repeat(80));
 

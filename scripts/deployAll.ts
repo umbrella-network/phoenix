@@ -1,5 +1,3 @@
-require('custom-env').env(); // eslint-disable-line
-
 import { deployAllContracts } from './deployers/contracts';
 import { deployContractRegistry } from './deployers/registry';
 import { isLocalNetwork, pressToContinue } from './utils/helpers';
@@ -14,9 +12,10 @@ async function main() {
   } else {
     console.log(
       '\n⚠️⚠️⚠️⚠️⚠️\n',
-      `setup registry address in config file and run\n\n> npm run deploy:contracts:${process.env.NODE_ENV}`,
+      'setup registry address in config file and run\n\n',
+      `> HARDHAT_NETWORK=${process.env.HARDHAT_NETWORK} npm run deploy:contracts`,
       '\n OR \n',
-      '<deploy ForeignChain command>',
+      `> HARDHAT_NETWORK=${process.env.HARDHAT_NETWORK} npm run deploy:foreignChain`,
       '\n\nto finish deployment\n⚠️⚠️⚠️⚠️⚠️\n'
     );
   }
