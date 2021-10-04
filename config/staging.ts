@@ -21,7 +21,7 @@ const staging: GlobalConfig = {
     },
     validators: readValidators('https://validator-dev.umb.network'),
   },
-  smartchain: {
+  bsc: {
     distributor: {
       address: '0x2BB2B0df0DB14EAfd5FCaBc46Fd543F7a6dFF8E9'
     },

@@ -1,6 +1,3 @@
-require('custom-env').env(); // eslint-disable-line
-
-
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-web3';
@@ -12,14 +9,13 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import 'hardhat-gas-reporter';
 
+require('./scripts/customEnv'); // eslint-disable-line
+
 import {HardhatUserConfig} from 'hardhat/types';
 
-import {NETWORKS} from './config';
-
 const {
-  NETWORK,
+  HARDHAT_NETWORK = '',
   INFURA_ID,
-  BSC_RPC_PROVIDER,
   DEPLOYER_PK,
   HARDHAT_MINING_AUTO = 'true',
   HARDHAT_MINING_INTERVAL = '5000',
@@ -29,8 +25,24 @@ const {
 
 const balance = '1000' + '0'.repeat(18);
 const autoMinting = HARDHAT_MINING_AUTO === 'true';
+const deployerAccounts = DEPLOYER_PK ? [DEPLOYER_PK] : [];
+const blockchain = HARDHAT_NETWORK.split('_')[0];
 
-console.log({NETWORK, autoMinting, HARDHAT_MINING_INTERVAL});
+const apiKey = (): string | undefined => {
+  switch (blockchain) {
+    case 'ethereum':
+      return ETHERSCAN_API;
+    case 'bsc':
+      return BSCSCAN_API;
+    default: return undefined; // throw Error(`Unknown blockchain: ${blockchain}`);
+  }
+};
+
+const bscRpcUrlTestnet = 'https://data-seed-prebsc-2-s1.binance.org:8545';
+
+console.log({autoMinting, HARDHAT_MINING_INTERVAL});
+
+const gwei = (n: number): number => n * 1e9;
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -60,23 +72,42 @@ const config: HardhatUserConfig = {
       blockGasLimit: 80000000,
       url: 'http://localhost:8545',
     },
-    staging: {
-      url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://kovan.infura.io/v3/${INFURA_ID}`,
-      accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
-      chainId: NETWORK === NETWORKS.BSC ? 97 : 42,
-      gasPrice: NETWORK === NETWORKS.BSC ? 10000000000 : 1000000000
+    ethereum_staging: {
+      url: `https://kovan.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 42,
+      gasPrice: gwei(1)
     },
-    sandbox: {
-      url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://kovan.infura.io/v3/${INFURA_ID}`,
-      accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
-      chainId: NETWORK === NETWORKS.BSC ? 97 : 42,
-      gasPrice: NETWORK === NETWORKS.BSC ? 10000000000 : 1000000000
+    bsc_staging: {
+      url: bscRpcUrlTestnet,
+      accounts: deployerAccounts,
+      chainId: 97,
+      gasPrice: gwei(10)
     },
-    production: {
-      url: NETWORK === NETWORKS.BSC ? BSC_RPC_PROVIDER : `https://ropsten.infura.io/v3/${INFURA_ID}`,
-      accounts: DEPLOYER_PK ? [DEPLOYER_PK] : [],
-      chainId: NETWORK === NETWORKS.BSC ? 56 : 3,
-      gasPrice: NETWORK === NETWORKS.BSC ? 5000000000 : 10000000000
+    ethereum_sandbox: {
+      url: `https://ropsten.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 3,
+      gasPrice: gwei(10)
+    },
+    bsc_sandbox: {
+      url: bscRpcUrlTestnet,
+      accounts: deployerAccounts,
+      chainId: 97,
+      gasPrice: gwei(10)
+    },
+    ethereum_production: {
+      url: `https://mainnet.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 1,
+      gasPrice: 'auto',
+      gasMultiplier: 1.5
+    },
+    bsc_production: {
+      url: 'https://bsc-dataseed.binance.org/',
+      accounts: deployerAccounts,
+      chainId: 56,
+      gasPrice: gwei(5)
     },
     docker: {
       url: 'http://eth:8545',
@@ -85,7 +116,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://bscscan.com/
-    apiKey: NETWORK === NETWORKS.BSC ? BSCSCAN_API : ETHERSCAN_API
+    apiKey: apiKey()
   },
   gasReporter: {
     gasPrice: 1,

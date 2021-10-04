@@ -1,5 +1,3 @@
-require('custom-env').env(); // eslint-disable-line
-
 import { verifyCode } from '../utils/verifyContract';
 import { ethers } from 'hardhat';
 import { Contract, Wallet, BigNumber, Signer } from 'ethers';
@@ -66,7 +64,10 @@ export const deployChainAndRegister = async (chainName: ChainContractNames): Pro
 
     console.log({ isForeign, chainName });
 
-    if (isForeign && chainName !== ChainContractNames.ForeignChain) {
+    if (
+      (!isForeign && chainName === ChainContractNames.ForeignChain) ||
+      (isForeign && chainName !== ChainContractNames.ForeignChain)
+    ) {
       throw Error(
         `One type of chain allowed per setup, isForeign: ${isForeign} in conflict with chainName: ${chainName}`
       );

@@ -59,7 +59,8 @@ sudo ./install.sh
 ```shell script
 npm run deploy:all
 ```
-For sidechain deployment you need `VALIDATOR_PK` to be setup in `.env*`.
+
+For sidechain deployment you need `VALIDATOR_PK` to be setup in `.env`.
 If you do not have it the script will throw error, but also generate random PK for you,
 so you can copy it, set into env file and rerun command.
 
@@ -67,12 +68,14 @@ so you can copy it, set into env file and rerun command.
 **NOTE: _N E V E R_  use this keys in mainnet! For mainnet use dedicated wallets to generate PK.**  
 ⚠️⚠️⚠️
 
-### Live or Test nets
-
-Setup Infura ID (every service has dedicated ID, use the one for `deployments` - see infura dashboard) in .env and run:
-
+### Live or Testnet
+ 
 ```shell
-npm run deploy:all:[staging|sandbox|production]
+# HARDHAT_NETWORK: localhost | <blockchainId>_<environment> 
+# eg: ethereum_staging, bsc_staging
+
+HARDHAT_NETWORK=ethereum_staging npm run deploy:all
+HARDHAT_NETWORK=bsc_staging npm run deploy:all
 ```
 
 In case of any errors, please read error message. There should be some tips what's need to be fixed.
@@ -86,39 +89,27 @@ In case of any errors, please read error message. There should be some tips what
 ### Home Chain
 
 ```shell
-hardhat compile && npx hardhat run --network localhost ./scripts/reDeployToken.ts
-hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployToken.ts
-hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/reDeployToken.ts
-hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployToken.ts
+hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/reDeployToken.ts
 
-hardhat compile && npx hardhat run --network localhost ./scripts/reDeployStakingBank.ts
-hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/reDeployStakingBank.ts
-hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/reDeployStakingBank.ts
-hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/reDeployStakingBank.ts
+hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/reDeployStakingBank.ts
 
-hardhat compile && npx hardhat run --network localhost ./scripts/deployChain.ts
-hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployChain.ts
-hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/deployChain.ts
-hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/deployChain.ts
+hardhat compile && HARDHAT_NETWORK= npm run deploy:chain
 
-hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/registerNewValidator.ts
-hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/registerNewValidator.ts
-hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/registerNewValidator.ts
+hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/registerNewValidator.ts
 ```
 
 ### Foreign Chain
 
 ```shell
-npm run deploy:all:[staging|sandbox|production]
+HARDHAT_NETWORK=<network_env> npm run deploy:all
+HARDHAT_NETWORK=ethereum_production npm run deploy:all
 ```
 
 then:
 
 ```shell
-hardhat compile && npx hardhat run --network localhost ./scripts/deployForeignChain.ts
-hardhat compile && NODE_ENV=staging npx hardhat run --network staging ./scripts/deployForeignChain.ts
-hardhat compile && NODE_ENV=sandbox npx hardhat run --network sandbox ./scripts/deployForeignChain.ts
-hardhat compile && NODE_ENV=production npx hardhat run --network production ./scripts/deployForeignChain.ts
+hardhat compile && HARDHAT_NETWORK=ethereum_sandbox npm run deploy:foreignChain
+hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignChain
 ```
 
 ### Connect with validators for staging and testing
@@ -136,14 +127,6 @@ cd ../pegasus
 echo 'BLOCKCHAIN_PROVIDER_URL=http://eth:8545' >> .env
 docker-compose up
 ```
-
-## TODO
-
-- [ ] Validator Rewards
-  - [link](https://github.com/umbrella-network/phoenix/pull/1/files#r496632272)
-- [ ] Robust Leader Selection 
-  - [link](https://github.com/umbrella-network/phoenix/pull/1/files#r496607598)
-  - [link](https://github.com/umbrella-network/phoenix/pull/1/files#r495886523)
 
 ## Licensed under MIT.
 

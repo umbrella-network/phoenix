@@ -1,5 +1,3 @@
-require('custom-env').env(); // eslint-disable-line
-
 import { deployDummyToken, registerContract } from './deployers/contracts';
 import { pressToContinue } from './utils/helpers';
 

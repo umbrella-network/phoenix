@@ -6,7 +6,7 @@ export const verifyCode = async (address: string, constructorArguments: any): Pr
   if (isLocalNetwork()) {
     return;
   }
-  console.log('verifyCode for ', address);
+  console.log('verifyCode for ', address, hre.network.name);
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
