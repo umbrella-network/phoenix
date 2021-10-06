@@ -138,8 +138,27 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+before:
+
+|  Methods                                                                                                         │
+·················|························|··············|·············|·············|···············|··············
+|  Contract      ·  Method                ·  Min         ·  Max        ·  Avg        ·  # calls      ·  usd (avg)  │
+·················|························|··············|·············|·············|···············|··············
+|  Chain         ·  setPadding            ·       30552  ·      30564  ·      30560  ·            6  ·          -  │
+·················|························|··············|·············|·············|···············|··············
+|  Chain         ·  submit                ·      109454  ·     159348  ·     120177  ·           34  ·          -  │
+·················|························|··············|·············|·············|···············|··············
+|  ForeignChain  ·  setPadding            ·           -  ·          -  ·      25752  ·            1  ·          -  │
+·················|························|··············|·············|·············|···············|··············
+|  ForeignChain  ·  submit                ·       73413  ·     125043  ·      88164  ·           26  ·          -  │
+
 
 binary search:
+|  Methods                                                                                           │
+·············|··············|··············|·············|·············|···············|··············
 |  Contract  ·  Method      ·  Min         ·  Max        ·  Avg        ·  # calls      ·  usd (avg)  │
-|  Chain     ·  submit      ·      106424  ·     304344  ·     159001  ·           37  ·          -  │
-|  ForeignChain  ·  submit      ·       73363  ·     124993  ·      88114  ·           26  ·          -  │
+·············|··············|··············|·············|·············|···············|··············
+|  Chain     ·  submit      ·      106501  ·     258045  ·     139510  ·           34  ·          -  │
+
+
+it is not cheaper! min gas is only because we do not do any search (when we have no blocks)

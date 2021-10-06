@@ -560,7 +560,7 @@ describe('Chain', () => {
       });
 
       it('expect to have no blocks', async () => {
-        expect(await newChain.blocksCount()).to.eq(0);
+        expect(await newChain.blocksCount()).to.eq(2 + 1);
       });
 
       it('expect to have offset', async () => {

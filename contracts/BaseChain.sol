@@ -76,7 +76,7 @@ abstract contract BaseChain is Registrable, Ownable {
 
   // this function does not works for past timestamps
   function getBlockIdAtTimestamp(uint256 _timestamp) virtual public view returns (uint32) {
-    uint32 _blocksCount = blocksCount() + blocksCountOffset;
+    uint32 _blocksCount = blocksCount();
 
     if (_blocksCount == 0) {
       return 0;
@@ -99,30 +99,39 @@ abstract contract BaseChain is Registrable, Ownable {
   }
 
   function blocksCount() virtual public view returns (uint32 index) {
-    uint32 jump = (type(uint32).max / 2) + 1;
+    uint32 offset = blocksCountOffset; // (type(uint32).max / 2) + 1;
+    // uint32 jump = 2147483648; // (type(uint32).max / 2) + 1;
+    //uint32 jump = 2147483648; // ((type(uint32).max - offset) / 2) + 1;
+    uint32 jump = uint32(4294967295) - offset; // ((type(uint32).max - offset) / 2) + 1;
+    uint32 mod = jump % 2;
+    jump = jump / 2 + mod;
     index = jump;
 
-    if (blocks[0].dataTimestamp == 0) {
-      return blocksCountOffset;
+    // console.log("starting search %s %s", index, jump);
+
+
+    if (blocks[offset].dataTimestamp == 0) {
+      return offset;
     }
 
     while (true) {
-      console.log("%s %s", index, jump);
-      if (blocks[index].dataTimestamp == 0 && blocks[index - 1].dataTimestamp > 0) {
-        return index + blocksCountOffset + 1;
+      // console.log("%s %s", index, jump);
+      if (blocks[index - 1].dataTimestamp > 0 && blocks[index].dataTimestamp == 0) {
+        return index;
       }
 
       // require(jump > 0, "oops");
       jump /= 2;
 
-      if (blocks[index].dataTimestamp == 0 && blocks[index - 1].dataTimestamp == 0) {
+      if (blocks[index - 1].dataTimestamp == 0 && blocks[index].dataTimestamp == 0) {
         index -= jump;
       } else {
         index += jump;
       }
     }
 
-    return blocksCountOffset;
+    require(false, 'we should never get here');
+    return offset;
   }
 
   function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
