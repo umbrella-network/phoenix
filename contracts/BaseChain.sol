@@ -99,7 +99,7 @@ abstract contract BaseChain is Registrable, Ownable {
   }
 
   function blocksCount() virtual public view returns (uint32 index) {
-    uint32 jump = type(uint32).max / 2 + 1;
+    uint32 jump = (type(uint32).max / 2) + 1;
     index = jump;
 
     if (blocks[0].dataTimestamp == 0) {
@@ -112,7 +112,7 @@ abstract contract BaseChain is Registrable, Ownable {
         return index + blocksCountOffset + 1;
       }
 
-      require(jump > 0, "oops");
+      // require(jump > 0, "oops");
       jump /= 2;
 
       if (blocks[index].dataTimestamp == 0 && blocks[index - 1].dataTimestamp == 0) {
