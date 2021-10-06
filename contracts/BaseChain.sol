@@ -10,6 +10,7 @@ import "./interfaces/IStakingBank.sol";
 
 import "./extensions/Registrable.sol";
 import "./Registry.sol";
+import "hardhat/console.sol";
 
 abstract contract BaseChain is Registrable, Ownable {
   using ValueDecoder for bytes;
@@ -31,7 +32,7 @@ abstract contract BaseChain is Registrable, Ownable {
   mapping(uint256 => Block) public blocks;
   mapping(bytes32 => FirstClassData) public fcds;
 
-  uint32 public blocksCount;
+  // uint32 public blocksCount;
   uint32 public immutable blocksCountOffset;
   uint16 public padding;
   uint16 public immutable requiredSignatures;
@@ -75,7 +76,7 @@ abstract contract BaseChain is Registrable, Ownable {
 
   // this function does not works for past timestamps
   function getBlockIdAtTimestamp(uint256 _timestamp) virtual public view returns (uint32) {
-    uint32 _blocksCount = blocksCount + blocksCountOffset;
+    uint32 _blocksCount = blocksCount() + blocksCountOffset;
 
     if (_blocksCount == 0) {
       return 0;
@@ -89,7 +90,39 @@ abstract contract BaseChain is Registrable, Ownable {
   }
 
   function getLatestBlockId() virtual public view returns (uint32) {
-    return blocksCount + blocksCountOffset - 1;
+    return findLatestBlockId();
+    // return blocksCount + blocksCountOffset - 1;
+  }
+
+  function findLatestBlockId() virtual public view returns (uint32) {
+    return blocksCount() - 1;
+  }
+
+  function blocksCount() virtual public view returns (uint32 index) {
+    uint32 jump = type(uint32).max / 2 + 1;
+    index = jump;
+
+    if (blocks[0].dataTimestamp == 0) {
+      return blocksCountOffset;
+    }
+
+    while (true) {
+      console.log("%s %s", index, jump);
+      if (blocks[index].dataTimestamp == 0 && blocks[index - 1].dataTimestamp > 0) {
+        return index + blocksCountOffset + 1;
+      }
+
+      require(jump > 0, "oops");
+      jump /= 2;
+
+      if (blocks[index].dataTimestamp == 0 && blocks[index - 1].dataTimestamp == 0) {
+        index -= jump;
+      } else {
+        index += jump;
+      }
+    }
+
+    return blocksCountOffset;
   }
 
   function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {

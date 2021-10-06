@@ -140,7 +140,7 @@ contract Chain is BaseChain {
     // require(power * 100 / staked >= 66, "not enough power was gathered");
 
     blocks[lastBlockId + 1] = Block(_root, _dataTimestamp);
-    blocksCount++;
+    // blocksCount++;
 
     emit LogMint(msg.sender, lastBlockId + 1, staked, power);
   }
