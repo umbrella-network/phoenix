@@ -67,6 +67,7 @@ contract Registry is Ownable {
       return 0x0;
     }
 
+    // solhint-disable-next-line no-inline-assembly
     assembly {
       result := mload(add(_string, 32))
     }

@@ -102,12 +102,13 @@ hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/registerNewValidat
 
 ```shell
 HARDHAT_NETWORK=<network_env> npm run deploy:all
-HARDHAT_NETWORK=ethereum_production npm run deploy:all
+HARDHAT_NETWORK=ethereum_staging npm run deploy:all
 ```
 
 then:
 
 ```shell
+hardhat compile && HARDHAT_NETWORK=ethereum_staging npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_sandbox npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignChain
 ```
@@ -137,3 +138,41 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Chain.submit cost down by 15% - 20%
+ForeignChain.submit cost down by 18% - 30% 
+
+verifyProofForBlock up by 0.216% - 0.422%
+
+before:
+
+|  Chain     ·  submit               ·      109454  ·     159360  ·     120176  ·           34  ·          -  │
+·············|·······················|··············|·············|·············|···············|··············
+|  Chain     ·  verifyProofForBlock  ·           -  ·          -  ·      33354  ·            2  ·          -  │
+·············|·······················|··············|·············|·············|···············|··············
+|  Chain     ·  verifyProofs         ·           -  ·          -  ·      51210  ·            1  ·          -  │
+
+|  ForeignChain  ·  submit               ·       73413  ·     125043  ·      88164  ·           26  ·          -  │
+·················|·······················|··············|·············|·············|···············|··············
+|  ForeignChain  ·  verifyProofForBlock  ·       30723  ·      33299  ·      32436  ·            3  ·          -  │
+·················|·······················|··············|·············|·············|···············|··············
+|  ForeignChain  ·  verifyProofs         ·           -  ·          -  ·      51210  ·            1  ·          -  │
+
+
+and for squashed root:
+
+
+|  Chain     ·  submit               ·       87062  ·     136955  ·      97787  ·           34  ·          -  │
+·············|·······················|··············|·············|·············|···············|··············
+|  Chain     ·  verifyProofForBlock  ·           -  ·          -  ·      33426  ·            2  ·          -  │
+·············|·······················|··············|·············|·············|···············|··············
+|  Chain     ·  verifyProofs         ·           -  ·          -  ·      51426  ·            1  ·          -  │
+
+|  ForeignChain  ·  submit               ·       51126  ·     102756  ·      65877  ·           26  ·          -  │
+·················|·······················|··············|·············|·············|···············|··············
+|  ForeignChain  ·  verifyProofForBlock  ·       33359  ·      33371  ·      33363  ·            3  ·          -  │
+·················|·······················|··············|·············|·············|···············|··············
+|  ForeignChain  ·  verifyProofs         ·           -  ·          -  ·      51426  ·            1  ·          -  │
+
+
+submit cost 

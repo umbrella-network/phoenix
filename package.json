@@ -17,9 +17,9 @@
     "deploy:foreignChain": "npx hardhat run scripts/deployForeignChain.ts",
     "deploy:all": "npx hardhat run scripts/deployAll.ts",
     "lint": "npm run lint:ts && npm run lint:sol",
-    "lint:ts": "eslint . --ext .ts,.tsx,.ts --max-warnings=5",
+    "lint:ts": "eslint . --ext .ts,.tsx,.ts --max-warnings=0",
     "lint:fix": "npm run lint:ts -- --fix",
-    "lint:sol": "solhint \"contracts/**/*.sol\" --max-warnings=3",
+    "lint:sol": "solhint \"contracts/**/*.sol\" --max-warnings=0",
     "prettier": "prettier --config .prettierrc 'scripts/**/*.ts' 'test/**/*.ts' --check",
     "prettier:format": "prettier --config .prettierrc 'scripts/**/*.ts' 'test/**/*.ts' --write",
     "format": "npm run prettier:format && npm run lint:fix"
@@ -60,11 +60,11 @@
     "eslint-plugin-node": "~11.1.0",
     "eslint-plugin-promise": "~4.2.1",
     "ethereum-waffle": "~3.4.0",
-    "ethers": "~5.4.4",
+    "ethers": "~5.4.7",
     "ganache-cli": "~6.12.2",
-    "hardhat": "~2.6.1",
+    "hardhat": "~2.6.5",
     "hardhat-deploy": "~0.8.11",
-    "hardhat-deploy-ethers": "~0.3.0-beta.10",
+    "hardhat-deploy-ethers": "~0.3.0-beta.11",
     "hardhat-gas-reporter": "~1.0.4",
     "husky": "~4.3.0",
     "prettier": "~2.2.1",
@@ -74,6 +74,6 @@
     "superagent": "~6.1.0",
     "ts-node": "~9.1.1",
     "typescript": "~4.1.5",
-    "web3": "~1.5.2"
+    "web3": "~1.6.0"
   }
 }

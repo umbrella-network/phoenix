@@ -2,7 +2,7 @@
 pragma solidity ^0.6.8;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "./lib/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
 
@@ -13,6 +13,7 @@ import "./Registry.sol";
 
 abstract contract BaseChain is Registrable, Ownable {
   using ValueDecoder for bytes;
+  using MerkleProof for bytes32;
 
   // ========== STATE VARIABLES ========== //
 
@@ -28,7 +29,7 @@ abstract contract BaseChain is Registrable, Ownable {
     uint32 dataTimestamp;
   }
 
-  mapping(uint256 => Block) public blocks;
+  mapping(uint256 => bytes32) public squashedRoots;
   mapping(bytes32 => FirstClassData) public fcds;
 
   uint32 public blocksCount;
@@ -69,6 +70,11 @@ abstract contract BaseChain is Registrable, Ownable {
     return ecrecover(hash, _v, _r, _s);
   }
 
+  function blocks(uint256 _blockId) external view returns (Block memory) {
+    bytes32 root = squashedRoots[_blockId];
+    return Block(root, root.extractTimestamp());
+  }
+
   function getBlockId() public view returns (uint32) {
     return getBlockIdAtTimestamp(block.timestamp);
   }
@@ -81,7 +87,7 @@ abstract contract BaseChain is Registrable, Ownable {
       return 0;
     }
 
-    if (blocks[_blocksCount - 1].dataTimestamp + padding < _timestamp) {
+    if (squashedRoots[_blocksCount - 1].extractTimestamp() + padding < _timestamp) {
       return _blocksCount;
     }
 
@@ -97,7 +103,7 @@ abstract contract BaseChain is Registrable, Ownable {
       return false;
     }
 
-    return MerkleProof.verify(_proof, _root, _leaf);
+    return _root.verify(_proof, _leaf);
   }
 
   function hashLeaf(bytes memory _key, bytes memory _value) public pure returns (bytes32) {
@@ -110,7 +116,7 @@ abstract contract BaseChain is Registrable, Ownable {
     bytes memory _key,
     bytes memory _value
   ) public view returns (bool) {
-    return verifyProof(_proof, blocks[_blockId].root, keccak256(abi.encodePacked(_key, _value)));
+    return squashedRoots[_blockId].verifySquashedRoot(_proof, keccak256(abi.encodePacked(_key, _value)));
   }
 
   function bytesToBytes32Array(
@@ -124,6 +130,7 @@ abstract contract BaseChain is Registrable, Ownable {
       bytes32 temp;
       uint256 idx = (i + 1 + _offset) * 32;
 
+      // solhint-disable-next-line no-inline-assembly
       assembly {
         temp := mload(add(_data, idx))
       }
@@ -144,10 +151,8 @@ abstract contract BaseChain is Registrable, Ownable {
     uint256 offset = 0;
 
     for (uint256 i = 0; i < _leaves.length; i++) {
-      results[i] = verifyProof(
-        bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]),
-        blocks[_blockIds[i]].root,
-        _leaves[i]
+      results[i] = squashedRoots[_blockIds[i]].verifySquashedRoot(
+        bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]), _leaves[i]
       );
 
       offset += _proofItemsCounter[i];
@@ -155,11 +160,11 @@ abstract contract BaseChain is Registrable, Ownable {
   }
 
   function getBlockRoot(uint32 _blockId) external view returns (bytes32) {
-    return blocks[_blockId].root;
+    return squashedRoots[_blockId].extractRoot();
   }
 
   function getBlockTimestamp(uint32 _blockId) external view returns (uint32) {
-    return blocks[_blockId].dataTimestamp;
+    return squashedRoots[_blockId].extractTimestamp();
   }
 
   function getCurrentValues(bytes32[] calldata _keys)
