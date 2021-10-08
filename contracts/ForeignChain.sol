@@ -43,7 +43,19 @@ contract ForeignChain is BaseChain {
     if (address(oldChain) != address(0x0)) {
       lastBlockId = oldChain.lastBlockId();
       // we cloning last block time, because we will need reference point for next submissions
-      blocks[lastBlockId].dataTimestamp = oldChain.getBlockTimestamp(lastBlockId);
+
+      // TODO we need two deployment to switch from blocks -> squashedRoots
+      // step 1) first update
+      uint32 lastBlockTime = oldChain.blocks(lastBlockId).dataTimestamp;
+      bytes32 lastRootTime;
+      // solhint-disable-next-line no-inline-assembly
+      assembly {
+        lastRootTime := or(0x0, lastBlockTime)
+      }
+      squashedRoots[lastBlockId] = lastRootTime;
+
+      // step 2) next updates (we can remove step1)
+      // squashedRoots[lastBlockId] = oldChain.squashedRoots(lastBlockId);
     }
   }
 
@@ -67,9 +79,9 @@ contract ForeignChain is BaseChain {
     uint32 _blockId
   ) external onlyReplicator {
     require(!deprecated, "contract is deprecated");
-    uint lastDataTimestamp = blocks[lastBlockId].dataTimestamp;
+    uint lastDataTimestamp = squashedRoots[lastBlockId].extractTimestamp();
 
-    require(blocks[_blockId].dataTimestamp == 0, "blockId already taken");
+    require(squashedRoots[_blockId].extractTimestamp() == 0, "blockId already taken");
     require(lastDataTimestamp < _dataTimestamp, "can NOT submit older data");
     require(lastDataTimestamp + padding < block.timestamp, "do not spam");
     require(_keys.length == _values.length, "numbers of keys and values not the same");
@@ -79,7 +91,7 @@ contract ForeignChain is BaseChain {
       fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
     }
 
-    blocks[_blockId] = Block(_root, _dataTimestamp);
+    squashedRoots[_blockId] = MerkleProof.makeSquashedRoot(_root, _dataTimestamp);
     lastBlockId = _blockId;
 
     emit LogBlockReplication(msg.sender, _blockId);
@@ -105,23 +117,24 @@ contract ForeignChain is BaseChain {
     blockNumber = block.number;
     timePadding = padding;
     lastId = lastBlockId;
-    lastDataTimestamp = blocks[lastId].dataTimestamp;
+    lastDataTimestamp = squashedRoots[lastId].extractTimestamp();
     nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
   }
 
   // this function does not works for past timestamps
   function getBlockIdAtTimestamp(uint256 _timestamp) override public view  returns (uint32) {
-    uint32 _lastId = lastBlockId;
+    uint32 lastId = lastBlockId;
+    uint32 dataTimestamp = squashedRoots[lastId].extractTimestamp();
 
-    if (blocks[_lastId].dataTimestamp == 0) {
+    if (dataTimestamp == 0) {
       return 0;
     }
 
-    if (blocks[_lastId].dataTimestamp + padding < _timestamp) {
-      return _lastId + 1;
+    if (dataTimestamp + padding < _timestamp) {
+      return lastId + 1;
     }
 
-    return _lastId;
+    return lastId;
   }
 
   function getLatestBlockId() override public view returns (uint32) {

@@ -8,6 +8,7 @@ export const sleep = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const constructorAbi = (types: string[], values: any[]): string => {
   return ethers.utils.defaultAbiCoder.encode(types, values).replace('0x', '');
 };
