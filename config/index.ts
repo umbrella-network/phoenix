@@ -25,13 +25,13 @@ const env = environment || ENVS.local;
 const configuration = (environment = env): Config => {
   switch (environment) {
     case ENVS.local:
-      return (local as any)[network];
+      return (local as any)[network]; // eslint-disable-line @typescript-eslint/no-explicit-any
     case ENVS.staging:
-      return (staging as any)[network];
+      return (staging as any)[network]; // eslint-disable-line @typescript-eslint/no-explicit-any
     case ENVS.sandbox:
-      return (sandbox as any)[network];
+      return (sandbox as any)[network]; // eslint-disable-line @typescript-eslint/no-explicit-any
     case ENVS.production:
-      return (production as any)[network];
+      return (production as any)[network]; // eslint-disable-line @typescript-eslint/no-explicit-any
     default:
       throw Error(`invalid environment: ${environment}`);
   }

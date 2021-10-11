@@ -102,12 +102,13 @@ hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/registerNewValidat
 
 ```shell
 HARDHAT_NETWORK=<network_env> npm run deploy:all
-HARDHAT_NETWORK=ethereum_production npm run deploy:all
+HARDHAT_NETWORK=ethereum_staging npm run deploy:all
 ```
 
 then:
 
 ```shell
+hardhat compile && HARDHAT_NETWORK=ethereum_staging npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_sandbox npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignChain
 ```

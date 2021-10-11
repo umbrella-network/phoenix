@@ -17,6 +17,11 @@ class SortedMerkleTree extends Tree {
     const idx = this.getIndexForKey(key);
     return this.getLeaves()[idx];
   }
+
+  // TODO move this to SDK
+  getRootSquashed(timestamp: number): string {
+    return this.getRoot().slice(0, 58) + timestamp.toString(16);
+  }
 }
 
 export default SortedMerkleTree;

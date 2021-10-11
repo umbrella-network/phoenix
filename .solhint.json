@@ -1,7 +1,6 @@
 {
   "extends": "solhint:all",
   "rules": {
-    "comprehensive-interface": "off",
     "func-visibility": [
       "error",
       {

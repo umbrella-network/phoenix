@@ -60,7 +60,13 @@ export const deployChainAndRegister = async (chainName: ChainContractNames): Pro
 
   if (address !== ethers.constants.AddressZero) {
     const currentChain = new ethers.Contract(address, Chain.abi, provider);
-    isForeign = await currentChain.isForeign();
+
+    try {
+      isForeign = await currentChain.isForeign();
+    } catch (e) {
+      console.log(e);
+      console.log('if chain throw,then it is "old" regular chain');
+    }
 
     console.log({ isForeign, chainName });
 
