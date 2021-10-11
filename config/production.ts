@@ -12,7 +12,7 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 300,
+      padding: 3600,
       requiredSignatures: 1,
       replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
     },
