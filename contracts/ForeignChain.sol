@@ -44,7 +44,11 @@ contract ForeignChain is BaseChain {
       lastBlockId = oldChain.lastBlockId();
       // we cloning last block time, because we will need reference point for next submissions
 
-      // TODO we need two deployment to switch from blocks -> squashedRoots
+      // TODO remove this after first redeployment will be done
+      //      we need two deployment to switch from blocks -> squashedRoots because previous version and this one
+      //      are not compatible in a sense of registering/unregistering
+      //      on release we will deploy contract with step1) then we can delete step1) completely
+      //      later deployment can be done normally, using step2
       // step 1) first update
       uint32 lastBlockTime = oldChain.blocks(lastBlockId).dataTimestamp;
       bytes32 lastRootTime;
