@@ -40,6 +40,7 @@ export const deployChain = async (
   }
 
   const chain = await ChainContract.deploy(...chainArgs);
+  console.log('tx', chain.deployTransaction.hash);
   await chain.deployed();
   console.log(`${chainName} deployed at`, chain.address);
 
@@ -103,6 +104,7 @@ export const deployStakingBank = async (contractRegistryAddress: string): Promis
   ];
 
   const stakingBank = await StakingBankContract.deploy(...stakingBankArgs);
+  console.log('tx', stakingBank.deployTransaction.hash);
   await stakingBank.deployed();
 
   if (contractRegistry) {
@@ -184,6 +186,7 @@ export const deployDummyToken = async (): Promise<Contract> => {
   const TokenContract = await ethers.getContractFactory('Token');
   const tokenArgs = [config.token.name, config.token.symbol];
   const token = await TokenContract.deploy(...tokenArgs);
+  console.log('tx', token.deployTransaction.hash);
   await token.deployed();
   console.log('test token deployed');
 

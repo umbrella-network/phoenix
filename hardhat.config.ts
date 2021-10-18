@@ -20,7 +20,8 @@ const {
   HARDHAT_MINING_AUTO = 'true',
   HARDHAT_MINING_INTERVAL = '5000',
   BSCSCAN_API,
-  ETHERSCAN_API
+  ETHERSCAN_API,
+  POLYGONSCAN_API
 } = process.env;
 
 const balance = '1000' + '0'.repeat(18);
@@ -30,6 +31,8 @@ const blockchain = HARDHAT_NETWORK.split('_')[0];
 
 const apiKey = (): string | undefined => {
   switch (blockchain) {
+    case 'polygon':
+      return POLYGONSCAN_API;
     case 'ethereum':
       return ETHERSCAN_API;
     case 'bsc':
@@ -84,6 +87,18 @@ const config: HardhatUserConfig = {
       chainId: 97,
       gasPrice: gwei(10)
     },
+    polygon_staging: {
+      url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 80001,
+      gasPrice: gwei(1)
+    },
+    polygon_sandbox: {
+      url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 80001,
+      gasPrice: gwei(1)
+    },
     ethereum_sandbox: {
       url: `https://ropsten.infura.io/v3/${INFURA_ID}`,
       accounts: deployerAccounts,
@@ -100,6 +115,7 @@ const config: HardhatUserConfig = {
       url: `https://mainnet.infura.io/v3/${INFURA_ID}`,
       accounts: deployerAccounts,
       chainId: 1,
+      live: true,
       gasPrice: 'auto',
       gasMultiplier: 1.5
     },
@@ -107,7 +123,16 @@ const config: HardhatUserConfig = {
       url: 'https://bsc-dataseed.binance.org/',
       accounts: deployerAccounts,
       chainId: 56,
-      gasPrice: gwei(5)
+      gasPrice: gwei(5),
+      live: true
+    },
+    polygon_production: {
+      url: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 137,
+      live: true,
+      gasPrice: 'auto',
+      gasMultiplier: 2
     },
     docker: {
       url: 'http://eth:8545',
