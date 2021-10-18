@@ -2,24 +2,25 @@ import {GlobalConfig} from './types';
 import {readValidators} from './utils';
 
 const production: GlobalConfig = {
-  ethereum: {
+  polygon: {
     contractRegistry: {
-      address: '0x41a75b8504fdac22b2152b5cfcdaae01ff50947e'
-    },
-    token: {
-      totalSupply: '1000000' + '0'.repeat(18),
-      name: 'not in use!',
-      symbol: 'UMB'
+      address: '0x455acbbC2c15c086978083968a69B2e7E4d38d34'
     },
     chain: {
       padding: 3600,
       requiredSignatures: 1,
       replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
     },
-    stakingBank: {
-      minAmountForStake: 100n * BigInt(1e18),
+  },
+  ethereum: {
+    contractRegistry: {
+      address: '0x41a75b8504fdac22b2152b5cfcdaae01ff50947e'
     },
-    validators: readValidators('https://validator.umb.network'),
+    chain: {
+      padding: 3600,
+      requiredSignatures: 1,
+      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
+    },
   },
   bsc: {
     contractRegistry: {

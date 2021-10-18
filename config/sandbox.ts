@@ -2,24 +2,25 @@ import {GlobalConfig} from './types';
 import {readValidators} from './utils';
 
 const staging: GlobalConfig = {
+  polygon: {
+    contractRegistry: {
+      address: '0x29A5f90DBe54A11d37b0b18573fF853c7dc5433B'
+    },
+    chain: {
+      padding: 60,
+      requiredSignatures: 1,
+      replicator: '0x620583c75bb474e06485893b795b0883b5816d10'
+    },
+  },
   ethereum: {
     contractRegistry: {
       address: '0x059FDd69e771645fe91d8E1040320DbB845cEaFd'
-    },
-    token: {
-      totalSupply: '1000000' + '0'.repeat(18),
-      name: 'Umbrella',
-      symbol: 'UMB'
     },
     chain: {
       padding: 300,
       requiredSignatures: 1,
       replicator: '0x620583c75bb474e06485893b795b0883b5816d10'
     },
-    stakingBank: {
-      minAmountForStake: 100n * BigInt(1e18),
-    },
-    validators: readValidators('https://validator.sbx.umb.network'),
   },
   bsc: {
     distributor: {
