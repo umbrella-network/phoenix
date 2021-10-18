@@ -72,7 +72,7 @@ so you can copy it, set into env file and rerun command.
  
 ```shell
 # HARDHAT_NETWORK: localhost | <blockchainId>_<environment> 
-# eg: ethereum_staging, bsc_staging
+# eg: ethereum_staging, bsc_staging - see full list in `hardhat.config.ts`
 
 HARDHAT_NETWORK=ethereum_staging npm run deploy:all
 HARDHAT_NETWORK=bsc_staging npm run deploy:all
@@ -103,6 +103,7 @@ hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/registerNewValidat
 ```shell
 HARDHAT_NETWORK=<network_env> npm run deploy:all
 HARDHAT_NETWORK=ethereum_staging npm run deploy:all
+HARDHAT_NETWORK=polygon_staging npm run deploy:all
 ```
 
 then:
@@ -112,6 +113,13 @@ hardhat compile && HARDHAT_NETWORK=ethereum_staging npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_sandbox npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignChain
 ```
+
+### Multichain
+
+#### EVM 
+
+Please see this commit for steps to adopt EVM compatible blockchain: 
+
 
 ### Connect with validators for staging and testing
 

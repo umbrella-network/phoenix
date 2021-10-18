@@ -27,7 +27,19 @@ export interface Config {
   validators: ValidatorConfig[],
 }
 
+export interface ForeignConfig {
+  contractRegistry: {
+    address: string
+  },
+  chain: {
+    padding: number
+    requiredSignatures: number
+    replicator: string
+  },
+}
+
 export interface GlobalConfig {
-  ethereum: Config,
   bsc: Config,
+  ethereum: ForeignConfig,
+  polygon: ForeignConfig,
 }

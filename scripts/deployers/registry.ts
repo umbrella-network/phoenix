@@ -26,6 +26,7 @@ export const deployContractRegistry = async (): Promise<Contract> => {
 
   const RegistryContract = await ethers.getContractFactory('Registry');
   const registry = await RegistryContract.deploy();
+  console.log('tx', registry.deployTransaction.hash);
   await registry.deployed();
 
   console.log('Registry deployed at', registry.address);
