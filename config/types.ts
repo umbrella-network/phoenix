@@ -28,6 +28,9 @@ export interface Config {
 }
 
 export interface ForeignConfig {
+  distributor?: {
+    address: string
+  },
   contractRegistry: {
     address: string
   },

@@ -3,6 +3,9 @@ import {readValidators} from './utils';
 
 const staging: GlobalConfig = {
   polygon: {
+    distributor: {
+      address: '0x3fBdba5E516611e2E9C1aA6cdFB8376c7cA7d7CE'
+    },
     contractRegistry: {
       address: '0x29A5f90DBe54A11d37b0b18573fF853c7dc5433B'
     },
@@ -13,6 +16,9 @@ const staging: GlobalConfig = {
     },
   },
   ethereum: {
+    distributor: {
+      address: '0xbb3455F2A94Ea21540c5f91A6e8D946dF1f3c425'
+    },
     contractRegistry: {
       address: '0x059FDd69e771645fe91d8E1040320DbB845cEaFd'
     },
