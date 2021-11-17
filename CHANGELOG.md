@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Added
 - `Distributor` contract
+- Avalanche support
 
 ### Removed
 - local minter, as hardhat can finally mint
