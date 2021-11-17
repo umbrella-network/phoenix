@@ -45,4 +45,5 @@ export interface GlobalConfig {
   bsc: Config,
   ethereum: ForeignConfig,
   polygon: ForeignConfig,
+  avalanche: ForeignConfig,
 }
