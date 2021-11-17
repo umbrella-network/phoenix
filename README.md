@@ -98,12 +98,21 @@ hardhat compile && HARDHAT_NETWORK= npm run deploy:chain
 hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/registerNewValidator.ts
 ```
 
-### Foreign Chain
+### Multichain
+
+#### EVM chains
+
+Please see [this commit](https://github.com/umbrella-network/phoenix/commit/02b2fc2c4e1f408d6fd57676632476023ad3f00b) 
+for steps to adopt EVM compatible blockchain.
+
+#### Foreign Chain
 
 ```shell
 HARDHAT_NETWORK=<network_env> npm run deploy:all
 HARDHAT_NETWORK=ethereum_staging npm run deploy:all
 HARDHAT_NETWORK=polygon_staging npm run deploy:all
+HARDHAT_NETWORK=avalanche_staging npm run deploy:all
+HARDHAT_NETWORK=avalanche_production npm run deploy:all
 ```
 
 then:
@@ -111,15 +120,18 @@ then:
 ```shell
 hardhat compile && HARDHAT_NETWORK=ethereum_staging npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_sandbox npm run deploy:foreignChain
+hardhat compile && HARDHAT_NETWORK=avalanche_production npm run deploy:foreignChain
 hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignChain
 ```
 
-### Multichain
 
-#### EVM 
+### Distributor
 
-Please see this commit for steps to adopt EVM compatible blockchain: 
+Only for testnets
 
+```shell
+hardhat compile && HARDHAT_NETWORK=polygon_staging npx hardhat run ./scripts/deployDistributor.ts
+```
 
 ### Connect with validators for staging and testing
 
@@ -135,6 +147,26 @@ cd ../pegasus
 # start hardhat network with contracts
 echo 'BLOCKCHAIN_PROVIDER_URL=http://eth:8545' >> .env
 docker-compose up
+```
+
+## Toubleshoot for avalanche
+
+In order to make hardhat work with avalanche, please edit this file:
+
+`node_modules/@nomiclabs/hardhat-etherscan/dist/src/network/prober.js`
+
+```aidl
+    NetworkID[NetworkID["AVALANCHE"] = 43114] = "AVALANCHE";
+    NetworkID[NetworkID["AVALANCHE_FUJI_TESTNET"] = 43113] = "AVALANCHE_FUJI_TESTNET";
+
+    [NetworkID.AVALANCHE]: {
+        apiURL: "https://api.snowtrace.io/api",
+        browserURL: "https://snowtrace.io/",
+    },
+    [NetworkID.AVALANCHE_FUJI_TESTNET]: {
+        apiURL: "https://api-testnet.snowtrace.io/api",
+        browserURL: "https://testnet.snowtrace.io/",
+    },
 ```
 
 ## Licensed under MIT.

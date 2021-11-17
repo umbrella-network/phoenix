@@ -28,6 +28,9 @@ export interface Config {
 }
 
 export interface ForeignConfig {
+  distributor?: {
+    address: string
+  },
   contractRegistry: {
     address: string
   },
@@ -42,4 +45,5 @@ export interface GlobalConfig {
   bsc: Config,
   ethereum: ForeignConfig,
   polygon: ForeignConfig,
+  avalanche: ForeignConfig,
 }

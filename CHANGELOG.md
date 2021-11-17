@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.3.0] - 2021-11-17
+### Added
+- `Distributor` contract
+- Avalanche support
+
+### Removed
+- local minter, as hardhat can finally mint
+
 ## [4.2.0] - 2021-10-18
 ### Added
 - Polygon support

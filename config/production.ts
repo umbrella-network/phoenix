@@ -1,15 +1,27 @@
 import {GlobalConfig} from './types';
 import {readValidators} from './utils';
 
+const replicator = '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1';
+
 const production: GlobalConfig = {
+  avalanche: {
+    contractRegistry: {
+      address: '0xDa9A63D77406faa09d265413F4E128B54b5057e0'
+    },
+    chain: {
+      padding: 30,
+      requiredSignatures: 1,
+      replicator
+    },
+  },
   polygon: {
     contractRegistry: {
       address: '0x455acbbC2c15c086978083968a69B2e7E4d38d34'
     },
     chain: {
-      padding: 3600,
+      padding: 30,
       requiredSignatures: 1,
-      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
+      replicator
     },
   },
   ethereum: {
@@ -19,7 +31,7 @@ const production: GlobalConfig = {
     chain: {
       padding: 3600,
       requiredSignatures: 1,
-      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
+      replicator
     },
   },
   bsc: {
@@ -35,7 +47,7 @@ const production: GlobalConfig = {
     chain: {
       padding: 60,
       requiredSignatures: 4,
-      replicator: '0x57a2022Fa04F38207Ab3CD280557CAD6d0b77BE1'
+      replicator
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),

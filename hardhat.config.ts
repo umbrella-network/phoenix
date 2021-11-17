@@ -21,7 +21,8 @@ const {
   HARDHAT_MINING_INTERVAL = '5000',
   BSCSCAN_API,
   ETHERSCAN_API,
-  POLYGONSCAN_API
+  POLYGONSCAN_API,
+  AVASCAN_API
 } = process.env;
 
 const balance = '1000' + '0'.repeat(18);
@@ -31,6 +32,8 @@ const blockchain = HARDHAT_NETWORK.split('_')[0];
 
 const apiKey = (): string | undefined => {
   switch (blockchain) {
+    case 'avalanche':
+      return AVASCAN_API;
     case 'polygon':
       return POLYGONSCAN_API;
     case 'ethereum':
@@ -75,11 +78,11 @@ const config: HardhatUserConfig = {
       blockGasLimit: 80000000,
       url: 'http://localhost:8545',
     },
-    ethereum_staging: {
-      url: `https://kovan.infura.io/v3/${INFURA_ID}`,
+    avalanche_staging: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
       accounts: deployerAccounts,
-      chainId: 42,
-      gasPrice: gwei(1)
+      chainId: 43113,
+      gasPrice: gwei(25)
     },
     bsc_staging: {
       url: bscRpcUrlTestnet,
@@ -87,11 +90,23 @@ const config: HardhatUserConfig = {
       chainId: 97,
       gasPrice: gwei(10)
     },
+    ethereum_staging: {
+      url: `https://kovan.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 42,
+      gasPrice: gwei(1)
+    },
     polygon_staging: {
       url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
       accounts: deployerAccounts,
       chainId: 80001,
       gasPrice: gwei(1)
+    },
+    avalanche_sandbox: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
+      accounts: deployerAccounts,
+      chainId: 43113,
+      gasPrice: gwei(25)
     },
     polygon_sandbox: {
       url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
@@ -110,6 +125,12 @@ const config: HardhatUserConfig = {
       accounts: deployerAccounts,
       chainId: 97,
       gasPrice: gwei(10)
+    },
+    avalanche_production: {
+      url: 'https://api.avax.network/ext/bc/C/rpc',
+      accounts: deployerAccounts,
+      chainId: 43114,
+      gasPrice: 'auto',
     },
     ethereum_production: {
       url: `https://mainnet.infura.io/v3/${INFURA_ID}`,

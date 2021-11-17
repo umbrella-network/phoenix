@@ -1,25 +1,46 @@
 import {GlobalConfig} from './types';
 import {readValidators} from './utils';
 
+const replicator = '0x620583C75BB474E06485893B795b0883b5816D10';
+
 const staging: GlobalConfig = {
+  avalanche: {
+    distributor: {
+      address: '0xbC758FCB97e06Ec635DFf698f55e41aCC35e1d2d'
+    },
+    contractRegistry: {
+      address: '0x65833489170A55374786B97C96e691949C60175a'
+    },
+    chain: {
+      padding: 60,
+      requiredSignatures: 1,
+      replicator
+    },
+  },
   polygon: {
+    distributor: {
+      address: '0x3fBdba5E516611e2E9C1aA6cdFB8376c7cA7d7CE'
+    },
     contractRegistry: {
       address: '0xaB61f05a9dabCEd63c9100b623A4c29FfD9bf077'
     },
     chain: {
       padding: 60,
-      requiredSignatures: 2,
-      replicator: '0x620583C75BB474E06485893B795b0883b5816D10'
+      requiredSignatures: 1,
+      replicator
     },
   },
   ethereum: {
+    distributor: {
+      address: '0xA3190e653678FF88Fe6F142BD86b75514A7f2E6c'
+    },
     contractRegistry: {
       address: '0x230A8CF6F74331491Bc7B724c8194b06Cc0486c9'
     },
     chain: {
       padding: 300,
       requiredSignatures: 2,
-      replicator: '0x620583C75BB474E06485893B795b0883b5816D10'
+      replicator
     },
   },
   bsc: {
@@ -37,7 +58,7 @@ const staging: GlobalConfig = {
     chain: {
       padding: 60,
       requiredSignatures: 2,
-      replicator: '0x620583C75BB474E06485893B795b0883b5816D10'
+      replicator
     },
     stakingBank: {
       minAmountForStake: 100n * BigInt(1e18),
