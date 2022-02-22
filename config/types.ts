@@ -46,4 +46,5 @@ export interface GlobalConfig {
   ethereum: ForeignConfig,
   polygon: ForeignConfig,
   avalanche: ForeignConfig,
+  arbitrum: ForeignConfig,
 }
