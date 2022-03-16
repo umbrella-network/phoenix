@@ -39,6 +39,7 @@ const local: GlobalConfig = {
   ethereum: foreignConfig,
   polygon: foreignConfig,
   avalanche: foreignConfig,
+  arbitrum: foreignConfig,
 };
 
 export default local;

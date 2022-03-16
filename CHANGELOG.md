@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.4.0] - 2022-03-16
+### Added
+- Arbitrum support
+
 ## [4.3.0] - 2021-11-17
 ### Added
 - `Distributor` contract

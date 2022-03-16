@@ -3,8 +3,12 @@ import superagent from 'superagent';
 import { deployedContract } from './utils/deployedContracts';
 import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
 import { formatEther } from 'ethers/lib/utils';
+import ERC20 from '../artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json';
+import configuration from '../config';
 
 const provider = getProvider();
+const config = configuration();
+const { PEGASUS_VERSION } = process.env;
 
 interface Validator {
   id: string;
@@ -34,8 +38,8 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
   console.log(`address ${info.validator} OK`);
 
-  if (info.version !== '5.1.0') {
-    throw Error(`${info.version} is not last version`);
+  if (info.version !== PEGASUS_VERSION) {
+    throw Error(`${info.version} is not last version => ${PEGASUS_VERSION}`);
   }
 
   console.log(`version ${info.version} OK`);
@@ -49,11 +53,25 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
   console.log(`Chain ${info.chainContractAddress} OK`);
 
   const balance = await provider.getBalance(info.validator);
+
   if (balance.lt(`3${'0'.repeat(17)}`)) {
     throw Error(`validator balance is too low: ${formatEther(balance)}`);
   }
 
   console.log(`validator balance: ${formatEther(balance)} OK`);
+
+  if (!config.token.address) {
+    throw Error('UMB token address empty');
+  }
+
+  const umb = new Contract(config.token.address, ERC20.abi, provider);
+  const umbBalance = await umb.balanceOf(info.validator);
+
+  if (umbBalance.lt(`100${'0'.repeat(18)}`)) {
+    throw Error(`validator UMB balance is too low: ${formatEther(umbBalance)}`);
+  }
+
+  console.log(`validator UMB balance: ${formatEther(umbBalance)} OK`);
 
   const registeredValidator = await stakingBank.validators(info.validator);
 
