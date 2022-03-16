@@ -102,7 +102,7 @@ hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/registerNewValidat
 
 #### EVM chains
 
-Please see [this commit](https://github.com/umbrella-network/phoenix/commit/02b2fc2c4e1f408d6fd57676632476023ad3f00b) 
+Please see [this commit](https://github.com/umbrella-network/phoenix/commit/4185f543fc73a686a58c82aa20e4120060053320) 
 for steps to adopt EVM compatible blockchain.
 
 #### Foreign Chain
@@ -112,7 +112,7 @@ HARDHAT_NETWORK=<network_env> npm run deploy:all
 HARDHAT_NETWORK=ethereum_staging npm run deploy:all
 HARDHAT_NETWORK=polygon_staging npm run deploy:all
 HARDHAT_NETWORK=avalanche_staging npm run deploy:all
-HARDHAT_NETWORK=avalanche_production npm run deploy:all
+HARDHAT_NETWORK=arbitrum_production npm run deploy:all
 ```
 
 then:

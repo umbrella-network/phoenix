@@ -4,6 +4,19 @@ import {readValidators} from './utils';
 const replicator = '0x620583c75bb474e06485893b795b0883b5816d10';
 
 const staging: GlobalConfig = {
+  arbitrum: {
+    distributor: {
+      address: ''
+    },
+    contractRegistry: {
+      address: '0x65833489170A55374786B97C96e691949C60175a'
+    },
+    chain: {
+      padding: 60 * 50,
+      requiredSignatures: 1,
+      replicator
+    },
+  },
   avalanche: {
     distributor: {
       address: '0xbC758FCB97e06Ec635DFf698f55e41aCC35e1d2d'

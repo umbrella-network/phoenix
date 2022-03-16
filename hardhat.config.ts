@@ -22,7 +22,8 @@ const {
   BSCSCAN_API,
   ETHERSCAN_API,
   POLYGONSCAN_API,
-  AVASCAN_API
+  AVASCAN_API,
+  ARBISCAN_API
 } = process.env;
 
 const balance = '1000' + '0'.repeat(18);
@@ -32,6 +33,8 @@ const blockchain = HARDHAT_NETWORK.split('_')[0];
 
 const apiKey = (): string | undefined => {
   switch (blockchain) {
+    case 'arbitrum':
+      return ARBISCAN_API;
     case 'avalanche':
       return AVASCAN_API;
     case 'polygon':
@@ -102,6 +105,18 @@ const config: HardhatUserConfig = {
       chainId: 80001,
       gasPrice: gwei(1)
     },
+    arbitrum_staging: {
+      url: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 421611,
+      gasPrice: 'auto'
+    },
+    arbitrum_sandbox: {
+      url: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 421611,
+      gasPrice: 'auto'
+    },
     avalanche_sandbox: {
       url: 'https://api.avax-test.network/ext/bc/C/rpc',
       accounts: deployerAccounts,
@@ -125,6 +140,12 @@ const config: HardhatUserConfig = {
       accounts: deployerAccounts,
       chainId: 97,
       gasPrice: gwei(10)
+    },
+    arbitrum_production: {
+      url: `https://arbitrum-mainnet.infura.io/v3/${INFURA_ID}`,
+      accounts: deployerAccounts,
+      chainId: 42161,
+      gasPrice: 'auto',
     },
     avalanche_production: {
       url: 'https://api.avax.network/ext/bc/C/rpc',

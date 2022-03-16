@@ -15,6 +15,7 @@ export const verifyCode = async (address: string, constructorArguments: any): Pr
       break;
     } catch (e) {
       console.log(e.message);
+      if (e.message.includes('Already Verified')) break;
       console.log('retrying in 5 sec...');
       await sleep(5000);
     }
