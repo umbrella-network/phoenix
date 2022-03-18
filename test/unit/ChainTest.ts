@@ -6,7 +6,7 @@ import { expect, use } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
-import { LeafKeyCoder } from '@umb-network/toolbox';
+import { LeafKeyCoder, constants as SDKConstants, LeafValueCoder } from '@umb-network/toolbox';
 
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
@@ -18,6 +18,8 @@ import { ChainStatus } from '../types/ChainStatus';
 import { abiUintEncoder, inputs, prepareData, tree } from './chainUtils';
 
 use(waffleChai);
+
+const { SIGNED_NUMBER_PREFIX } = SDKConstants;
 
 const timePadding = 100;
 
@@ -184,8 +186,7 @@ describe('Chain', () => {
 
     describe('.getLeaderIndex()', () => {
       [1, 2, 3, 4].forEach((numberOfValidators) => {
-        return;
-        it(`expect to return valid index for ${numberOfValidators}`, async () => {
+        it.skip(`expect to return valid index for ${numberOfValidators}`, async () => {
           const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
 
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
@@ -216,8 +217,7 @@ describe('Chain', () => {
         });
 
         [1, 2, 3, 4].forEach((numberOfValidators) => {
-          return;
-          it(`expect to return valid index for ${numberOfValidators}`, async () => {
+          it.skip(`expect to return valid index for ${numberOfValidators}`, async () => {
             const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
 
             expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
@@ -276,8 +276,7 @@ describe('Chain', () => {
               .reverted;
           });
 
-          it('throw when timestamp NOT in acceptable range', async () => {
-            return;
+          it.skip('throw when timestamp NOT in acceptable range', async () => {
             // temporary remove this condition, because recently on ropsten we see cases when minter/node
             // can be even 100sec behind
 
@@ -350,7 +349,7 @@ describe('Chain', () => {
             expect((await contract.blocks(0)).root).to.eq(tree.getRootSquashed(dataTimestamp));
           });
 
-          it('expect to have no current FCD', async () => {
+          it('expect to NOT have current FCD', async () => {
             const bytes32 = `0x${abiUintEncoder(0)}`;
             const fcds = await contract.getCurrentValues([bytes32]);
             expect(fcds[0].map((f: BigNumber) => f.toString())).to.eql(['0']);
@@ -428,13 +427,15 @@ describe('Chain', () => {
       });
 
       describe('with FCD', () => {
-        const fcdKeys = [toBytes32('a'), toBytes32('b')];
-        const fcdValues = [1, 2];
+        const signedKey = SIGNED_NUMBER_PREFIX + 'abc';
+        const fcdKeys = [toBytes32('a'), toBytes32('b'), '0x' + LeafKeyCoder.encode(signedKey).toString('hex')];
+        const fcdValues = [1, 2, '0x' + LeafValueCoder.encode(-321, signedKey).toString('hex')];
+
         let submittedDataTimestamp: number;
 
         it('accept max FCD value', async () => {
           await mockSubmit();
-          const values = [1, '0x' + 'F'.repeat(56)];
+          const values = [1, 2, '0x' + 'F'.repeat(56)];
 
           const { r, s, v, dataTimestamp } = await prepareData(
             validator,
@@ -447,9 +448,23 @@ describe('Chain', () => {
           await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not.be.reverted;
         });
 
+        it.skip('accept max FCD value GAS', async () => {
+          await mockSubmit();
+
+          for (let i = 0; i < 20; i++) {
+            await mintBlocks(100);
+            const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root, [], []);
+
+            console.log(dataTimestamp);
+            await expect(contract.submit(dataTimestamp, root, [], [], [v], [r], [s])).to.not.be.reverted;
+            // 1FCD avg = 104497 gas
+            // 0 FCD => 87092
+          }
+        });
+
         it('throw when FCD overflows', async () => {
           await mockSubmit();
-          const values = [1, '0x01' + 'F'.repeat(56)];
+          const values = [1, 2, '0x01' + 'F'.repeat(56)];
 
           const { r, s, v, dataTimestamp } = await prepareData(
             validator,
@@ -465,6 +480,7 @@ describe('Chain', () => {
         describe('when block submitted', () => {
           beforeEach(async () => {
             await mockSubmit();
+
             const { r, s, v, dataTimestamp } = await prepareData(
               validator,
               await blockTimestamp(),
@@ -480,24 +496,28 @@ describe('Chain', () => {
             ).to.emit(contract, 'LogMint');
           });
 
+          it('expect to have signed integer', async () => {
+            const [value, timestamp] = await contract.getCurrentIntValue(fcdKeys[2]);
+            console.log({ key: fcdKeys[2], value, timestamp });
+            expect(value).to.eq(-321000000000000000000n);
+          });
+
           it('expect to get FCD by key', async () => {
-            const fcd = await contract.getCurrentValue(fcdKeys[0]);
-            expect(fcd.map((f: BigNumber) => f.toString())).to.eql([
-              fcdValues[0].toFixed(0),
-              submittedDataTimestamp.toFixed(0),
-            ]);
+            const [value, time] = await contract.getCurrentValue(fcdKeys[0]);
+
+            expect(value).eq(fcdValues[0]);
+            expect(time).eq(submittedDataTimestamp.toFixed(0));
           });
 
           it('expect to get many FCDs', async () => {
             const fcds = await contract.getCurrentValues(fcdKeys);
 
-            const expected = [
-              [fcdValues[0].toFixed(0), fcdValues[1].toFixed(0)],
-              [submittedDataTimestamp, submittedDataTimestamp],
-            ];
+            const expected = [[...fcdValues], [submittedDataTimestamp, submittedDataTimestamp, submittedDataTimestamp]];
 
-            expect(fcds[0].map((f: BigNumber) => f.toString())).to.eql(expected[0]);
-            expect(fcds[1]).to.eql(expected[1]);
+            fcds[0].forEach((f: BigNumber, n: number) => {
+              expect(f).to.eq(expected[0][n]);
+              expect(fcds[1][n]).to.eql(expected[1][n]);
+            });
           });
 
           it('expect to validate proof for selected key-value pair', async () => {
