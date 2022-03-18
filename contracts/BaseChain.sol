@@ -13,6 +13,7 @@ import "./Registry.sol";
 
 abstract contract BaseChain is Registrable, Ownable {
   using ValueDecoder for bytes;
+  using ValueDecoder for uint224;
   using MerkleProof for bytes32;
 
   // ========== STATE VARIABLES ========== //
@@ -182,6 +183,11 @@ abstract contract BaseChain is Registrable, Ownable {
   function getCurrentValue(bytes32 _key) external view returns (uint256 value, uint256 timestamp) {
     FirstClassData storage numericFCD = fcds[_key];
     return (uint256(numericFCD.value), numericFCD.dataTimestamp);
+  }
+
+  function getCurrentIntValue(bytes32 _key) external view returns (int256 value, uint256 timestamp) {
+    FirstClassData storage numericFCD = fcds[_key];
+    return (numericFCD.value.toInt(), numericFCD.dataTimestamp);
   }
 
   // ========== EVENTS ========== //

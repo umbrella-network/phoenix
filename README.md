@@ -94,8 +94,9 @@ hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/reDeployToken.ts
 hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/reDeployStakingBank.ts
 
 hardhat compile && HARDHAT_NETWORK= npm run deploy:chain
+hardhat compile && HARDHAT_NETWORK=bsc_production npm run deploy:chain
 
-hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/registerNewValidator.ts
+hardhat compile && HARDHAT_NETWORK=bsc_production npx hardhat run ./scripts/registerNewValidator.ts
 ```
 
 ### Multichain
