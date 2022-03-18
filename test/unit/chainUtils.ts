@@ -1,9 +1,11 @@
 import { ethers } from 'hardhat';
 import { Signer } from 'ethers';
-import { LeafValueCoder } from '@umb-network/toolbox';
+import { LeafValueCoder, constants as SDKConstants } from '@umb-network/toolbox';
 import { remove0x } from '@umb-network/toolbox/dist/utils/helpers';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
+
+const { SIGNED_NUMBER_PREFIX } = SDKConstants;
 
 const inputsData: Record<string, Buffer> = {};
 
@@ -18,11 +20,14 @@ export const keys = [
   'WAR-USD',
   'LTC-USD',
   'UNI-USD',
+  SIGNED_NUMBER_PREFIX + 'INT',
 ];
 
 keys.forEach((k, i) => {
-  inputsData[k] = LeafValueCoder.encode(i + 1, 'label');
+  inputsData[k] = LeafValueCoder.isSignedValue(k) ? LeafValueCoder.encode(-321, k) : LeafValueCoder.encode(i + 1, k);
 });
+
+console.log({ inputsData });
 
 export const inputs = inputsData;
 
