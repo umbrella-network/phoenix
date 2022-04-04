@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IStakingBank.sol";
 
-contract Token is ERC20, Ownable {
+contract LimitedMintingToken is ERC20, Ownable {
   struct MintData {
     uint256 dailyAllowance;
     mapping (address => uint256) lastMintTimestamp;

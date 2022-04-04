@@ -150,7 +150,7 @@ echo 'BLOCKCHAIN_PROVIDER_URL=http://eth:8545' >> .env
 docker-compose up
 ```
 
-## Toubleshoot for avalanche
+## Troubleshoot for avalanche
 
 In order to make hardhat work with avalanche, please edit this file:
 
