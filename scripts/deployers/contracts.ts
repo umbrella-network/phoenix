@@ -219,6 +219,19 @@ export const deployDummyToken = async (): Promise<Contract> => {
   return token;
 };
 
+export const deployLimitedMintingDummyToken = async (): Promise<Contract> => {
+  console.log('deploying limited minting dummy token...');
+  const TokenContract = await ethers.getContractFactory('LimitedMintingToken');
+  const tokenArgs = [config.token.name, config.token.symbol, config.token.dailyMintingAllowance];
+  const token = await TokenContract.deploy(...tokenArgs);
+  console.log('tx', token.deployTransaction.hash);
+  await token.deployed();
+  console.log('test token deployed at', token.address);
+
+  await verifyCode(token.address, tokenArgs);
+  return token;
+};
+
 const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
   if (config.token.address) {
     console.log('using real token', config.token.address);

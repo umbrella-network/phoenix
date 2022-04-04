@@ -15,6 +15,7 @@
     "deploy:contracts": "npx hardhat run scripts/deployContracts.ts",
     "deploy:chain": "npx hardhat run scripts/deployChain.ts",
     "deploy:foreignChain": "npx hardhat run scripts/deployForeignChain.ts",
+    "deploy:limitedToken": "npx hardhat run scripts/deployLimitedDummyToken.ts",
     "deploy:all": "npx hardhat run scripts/deployAll.ts",
     "lint": "npm run lint:ts && npm run lint:sol",
     "lint:ts": "eslint . --ext .ts,.tsx,.ts --max-warnings=0",
