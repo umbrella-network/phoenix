@@ -2,7 +2,7 @@
 pragma solidity ^0.6.8;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./interfaces/IStakingBank.sol";
+import "../interfaces/IStakingBank.sol";
 
 // please remember this is our dummy token!
 // it will be replaced by proper DPoS solution in future

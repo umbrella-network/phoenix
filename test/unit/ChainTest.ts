@@ -11,7 +11,7 @@ import { LeafKeyCoder, constants as SDKConstants, LeafValueCoder } from '@umb-ne
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
-import Token from '../../artifacts/contracts/Token.sol/Token.json';
+import Token from '../../artifacts/contracts/mock/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 import { blockTimestamp, mintBlocks } from '../utils';
 import { ChainStatus } from '../types/ChainStatus';
