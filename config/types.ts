@@ -5,46 +5,47 @@ export interface ValidatorConfig {
 
 export interface Config {
   distributor?: {
-    address: string
-  },
+    address: string;
+  };
   contractRegistry: {
-    address: string
-  },
+    address: string;
+  };
   token: {
-    address?: string
-    totalSupply: string,
-    name: string,
-    symbol: string
-  },
+    address?: string;
+    totalSupply: string;
+    name: string;
+    symbol: string;
+    dailyMintingAllowance?: string;
+  };
   chain: {
-    padding: number
-    requiredSignatures: number
-    replicator?: string
-  },
+    padding: number;
+    requiredSignatures: number;
+    replicator?: string;
+  };
   stakingBank: {
-    minAmountForStake: bigint
-  }
-  validators: ValidatorConfig[],
+    minAmountForStake: bigint;
+  };
+  validators: ValidatorConfig[];
 }
 
 export interface ForeignConfig {
   distributor?: {
-    address: string
-  },
+    address: string;
+  };
   contractRegistry: {
-    address: string
-  },
+    address: string;
+  };
   chain: {
-    padding: number
-    requiredSignatures: number
-    replicator: string
-  },
+    padding: number;
+    requiredSignatures: number;
+    replicator: string;
+  };
 }
 
 export interface GlobalConfig {
-  bsc: Config,
-  ethereum: ForeignConfig,
-  polygon: ForeignConfig,
-  avalanche: ForeignConfig,
-  arbitrum: ForeignConfig,
+  bsc: Config;
+  ethereum: ForeignConfig;
+  polygon: ForeignConfig;
+  avalanche: ForeignConfig;
+  arbitrum: ForeignConfig;
 }

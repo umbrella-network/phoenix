@@ -8,7 +8,7 @@ import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract, MockContract } from '@ethereum-waffle/mock-contract';
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
-import Token from '../../artifacts/contracts/Token.sol/Token.json';
+import Token from '../../artifacts/contracts/mock/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 
 use(waffleChai);

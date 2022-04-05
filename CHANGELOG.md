@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.5.0] - 2022-04-05
+### Added
+- support for sign integers
+- `Limited minting token` test contract to be used on SBX
+
 ## [4.4.0] - 2022-03-16
 ### Added
 - Arbitrum support

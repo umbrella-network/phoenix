@@ -66,7 +66,8 @@ const staging: GlobalConfig = {
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
       name: 'Umbrella',
-      symbol: 'UMB'
+      symbol: 'UMB',
+      dailyMintingAllowance: '5000' + '0'.repeat(18)
     },
     chain: {
       padding: 20,
