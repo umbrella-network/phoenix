@@ -1,8 +1,11 @@
-import { deployLimitedMintingDummyToken } from './deployers/contracts';
+import { deployLimitedMintingDummyToken, registerContract } from './deployers/contracts';
 import { pressToContinue } from './utils/helpers';
 
 const deployAndRegister = async () => {
-  await deployLimitedMintingDummyToken();
+  const token = await deployLimitedMintingDummyToken();
+
+  console.log('token updated:', token.address);
+  await registerContract([token.address]);
 };
 
 pressToContinue('y', () => {

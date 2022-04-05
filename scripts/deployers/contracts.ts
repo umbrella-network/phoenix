@@ -8,7 +8,7 @@ import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import { TransactionReceipt } from '@ethersproject/providers';
 
-import { getProvider, isLocalNetwork, waitForTx } from '../utils/helpers';
+import { getProvider, isLocalNetwork, isProduction, waitForTx } from '../utils/helpers';
 
 const config = configuration();
 const provider = getProvider();
@@ -207,11 +207,14 @@ export const registerValidator = async (stakingBank: Contract, token: Contract, 
 };
 
 export const deployDummyToken = async (): Promise<Contract> => {
+  if (isProduction()) throw 'This contract shall not go to production';
+
   console.log('deploying test token...');
   const TokenContract = await ethers.getContractFactory('Token');
   const tokenArgs = [config.token.name, config.token.symbol];
   const token = await TokenContract.deploy(...tokenArgs);
   console.log('tx', token.deployTransaction.hash);
+
   await token.deployed();
   console.log('test token deployed');
 
@@ -220,11 +223,14 @@ export const deployDummyToken = async (): Promise<Contract> => {
 };
 
 export const deployLimitedMintingDummyToken = async (): Promise<Contract> => {
+  if (isProduction()) throw 'This contract shall not go to production';
+
   console.log('deploying limited minting dummy token...');
   const TokenContract = await ethers.getContractFactory('LimitedMintingToken');
   const tokenArgs = [config.token.name, config.token.symbol, config.token.dailyMintingAllowance];
   const token = await TokenContract.deploy(...tokenArgs);
   console.log('tx', token.deployTransaction.hash);
+
   await token.deployed();
   console.log('test token deployed at', token.address);
 

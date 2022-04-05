@@ -16,6 +16,10 @@ export const constructorAbi = (types: string[], values: any[]): string => {
 export const isLocalNetwork = (): boolean =>
   ['buidlerevm', 'localhost', 'docker', 'hardhat'].includes(hre.network.name);
 
+export const isProduction = (): boolean => {
+  return Boolean(process.env.HARDHAT_NETWORK?.toLowerCase().match(/prod/));
+};
+
 export const getProvider = (): Provider => {
   return new ethers.providers.JsonRpcProvider((<HttpNetworkUserConfig>hre.config.networks[hre.network.name]).url);
 };
