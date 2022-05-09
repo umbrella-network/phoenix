@@ -16,6 +16,7 @@ import { toBytes32 } from '../../scripts/utils/helpers';
 import { blockTimestamp, mintBlocks } from '../utils';
 import { ChainStatus } from '../types/ChainStatus';
 import { abiUintEncoder, inputs, prepareData, tree } from './chainUtils';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 use(waffleChai);
 
@@ -51,7 +52,7 @@ const setup = async (requiredSignatures = 1) => {
 };
 
 describe('Chain', () => {
-  let owner: Signer,
+  let owner: SignerWithAddress,
     validator: Signer,
     validator2: Signer,
     validatorAddress: string,
@@ -62,7 +63,9 @@ describe('Chain', () => {
 
   const mockSubmit = async (leader = validator, totalSupply = 1000, balance = 1000) => {
     await stakingBank.mock.totalSupply.returns(totalSupply);
-    await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
+    const leaderAddr = await leader.getAddress();
+    await stakingBank.mock.balanceOf.withArgs(leaderAddr).returns(balance);
+    await stakingBank.mock.validators.withArgs(leaderAddr).returns(leaderAddr, 'url');
   };
 
   // note - DO NOT use this function if you want to catch eventexpect to getStatus()
@@ -265,6 +268,17 @@ describe('Chain', () => {
             .revertedWith('Mock on the method is not initialized');
         });
 
+        it('fail when submited not by validator', async () => {
+          await mockSubmit();
+          const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
+
+          await stakingBank.mock.validators.withArgs(owner.address).returns(ethers.constants.AddressZero, 'url');
+
+          await expect(contract.submit(dataTimestamp, root, [], [], [v], [r], [s])).to.be.revertedWith(
+            'not a validator'
+          );
+        });
+
         describe('check the future dataTimestamp', () => {
           it('NOT failing when timestamp in acceptable range', async () => {
             await mockSubmit();
@@ -445,7 +459,8 @@ describe('Chain', () => {
             values
           );
 
-          await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not.be.reverted;
+          await expect(contract.connect(validator).submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not
+            .be.reverted;
         });
 
         it.skip('accept max FCD value GAS', async () => {

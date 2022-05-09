@@ -101,6 +101,12 @@ contract Chain is BaseChain {
 
     require(dataTimestamp + padding < block.timestamp, "do not spam");
     require(dataTimestamp < _dataTimestamp, "can NOT submit older data");
+
+    {
+      (address registeredValidator, ) = stakingBank.validators(msg.sender);
+      require(registeredValidator != address(0), "not a validator");
+    }
+
     // we can't expect minter will have exactly the same timestamp
     // but for sure we can demand not to be off by a lot, that's why +3sec
     // temporary remove this condition, because recently on ropsten we see cases when minter/node
