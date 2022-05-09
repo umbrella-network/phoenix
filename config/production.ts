@@ -56,7 +56,7 @@ const production: GlobalConfig = {
     },
     chain: {
       padding: 60,
-      requiredSignatures: 4,
+      requiredSignatures: 6,
       replicator
     },
     stakingBank: {
