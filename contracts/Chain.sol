@@ -123,9 +123,9 @@ contract Chain is BaseChain {
     uint256 staked = stakingBank.totalSupply();
     address prevSigner = address(0x0);
 
-    uint256 i = 0;
+    uint256 signatures = 0;
 
-    for (; i < _v.length; i++) {
+    for (uint256 i; i < _v.length; i++) {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
@@ -133,11 +133,13 @@ contract Chain is BaseChain {
       prevSigner = signer;
       if (balance == 0) continue;
 
+      signatures++;
+
       emit LogVoter(lastBlockId + 1, signer, balance);
       power += balance; // no need for safe math, if we overflow then we will not have enough power
     }
 
-    require(i >= requiredSignatures, "not enough signatures");
+    require(signatures >= requiredSignatures, "not enough signatures");
     // we turn on power once we have proper DPoS
     // require(power * 100 / staked >= 66, "not enough power was gathered");
 
