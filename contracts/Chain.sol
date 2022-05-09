@@ -102,10 +102,7 @@ contract Chain is BaseChain {
     require(dataTimestamp + padding < block.timestamp, "do not spam");
     require(dataTimestamp < _dataTimestamp, "can NOT submit older data");
 
-    {
-      (address registeredValidator, ) = stakingBank.validators(msg.sender);
-      require(registeredValidator != address(0), "not a validator");
-    }
+    bool leaderSigned;
 
     // we can't expect minter will have exactly the same timestamp
     // but for sure we can demand not to be off by a lot, that's why +3sec
@@ -139,6 +136,8 @@ contract Chain is BaseChain {
       prevSigner = signer;
       if (balance == 0) continue;
 
+      if (!leaderSigned && signer == msg.sender) leaderSigned = true;
+
       signatures++;
 
       emit LogVoter(lastBlockId + 1, signer, balance);
@@ -146,6 +145,7 @@ contract Chain is BaseChain {
     }
 
     require(signatures >= requiredSignatures, "not enough signatures");
+    require(leaderSigned, "leader did not sign");
     // we turn on power once we have proper DPoS
     // require(power * 100 / staked >= 66, "not enough power was gathered");
 
