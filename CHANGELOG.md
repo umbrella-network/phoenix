@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - support for sign integers
 
+## [4.5.2] - 2022-05-09
+### Changed
+- change required signature number
+
 ## [4.5.1] - 2022-05-09
 ### Fixed
 - count signatures
