@@ -6,16 +6,12 @@ import "../interfaces/IRegistry.sol";
 import "../interfaces/IStakingBank.sol";
 
 abstract contract Registrable {
-  IRegistry public contractRegistry;
+  IRegistry public immutable contractRegistry;
 
-  // ========== CONSTRUCTOR ========== //
-
-  constructor(address _contractRegistry) internal {
-    require(_contractRegistry != address(0x0), "_registry is empty");
-    contractRegistry = IRegistry(_contractRegistry);
+  constructor(IRegistry _contractRegistry) internal {
+    require(address(_contractRegistry) != address(0x0), "_registry is empty");
+    contractRegistry = _contractRegistry;
   }
-
-  // ========== MODIFIERS ========== //
 
   modifier onlyFromContract(address _msgSender, bytes32 _contractName) {
     require(
@@ -30,8 +26,6 @@ abstract contract Registrable {
     _;
   }
 
-  // ========== MUTATIVE ========== //
-
   function register() virtual external {
     // this is required only for ForeignChain
     // but for backward compatibility the body is implemented as empty
@@ -43,8 +37,6 @@ abstract contract Registrable {
     // but for backward compatibility the body is implemented as empty
     // also note, that in order to use this method, we need new registry
   }
-
-  // ========== VIEWS ========== //
 
   function getName() virtual external pure returns (bytes32);
 

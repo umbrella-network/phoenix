@@ -23,10 +23,10 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
     string location;
   }
 
-  mapping(address => Validator) override public validators;
+  mapping(address => Validator) public override validators;
 
   ERC20 public immutable token;
-  address[] override public addresses;
+  address[] public override addresses;
   uint256 public minAmountForStake; // minimum amount of tokens that we accept for staking
 
   event LogValidatorRegistered(address id);
@@ -35,22 +35,20 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   event LogMinAmountForStake(uint256 minAmountForStake);
 
   constructor(
-    address _contractRegistry,
+    IRegistry _contractRegistry,
     uint256 _minAmountForStake,
     string memory _name,
     string memory _symbol
   )
-  public
-  Registrable(_contractRegistry)
-  ERC20(
-      string(abi.encodePacked("staked ", _name)),
-      string(abi.encodePacked("sb", _symbol))
-    ) {
-    token = tokenContract();
+    public
+    Registrable(_contractRegistry)
+    ERC20(string(abi.encodePacked("staked ", _name)), string(abi.encodePacked("sb", _symbol)))
+  {
+    token = ERC20(_contractRegistry.requireAndGetAddress("UMB"));
     _setMinAmountForStake(_minAmountForStake);
   }
 
-  function getName() override external pure returns (bytes32) {
+  function getName() external pure override returns (bytes32) {
     return "StakingBank";
   }
 
