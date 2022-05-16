@@ -12,23 +12,16 @@ import "./BaseChain.sol";
 contract Chain is BaseChain {
   IStakingBank public immutable stakingBank;
 
-  // ========== EVENTS ========== //
-
   event LogMint(address indexed minter, uint256 blockId, uint256 staked, uint256 power);
   event LogVoter(uint256 indexed blockId, address indexed voter, uint256 vote);
 
-  // ========== CONSTRUCTOR ========== //
-
   constructor(
-    address _contractRegistry,
+    IRegistry _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures
   ) public BaseChain(_contractRegistry, _padding, _requiredSignatures) {
-    // we not changing SB address that often, so lets save it once, it will save 10% gas
-    stakingBank = stakingBankContract();
+    stakingBank = IStakingBank(_contractRegistry.requireAndGetAddress("StakingBank"));
   }
-
-  // ========== VIEWS ========== //
 
   function isForeign() override external pure returns (bool) {
     return false;
@@ -84,8 +77,6 @@ contract Chain is BaseChain {
     return getLeaderAddressAtTime(block.timestamp);
   }
 
-  // ========== MUTATIVE FUNCTIONS ========== //
-
   // solhint-disable-next-line function-max-lines
   function submit(
     uint32 _dataTimestamp,
@@ -113,6 +104,7 @@ contract Chain is BaseChain {
 
     for (uint256 i = 0; i < _keys.length; i++) {
       require(uint224(_values[i]) == _values[i], "FCD overflow");
+
       fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
     }
@@ -130,6 +122,7 @@ contract Chain is BaseChain {
       uint256 balance = stakingBank.balanceOf(signer);
 
       require(prevSigner < signer, "validator included more than once");
+
       prevSigner = signer;
       if (balance == 0) continue;
 

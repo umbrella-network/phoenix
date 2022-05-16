@@ -16,8 +16,6 @@ abstract contract BaseChain is Registrable, Ownable {
   using ValueDecoder for uint224;
   using MerkleProof for bytes32;
 
-  // ========== STATE VARIABLES ========== //
-
   bytes constant public ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
 
   struct Block {
@@ -38,16 +36,14 @@ abstract contract BaseChain is Registrable, Ownable {
   uint16 public padding;
   uint16 public immutable requiredSignatures;
 
-  // ========== CONSTRUCTOR ========== //
-
   constructor(
-    address _contractRegistry,
+    IRegistry _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures // we have a plan to use signatures also in foreign Chains so lets keep it in base
   ) public Registrable(_contractRegistry) {
     padding = _padding;
     requiredSignatures = _requiredSignatures;
-    BaseChain oldChain = BaseChain(Registry(_contractRegistry).getAddress("Chain"));
+    BaseChain oldChain = BaseChain(_contractRegistry.getAddress("Chain"));
 
     blocksCountOffset = address(oldChain) != address(0x0)
       // +1 because it might be situation when tx is already in progress in old contract
@@ -55,14 +51,10 @@ abstract contract BaseChain is Registrable, Ownable {
       : 0;
   }
 
-  // ========== MUTATIVE FUNCTIONS ========== //
-
   function setPadding(uint16 _padding) external onlyOwner {
     padding = _padding;
     emit LogPadding(msg.sender, _padding);
   }
-
-  // ========== VIEWS ========== //
 
   function isForeign() virtual external pure returns (bool);
 
@@ -189,8 +181,6 @@ abstract contract BaseChain is Registrable, Ownable {
     FirstClassData storage numericFCD = fcds[_key];
     return (numericFCD.value.toInt(), numericFCD.dataTimestamp);
   }
-
-  // ========== EVENTS ========== //
 
   event LogPadding(address indexed executor, uint16 timePadding);
 }

@@ -9,11 +9,7 @@ import "./extensions/Registrable.sol";
 contract Registry is Ownable {
   mapping(bytes32 => address) public registry;
 
-  // ========== EVENTS ========== //
-
   event LogRegistered(address indexed destination, bytes32 name);
-
-  // ========== MUTATIVE FUNCTIONS ========== //
 
   function importAddresses(bytes32[] calldata _names, address[] calldata _destinations) external onlyOwner {
     require(_names.length == _destinations.length, "Input lengths must match");
@@ -43,8 +39,6 @@ contract Registry is Ownable {
 
     emit LogRegistered(_newContract, name);
   }
-
-  // ========== VIEWS ========== //
 
   function requireAndGetAddress(bytes32 name) external view returns (address) {
     address _foundAddress = registry[name];

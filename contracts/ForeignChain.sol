@@ -6,20 +6,15 @@ import "./Registry.sol";
 import "./BaseChain.sol";
 
 contract ForeignChain is BaseChain {
-  // we will not be changing replicator that often, so we can make it immutable, it saves 200gas
   address public immutable replicator;
   uint32 public lastBlockId;
   bool public deprecated;
 
-  // ========== EVENTS ========== //
-
   event LogBlockReplication(address indexed minter, uint32 blockId);
   event LogDeprecation(address indexed deprecator);
 
-  // ========== CONSTRUCTOR ========== //
-
   constructor(
-    address _contractRegistry,
+    IRegistry _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures,
     address _replicator
@@ -31,8 +26,6 @@ contract ForeignChain is BaseChain {
     require(msg.sender == replicator, "onlyReplicator");
     _;
   }
-
-  // ========== MUTATIVE FUNCTIONS ========== //
 
   function register() override external {
     require(msg.sender == address(contractRegistry), "only contractRegistry can register");
@@ -52,10 +45,12 @@ contract ForeignChain is BaseChain {
       // step 1) first update
       uint32 lastBlockTime = oldChain.blocks(lastBlockId).dataTimestamp;
       bytes32 lastRootTime;
+
       // solhint-disable-next-line no-inline-assembly
       assembly {
         lastRootTime := or(0x0, lastBlockTime)
       }
+
       squashedRoots[lastBlockId] = lastRootTime;
 
       // step 2) next updates (we can remove step1)
@@ -100,8 +95,6 @@ contract ForeignChain is BaseChain {
 
     emit LogBlockReplication(msg.sender, _blockId);
   }
-
-  // ========== VIEWS ========== //
 
   function isForeign() override external pure returns (bool) {
     return true;
