@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { Signer } from 'ethers';
-import { LeafValueCoder, constants as SDKConstants } from '@umb-network/toolbox';
+import { constants as SDKConstants, LeafValueCoder } from '@umb-network/toolbox';
 import { remove0x } from '@umb-network/toolbox/dist/utils/helpers';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
