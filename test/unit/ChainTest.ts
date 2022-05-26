@@ -6,14 +6,14 @@ import { expect, use } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
-import { LeafKeyCoder, constants as SDKConstants, LeafValueCoder } from '@umb-network/toolbox';
+import { constants as SDKConstants, LeafKeyCoder, LeafValueCoder } from '@umb-network/toolbox';
 
 import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
 import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 import Token from '../../artifacts/contracts/mock/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
-import { blockTimestamp, mintBlocks } from '../utils';
+import { blockTimestamp, increaseTime, mintBlocks } from '../utils';
 import { ChainStatus } from '../types/ChainStatus';
 import { abiUintEncoder, inputs, prepareData, tree } from './chainUtils';
 
@@ -65,7 +65,6 @@ describe('Chain', () => {
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
-  // note - DO NOT use this function if you want to catch eventexpect to getStatus()
   const executeSubmit = async (blockId: number, dataTimestamp: number, validators = [validator]) => {
     await mockSubmit();
 
@@ -87,7 +86,7 @@ describe('Chain', () => {
     await contract.connect(validator).submit(dataTimestamp, root, [], [], vv, rr, ss);
   };
 
-  describe('PROD Chain', () => {
+  describe('test signatures', () => {
     beforeEach(async () => {
       return ({
         owner,
@@ -111,7 +110,7 @@ describe('Chain', () => {
     });
   });
 
-  describe('DEMO Chain', () => {
+  describe('Chain', () => {
     beforeEach(async () => {
       return ({
         owner,
@@ -185,61 +184,70 @@ describe('Chain', () => {
     });
 
     describe('.getLeaderIndex()', () => {
-      [1, 2, 3, 4].forEach((numberOfValidators) => {
-        it.skip(`expect to return valid index for ${numberOfValidators}`, async () => {
+      const numberOfValidators = 3;
+
+      it(`expect to return valid index for ${numberOfValidators}`, async () => {
+        const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
+
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          id,
+          'round #1'
+        );
+
+        await mintBlocks(timePadding);
+        console.log(await blockTimestamp());
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          (id + 1) % numberOfValidators,
+          'round #2'
+        );
+
+        await mintBlocks(timePadding);
+        console.log(await blockTimestamp());
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          (id + 2) % numberOfValidators,
+          'round #3'
+        );
+
+        await mintBlocks(timePadding);
+        console.log(await blockTimestamp());
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          (id + 3) % numberOfValidators,
+          'round #4'
+        );
+      });
+
+      describe('when block was minted', () => {
+        beforeEach(async () => {
+          const t = await blockTimestamp();
+          await increaseTime(t % timePadding);
+          await executeSubmit(0, await blockTimestamp());
+        });
+
+        it(`expect to return valid index for ${numberOfValidators}`, async () => {
           const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
 
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             id,
             'round #1'
           );
+
           await mintBlocks(timePadding);
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             (id + 1) % numberOfValidators,
             'round #2'
           );
+
           await mintBlocks(timePadding);
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             (id + 2) % numberOfValidators,
             'round #3'
           );
+
           await mintBlocks(timePadding);
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             (id + 3) % numberOfValidators,
             'round #4'
           );
-        });
-      });
-
-      describe('when block was minted', () => {
-        beforeEach(async () => {
-          await executeSubmit(0, await blockTimestamp());
-        });
-
-        [1, 2, 3, 4].forEach((numberOfValidators) => {
-          it.skip(`expect to return valid index for ${numberOfValidators}`, async () => {
-            const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
-
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              id,
-              'round #1'
-            );
-            await mintBlocks(timePadding);
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              (id + 1) % numberOfValidators,
-              'round #2'
-            );
-            await mintBlocks(timePadding);
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              (id + 2) % numberOfValidators,
-              'round #3'
-            );
-            await mintBlocks(timePadding);
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              (id + 3) % numberOfValidators,
-              'round #4'
-            );
-          });
         });
       });
     });
