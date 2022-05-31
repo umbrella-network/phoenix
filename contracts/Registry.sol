@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.6.8;
+pragma solidity 0.8.13;
 
 // Inheritance
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -14,17 +14,25 @@ contract Registry is Ownable {
   function importAddresses(bytes32[] calldata _names, address[] calldata _destinations) external onlyOwner {
     require(_names.length == _destinations.length, "Input lengths must match");
 
-    for (uint i = 0; i < _names.length; i++) {
+    for (uint i = 0; i < _names.length;) {
       registry[_names[i]] = _destinations[i];
       emit LogRegistered(_destinations[i], _names[i]);
+
+      unchecked {
+        i++;
+      }
     }
   }
 
   function importContracts(address[] calldata _destinations) external onlyOwner {
-    for (uint i = 0; i < _destinations.length; i++) {
+    for (uint i = 0; i < _destinations.length;) {
       bytes32 name = Registrable(_destinations[i]).getName();
       registry[name] = _destinations[i];
       emit LogRegistered(_destinations[i], name);
+
+      unchecked {
+        i++;
+      }
     }
   }
 

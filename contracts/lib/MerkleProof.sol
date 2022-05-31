@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.8;
+pragma solidity 0.8.13;
 
 /**
  * @dev These functions deal with verification of Merkle trees (hash trees),
@@ -56,7 +56,7 @@ library MerkleProof {
   function computeRoot(bytes32[] memory proof, bytes32 leaf) internal pure returns (bytes32) {
     bytes32 computedHash = leaf;
 
-    for (uint256 i = 0; i < proof.length; i++) {
+    for (uint256 i = 0; i < proof.length;) {
       bytes32 proofElement = proof[i];
 
       if (computedHash <= proofElement) {
@@ -65,6 +65,10 @@ library MerkleProof {
       } else {
         // Hash(current element of the proof + current computed hash)
         computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
+      }
+
+      unchecked {
+        i++;
       }
     }
 

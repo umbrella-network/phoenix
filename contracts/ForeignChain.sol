@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.8;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
+//pragma experimental ABIEncoderV2;
 
 import "./Registry.sol";
 import "./BaseChain.sol";
 
 contract ForeignChain is BaseChain {
+  using MerkleProof for bytes32;
+
   address public immutable replicator;
   uint32 public lastBlockId;
   bool public deprecated;
@@ -82,12 +84,19 @@ contract ForeignChain is BaseChain {
 
     require(squashedRoots[_blockId].extractTimestamp() == 0, "blockId already taken");
     require(lastDataTimestamp < _dataTimestamp, "can NOT submit older data");
-    require(lastDataTimestamp + padding < block.timestamp, "do not spam");
+    unchecked {
+      // we will not overflow on `timestamp` and `padding` in a life time
+      require(lastDataTimestamp + padding < block.timestamp, "do not spam");
+    }
     require(_keys.length == _values.length, "numbers of keys and values not the same");
 
-    for (uint256 i = 0; i < _keys.length; i++) {
+    for (uint256 i = 0; i < _keys.length;) {
       require(uint224(_values[i]) == _values[i], "FCD overflow");
       fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
+
+      unchecked {
+        i++;
+      }
     }
 
     squashedRoots[_blockId] = MerkleProof.makeSquashedRoot(_root, _dataTimestamp);
@@ -115,7 +124,11 @@ contract ForeignChain is BaseChain {
     timePadding = padding;
     lastId = lastBlockId;
     lastDataTimestamp = squashedRoots[lastId].extractTimestamp();
-    nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
+
+    unchecked {
+      // we will not overflow on `timestamp` in a life time
+      nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
+    }
   }
 
   // this function does not works for past timestamps
@@ -127,8 +140,11 @@ contract ForeignChain is BaseChain {
       return 0;
     }
 
-    if (dataTimestamp + padding < _timestamp) {
-      return lastId + 1;
+    unchecked {
+      // we will not overflow on `timestamp` and `padding` in a life time
+      if (dataTimestamp + padding < _timestamp) {
+        return lastId + 1;
+      }
     }
 
     return lastId;

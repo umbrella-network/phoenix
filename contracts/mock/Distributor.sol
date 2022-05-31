@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.8;
+pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./Registry.sol";
+import "../Registry.sol";
 
 contract Distributor is Ownable {
-  using SafeMath for uint256;
-  
   address[] public recipients;
   uint256 public bottomLimit = 5e17;
   uint256 public topLimit = 1e18;

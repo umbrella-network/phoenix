@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.8;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
+//pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
@@ -10,6 +10,8 @@ import "./interfaces/IStakingBank.sol";
 import "./BaseChain.sol";
 
 contract Chain is BaseChain {
+  using MerkleProof for bytes32;
+
   IStakingBank public immutable stakingBank;
 
   event LogMint(address indexed minter, uint256 blockId, uint256 staked, uint256 power);
@@ -56,17 +58,25 @@ contract Chain is BaseChain {
     validators = new address[](numberOfValidators);
     locations = new string[](numberOfValidators);
 
-    for (uint256 i = 0; i < numberOfValidators; i++) {
+    for (uint256 i = 0; i < numberOfValidators;) {
       validators[i] = stakingBank.addresses(i);
       (, locations[i]) = stakingBank.validators(validators[i]);
       powers[i] = stakingBank.balanceOf(validators[i]);
+
+      unchecked {
+        i++;
+      }
     }
 
-    nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
+    unchecked {
+      // we will not overflow with timestamp
+      nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
 
-    nextLeader = numberOfValidators > 0
-      ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
-      : address(0);
+      nextLeader = numberOfValidators > 0
+        // we will not overflow with timestamp
+        ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
+        : address(0);
+    }
   }
 
   function getNextLeaderAddress() external view returns (address) {
@@ -90,7 +100,11 @@ contract Chain is BaseChain {
     uint32 lastBlockId = getLatestBlockId();
     uint32 dataTimestamp = squashedRoots[lastBlockId].extractTimestamp();
 
-    require(dataTimestamp + padding < block.timestamp, "do not spam");
+    unchecked {
+      // we will not overflow with timestamp and padding(uint16)
+      require(dataTimestamp + padding < block.timestamp, "do not spam");
+    }
+
     require(dataTimestamp < _dataTimestamp, "can NOT submit older data");
     // we can't expect minter will have exactly the same timestamp
     // but for sure we can demand not to be off by a lot, that's why +3sec
@@ -102,11 +116,15 @@ contract Chain is BaseChain {
 
     bytes memory testimony = abi.encodePacked(_dataTimestamp, _root);
 
-    for (uint256 i = 0; i < _keys.length; i++) {
+    for (uint256 i = 0; i < _keys.length;) {
       require(uint224(_values[i]) == _values[i], "FCD overflow");
 
       fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
+
+      unchecked {
+        i++;
+      }
     }
 
     bytes32 affidavit = keccak256(testimony);
@@ -128,28 +146,37 @@ contract Chain is BaseChain {
 
       signatures++;
 
-      emit LogVoter(lastBlockId + 1, signer, balance);
-      power += balance; // no need for safe math, if we overflow then we will not have enough power
+      unchecked {
+        emit LogVoter(lastBlockId + 1, signer, balance);
+        power += balance; // no need for safe math, if we overflow then we will not have enough power
+        i++;
+      }
     }
 
     require(signatures >= requiredSignatures, "not enough signatures");
     // we turn on power once we have proper DPoS
     // require(power * 100 / staked >= 66, "not enough power was gathered");
 
-    squashedRoots[lastBlockId + 1] = _root.makeSquashedRoot(_dataTimestamp);
-    blocksCount++;
+    unchecked {
+      // we will not overflow on `lastBlockId + 1` in a life time
+      squashedRoots[lastBlockId + 1] = _root.makeSquashedRoot(_dataTimestamp);
+      blocksCount++;
 
-    emit LogMint(msg.sender, lastBlockId + 1, staked, power);
+      emit LogMint(msg.sender, lastBlockId + 1, staked, power);
+    }
   }
 
   function getLeaderIndex(uint256 _numberOfValidators, uint256 _timestamp) public view returns (uint256) {
     uint32 latestBlockId = getLatestBlockId();
 
-    // timePadding + 1 => because padding is a space between blocks, so next round starts on first block after padding
-    uint256 validatorIndex = latestBlockId +
-      (_timestamp - squashedRoots[latestBlockId].extractTimestamp()) / (padding + 1);
+    unchecked {
+      // we will not overflow on `timestamp` and `padding` in a life time
+      // timePadding + 1 => because padding is a space between blocks, so next round starts on first block after padding
+      uint256 validatorIndex = latestBlockId +
+        (_timestamp - squashedRoots[latestBlockId].extractTimestamp()) / (padding + 1);
 
-    return uint16(validatorIndex % _numberOfValidators);
+      return uint16(validatorIndex % _numberOfValidators);
+    }
   }
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
