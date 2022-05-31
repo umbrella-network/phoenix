@@ -1,22 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.8;
+pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./interfaces/IERC20Detailed.sol";
 import "./interfaces/IStakingBank.sol";
-
 import "./extensions/Registrable.sol";
-
 import "./Registry.sol";
-import "hardhat/console.sol";
 
 contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownable {
   using SafeERC20 for ERC20;
-  using SafeMath for uint256;
 
   struct Validator {
     address id;
@@ -40,9 +35,8 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
     string memory _name,
     string memory _symbol
   )
-    public
     Registrable(_contractRegistry)
-    ERC20(string(abi.encodePacked("staked ", _name)), string(abi.encodePacked("sb", _symbol)))
+    ERC20(string.concat("staked ", _name), string.concat("sb", _symbol))
   {
     token = ERC20(_contractRegistry.requireAndGetAddress("UMB"));
     _setMinAmountForStake(_minAmountForStake);
@@ -62,8 +56,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
     emit LogMinAmountForStake(_minAmountForStake);
   }
 
-  // solhint-disable-next-line no-unused-vars
-  function _transfer(address sender, address recipient, uint256 amount) internal override {
+  function _transfer(address, address, uint256) internal pure override {
     revert("staked tokens can not be transferred");
   }
 
@@ -82,7 +75,11 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   function withdraw(uint256 _value) override external nonReentrant returns (bool success) {
     uint256 balance = balanceOf(msg.sender);
     require(balance >= _value, "can't withdraw more than balance");
-    require(balance - _value >= minAmountForStake, "minAmountForStake must be available, use exit to withdraw all");
+
+    unchecked {
+      // underflow is not possible because we checked for `balance >= _value`
+      require(balance - _value >= minAmountForStake, "minAmountForStake must be available, use exit to withdraw all");
+    }
 
     _unstake(msg.sender, _value);
     return true;
@@ -103,7 +100,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   }
 
   function _unstake(address _validator, uint256 _value) internal {
-    require(_value > 0, "empty withdraw value");
+    require(_value != 0, "empty withdraw value");
 
     _burn(_validator, _value);
     token.safeTransfer(_validator, _value);
@@ -128,7 +125,8 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
     emit LogValidatorRemoved(_id);
 
     uint256 balance = balanceOf(_id);
-    if (balance > 0) {
+
+    if (balance != 0) {
       _unstake(_id, balanceOf(_id));
     }
 
@@ -153,7 +151,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
 
     validator.location = _location;
 
-    LogValidatorUpdated(validator.id);
+    emit LogValidatorUpdated(validator.id);
   }
 
   function getNumberOfValidators() override external view returns (uint256) {

@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.6.8;
+pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IRegistry.sol";
@@ -8,7 +8,7 @@ import "../interfaces/IStakingBank.sol";
 abstract contract Registrable {
   IRegistry public immutable contractRegistry;
 
-  constructor(IRegistry _contractRegistry) internal {
+  constructor(IRegistry _contractRegistry) {
     require(address(_contractRegistry) != address(0x0), "_registry is empty");
     contractRegistry = _contractRegistry;
   }

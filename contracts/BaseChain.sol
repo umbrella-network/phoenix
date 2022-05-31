@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.8;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
+//pragma experimental ABIEncoderV2;
 
-import "./lib/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
 
 import "./interfaces/IStakingBank.sol";
-
 import "./extensions/Registrable.sol";
 import "./Registry.sol";
+
+import "./lib/MerkleProof.sol";
 
 abstract contract BaseChain is Registrable, Ownable {
   using ValueDecoder for bytes;
@@ -40,7 +40,7 @@ abstract contract BaseChain is Registrable, Ownable {
     IRegistry _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures // we have a plan to use signatures also in foreign Chains so lets keep it in base
-  ) public Registrable(_contractRegistry) {
+  ) Registrable(_contractRegistry) {
     padding = _padding;
     requiredSignatures = _requiredSignatures;
     BaseChain oldChain = BaseChain(_contractRegistry.getAddress("Chain"));
@@ -80,15 +80,24 @@ abstract contract BaseChain is Registrable, Ownable {
       return 0;
     }
 
-    if (squashedRoots[_blocksCount - 1].extractTimestamp() + padding < _timestamp) {
-      return _blocksCount;
-    }
+    unchecked {
+      // in theory we can overflow when we manually provide `_timestamp`
+      // but for internal usage, we using block.timestamp, so we are safe when doing `+padding(uint16)`
+      if (squashedRoots[_blocksCount - 1].extractTimestamp() + padding < _timestamp) {
+        return _blocksCount;
+      }
 
-    return _blocksCount - 1;
+      // we can't underflow because of above `if (_blocksCount == 0)`
+      return _blocksCount - 1;
+    }
   }
 
   function getLatestBlockId() virtual public view returns (uint32) {
-    return blocksCount + blocksCountOffset - 1;
+    unchecked {
+      // we can underflow on very begin and this is OK, because next blockId will be +1 => that gives 0 (so first block)
+      // overflow is not possible in a life time
+      return blocksCount + blocksCountOffset - 1;
+    }
   }
 
   function verifyProof(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf) public pure returns (bool) {
@@ -119,16 +128,20 @@ abstract contract BaseChain is Registrable, Ownable {
   ) public pure returns (bytes32[] memory) {
     bytes32[] memory dataList = new bytes32[](_items);
 
-    for (uint256 i = 0; i < _items; i++) {
-      bytes32 temp;
-      uint256 idx = (i + 1 + _offset) * 32;
+    // we can unchecked because we working only with `i` and `_offset`
+    // in case of wrong `_offset` it will throw
+    unchecked {
+      for (uint256 i = 0; i < _items; i++) {
+        bytes32 temp;
+        uint256 idx = (i + 1 + _offset) * 32;
 
-      // solhint-disable-next-line no-inline-assembly
-      assembly {
-        temp := mload(add(_data, idx))
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+          temp := mload(add(_data, idx))
+        }
+
+        dataList[i] = temp;
       }
-
-      dataList[i] = temp;
     }
 
     return (dataList);
@@ -143,12 +156,15 @@ abstract contract BaseChain is Registrable, Ownable {
     results = new bool[](_leaves.length);
     uint256 offset = 0;
 
-    for (uint256 i = 0; i < _leaves.length; i++) {
-      results[i] = squashedRoots[_blockIds[i]].verifySquashedRoot(
-        bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]), _leaves[i]
-      );
+    // we can uncheck because we using `i` and `offset`
+    unchecked {
+      for (uint256 i = 0; i < _leaves.length; i++) {
+        results[i] = squashedRoots[_blockIds[i]].verifySquashedRoot(
+          bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]), _leaves[i]
+        );
 
-      offset += _proofItemsCounter[i];
+        offset += _proofItemsCounter[i];
+      }
     }
   }
 
@@ -165,10 +181,14 @@ abstract contract BaseChain is Registrable, Ownable {
     timestamps = new uint32[](_keys.length);
     values = new uint256[](_keys.length);
 
-    for (uint i=0; i<_keys.length; i++) {
+    for (uint i=0; i<_keys.length;) {
       FirstClassData storage numericFCD = fcds[_keys[i]];
       values[i] = uint256(numericFCD.value);
       timestamps[i] = numericFCD.dataTimestamp;
+
+      unchecked {
+        i++;
+      }
     }
   }
 

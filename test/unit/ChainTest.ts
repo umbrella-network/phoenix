@@ -65,7 +65,7 @@ describe('Chain', () => {
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
-  const executeSubmit = async (blockId: number, dataTimestamp: number, validators = [validator]) => {
+  const executeSubmit = async (blockId: number, dataTimestamp: number, validators = [validator]): Promise<unknown> => {
     await mockSubmit();
 
     if (validators.length > 1) {
@@ -76,19 +76,19 @@ describe('Chain', () => {
     const rr: string[] = [];
     const ss: string[] = [];
 
-    validators.forEach(async (participant) => {
+    for (const participant of validators) {
       const { r, s, v } = await prepareData(participant, dataTimestamp, root);
       vv.push(v);
       rr.push(r);
       ss.push(s);
-    });
+    }
 
-    await contract.connect(validator).submit(dataTimestamp, root, [], [], vv, rr, ss);
+    return contract.connect(validator).submit(dataTimestamp, root, [], [], vv, rr, ss);
   };
 
   describe('test signatures', () => {
     beforeEach(async () => {
-      return ({
+      ({
         owner,
         validator,
         validator2,
@@ -106,13 +106,13 @@ describe('Chain', () => {
 
     it('accept block from 2 participants', async () => {
       // order of validators matters
-      await expect(executeSubmit(0, await blockTimestamp(), [validator2, validator])).to.not.throw;
+      await expect(async () => executeSubmit(0, await blockTimestamp(), [validator2, validator])).to.not.throw;
     });
   });
 
   describe('Chain', () => {
     beforeEach(async () => {
-      return ({
+      ({
         owner,
         validator,
         validatorAddress,

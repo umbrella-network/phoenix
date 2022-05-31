@@ -2,13 +2,12 @@ import 'hardhat'; // require for IntelliJ to run tests
 import '@nomiclabs/hardhat-waffle'; // require for IntelliJ to run tests
 import '@nomiclabs/hardhat-ethers';
 
-import { ethers } from 'hardhat';
+import { ethers, artifacts } from 'hardhat';
 import { use, expect } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Distributor = require('../../artifacts/contracts/Distributor.sol/Distributor.json');
+const Distributor = artifacts.readArtifactSync('Distributor');
 
 use(waffleChai);
 
