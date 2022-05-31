@@ -11,8 +11,11 @@ contract Registry is Ownable {
 
   event LogRegistered(address indexed destination, bytes32 name);
 
+  error NameNotRegistered();
+  error ArraysDataDoNotMatch();
+
   function importAddresses(bytes32[] calldata _names, address[] calldata _destinations) external onlyOwner {
-    require(_names.length == _destinations.length, "Input lengths must match");
+    if (_names.length != _destinations.length) revert ArraysDataDoNotMatch();
 
     for (uint i = 0; i < _names.length;) {
       registry[_names[i]] = _destinations[i];
@@ -50,7 +53,8 @@ contract Registry is Ownable {
 
   function requireAndGetAddress(bytes32 name) external view returns (address) {
     address _foundAddress = registry[name];
-    require(_foundAddress != address(0), string(abi.encodePacked("Name not registered: ", name)));
+    if (_foundAddress == address(0)) revert NameNotRegistered();
+
     return _foundAddress;
   }
 

@@ -101,7 +101,7 @@ describe('Chain', () => {
     });
 
     it('throws when not enough participants', async () => {
-      await expect(executeSubmit(0, await blockTimestamp())).to.revertedWith('not enough signatures');
+      await expect(executeSubmit(0, await blockTimestamp())).to.revertedWith('NotEnoughSignatures');
     });
 
     it('accept block from 2 participants', async () => {
@@ -371,7 +371,7 @@ describe('Chain', () => {
 
             await expect(
               contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-            ).to.be.revertedWith('can NOT submit older data');
+            ).to.be.revertedWith('DataToOld');
           });
 
           describe('verify Proof', () => {
@@ -402,7 +402,7 @@ describe('Chain', () => {
               const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
               await expect(
                 contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-              ).to.revertedWith('do not spam');
+              ).to.revertedWith('BlockSubmittedToFast');
             });
 
             describe('when minimal padding reached', () => {
@@ -426,7 +426,7 @@ describe('Chain', () => {
                   const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
                   await expect(
                     contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-                  ).to.revertedWith('do not spam');
+                  ).to.revertedWith('BlockSubmittedToFast');
                 });
               });
             });
