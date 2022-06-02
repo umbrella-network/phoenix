@@ -9,7 +9,7 @@ import "../interfaces/IStakingBank.sol";
 contract Token is ERC20 {
   constructor(
     string memory _name,
-    string memory _symbol) public ERC20(_name, _symbol) {
+    string memory _symbol) ERC20(_name, _symbol) {
   }
 
   function mint(address _holder, uint256 _amount) external {

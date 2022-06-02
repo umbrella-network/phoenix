@@ -9,6 +9,7 @@ import "./interfaces/IStakingBank.sol";
 
 import "./BaseChain.sol";
 
+/// @dev contract for homechain
 contract Chain is BaseChain {
   using MerkleProof for bytes32;
 
@@ -20,6 +21,9 @@ contract Chain is BaseChain {
   error SignaturesOutOfOrder();
   error NotEnoughSignatures();
 
+  /// @param _contractRegistry Registry address
+  /// @param _padding required "space" between blocks in seconds
+  /// @param _requiredSignatures number of required signatures for accepting consensus submission
   constructor(
     IRegistry _contractRegistry,
     uint16 _padding,
@@ -28,14 +32,28 @@ contract Chain is BaseChain {
     stakingBank = IStakingBank(_contractRegistry.requireAndGetAddress("StakingBank"));
   }
 
-  function isForeign() override external pure returns (bool) {
+  /// @inheritdoc BaseChain
+  function isForeign() external pure override returns (bool) {
     return false;
   }
 
-  function getName() override external pure returns (bytes32) {
+  /// @inheritdoc Registrable
+  function getName() external pure override returns (bytes32) {
     return "Chain";
   }
 
+  /// @dev helper method that returns all important data about current state of contract
+  /// @return blockNumber `block.number`
+  /// @return timePadding `this.padding`
+  /// @return lastDataTimestamp timestamp for last submitted consensus
+  /// @return lastBlockId ID of last submitted consensus
+  /// @return nextLeader leader for `block.timestamp + 1`
+  /// @return nextBlockId block ID for `block.timestamp + 1`
+  /// @return validators array of all validators addresses
+  /// @return powers array of all validators powers
+  /// @return locations array of all validators locations
+  /// @return staked total UMB staked by validators
+  /// @return minSignatures `this.requiredSignatures`
   function getStatus() external view returns(
     uint256 blockNumber,
     uint16 timePadding,
@@ -82,15 +100,25 @@ contract Chain is BaseChain {
     }
   }
 
+  /// @return address of leader for next second
   function getNextLeaderAddress() external view returns (address) {
     return getLeaderAddressAtTime(block.timestamp + 1);
   }
 
+  /// @return address of current leader
   function getLeaderAddress() external view returns (address) {
     return getLeaderAddressAtTime(block.timestamp);
   }
 
-  // solhint-disable-next-line function-max-lines
+  /// @dev method for submitting consensus data
+  /// @param _dataTimestamp consensus timestamp, this is time for all data in merkle tree including FCDs
+  /// @param _root merkle root
+  /// @param _keys FCDs keys
+  /// @param _values FCDs values
+  /// @param _v array of `v` part of validators signatures
+  /// @param _r array of `r` part of validators signatures
+  /// @param _s array of `s` part of validators signatures
+  // solhint-disable-next-line function-max-lines, code-complexity
   function submit(
     uint32 _dataTimestamp,
     bytes32 _root,
@@ -169,6 +197,9 @@ contract Chain is BaseChain {
     }
   }
 
+  /// @param _numberOfValidators total number of validators
+  /// @param _timestamp timestamp for which you want to calculate index
+  /// @return leader index, use it for StakingBank.addresses[index] to fetch leader address
   function getLeaderIndex(uint256 _numberOfValidators, uint256 _timestamp) public view returns (uint256) {
     uint32 latestBlockId = getLatestBlockId();
 
@@ -183,6 +214,8 @@ contract Chain is BaseChain {
   }
 
   // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
+  /// @param _timestamp timestamp for which you want to calculate leader address
+  /// @return leader address for provider timestamp
   function getLeaderAddressAtTime(uint256 _timestamp) public view returns (address) {
     uint256 numberOfValidators = stakingBank.getNumberOfValidators();
 
