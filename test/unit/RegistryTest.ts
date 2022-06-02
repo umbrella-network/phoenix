@@ -1,8 +1,8 @@
 import { expect, use } from 'chai';
 
-import { ethers, ContractFactory, Contract, Signer } from 'ethers';
+import { ethers, ContractFactory, Contract, Wallet } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
-import { deployMockContract } from '@ethereum-waffle/mock-contract';
+import { deployMockContract, MockContract } from '@ethereum-waffle/mock-contract';
 import { loadFixture } from 'ethereum-waffle';
 import { toBytes32 } from '../../scripts/utils/helpers';
 
@@ -11,7 +11,11 @@ import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 
 use(waffleChai);
 
-async function fixture([owner]: Signer[]) {
+async function fixture([owner]: Wallet[]): Promise<{
+  ownerAddress: string;
+  registrable: MockContract;
+  contract: Contract;
+}> {
   const registrable = await deployMockContract(owner, Registrable.abi);
   const contractFactory = new ContractFactory(Registry.abi, Registry.bytecode, owner);
   const contract = await contractFactory.deploy();

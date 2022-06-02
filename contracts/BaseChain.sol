@@ -136,8 +136,9 @@ abstract contract BaseChain is Registrable, Ownable {
     /// block for last ID will be available in previous contract
     function getLatestBlockId() virtual public view returns (uint32) {
         unchecked {
-            // we can underflow on very begin and this is OK, because next blockId will be +1 => that gives 0 (first block)
-            // overflow is not possible in a life time
+            // underflow: we can underflow on very begin and this is OK,
+            // because next blockId will be +1 => that gives 0 (first block)
+            // overflow: is not possible in a life time
             return blocksCount + blocksCountOffset - 1;
         }
     }

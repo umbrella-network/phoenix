@@ -88,16 +88,8 @@ describe('Chain', () => {
 
   describe('test signatures', () => {
     beforeEach(async () => {
-      ({
-        owner,
-        validator,
-        validator2,
-        validatorAddress,
-        contractRegistry,
-        stakingBank,
-        contract,
-        contractFactory,
-      } = await setup(2));
+      ({ owner, validator, validator2, validatorAddress, contractRegistry, stakingBank, contract, contractFactory } =
+        await setup(2));
     });
 
     it('throws when not enough participants', async () => {
@@ -112,15 +104,8 @@ describe('Chain', () => {
 
   describe('Chain', () => {
     beforeEach(async () => {
-      ({
-        owner,
-        validator,
-        validatorAddress,
-        contractRegistry,
-        stakingBank,
-        contract,
-        contractFactory,
-      } = await setup());
+      ({ owner, validator, validatorAddress, contractRegistry, stakingBank, contract, contractFactory } =
+        await setup());
     });
 
     describe('when deployed', () => {
