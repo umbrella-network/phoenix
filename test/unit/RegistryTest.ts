@@ -70,13 +70,9 @@ describe('Registry', () => {
     });
 
     it('expect to throw when uneven number of inputs', async () => {
-      await expect(contract.importAddresses([aName32, bName32], [ownerAddress])).to.revertedWith(
-        'Input lengths must match'
-      );
+      await expect(contract.importAddresses([aName32, bName32], [ownerAddress])).to.reverted;
 
-      await expect(contract.importAddresses([aName32], [ownerAddress, ownerAddress])).to.revertedWith(
-        'Input lengths must match'
-      );
+      await expect(contract.importAddresses([aName32], [ownerAddress, ownerAddress])).to.reverted;
     });
   });
 

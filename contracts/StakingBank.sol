@@ -24,10 +24,18 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   address[] public override addresses;
   uint256 public minAmountForStake; // minimum amount of tokens that we accept for staking
 
-  event LogValidatorRegistered(address id);
-  event LogValidatorUpdated(address id);
-  event LogValidatorRemoved(address id);
+  event LogValidatorRegistered(address indexed id);
+  event LogValidatorUpdated(address indexed id);
+  event LogValidatorRemoved(address indexed id);
   event LogMinAmountForStake(uint256 minAmountForStake);
+
+  error NoChangeToState();
+  error ValueMustBePositive();
+  error TransferDenied();
+  error NotEnoughBalance();
+  error MinimalStakeAmountRequired();
+  error ValidatorNotExists();
+  error ValidatorAlreadyExists();
 
   constructor(
     IRegistry _contractRegistry,
@@ -51,13 +59,15 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   }
 
   function _setMinAmountForStake(uint256 _minAmountForStake) internal {
-    require(_minAmountForStake > 0, "_minAmountForStake must be positive");
+    if (minAmountForStake == _minAmountForStake) revert NoChangeToState();
+    if (_minAmountForStake == 0) revert ValueMustBePositive();
+
     minAmountForStake = _minAmountForStake;
     emit LogMinAmountForStake(_minAmountForStake);
   }
 
   function _transfer(address, address, uint256) internal pure override {
-    revert("staked tokens can not be transferred");
+    revert TransferDenied();
   }
 
   function stake(uint256 _value) external nonReentrant {
@@ -74,11 +84,12 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
 
   function withdraw(uint256 _value) override external nonReentrant returns (bool success) {
     uint256 balance = balanceOf(msg.sender);
-    require(balance >= _value, "can't withdraw more than balance");
+    if (_value > balance) revert NotEnoughBalance();
 
     unchecked {
-      // underflow is not possible because we checked for `balance >= _value`
-      require(balance - _value >= minAmountForStake, "minAmountForStake must be available, use exit to withdraw all");
+      // underflow is not possible because we checked for `_value > balance`
+      // minAmountForStake must be available, use exit to withdraw all
+      if (balance - _value < minAmountForStake) revert MinimalStakeAmountRequired();
     }
 
     _unstake(msg.sender, _value);
@@ -92,15 +103,15 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   }
 
   function _stake(address _from, uint256 _amount) internal {
-    require(_amount >= minAmountForStake, "_amount is too low");
-    require(validators[_from].id != address(0x0), "validator does not exist in registry");
+    if (validators[_from].id == address(0x0)) revert ValidatorNotExists();
+    if (balanceOf(_from) + _amount < minAmountForStake) revert MinimalStakeAmountRequired();
 
     token.safeTransferFrom(_from, address(this), _amount);
     _mint(_from, _amount);
   }
 
   function _unstake(address _validator, uint256 _value) internal {
-    require(_value != 0, "empty withdraw value");
+    if (_value == 0) revert ValueMustBePositive();
 
     _burn(_validator, _value);
     token.safeTransfer(_validator, _value);
@@ -109,7 +120,8 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   function create(address _id, string calldata _location) override external onlyOwner {
     Validator storage validator = validators[_id];
 
-    require(validator.id == address(0x0), "validator exists");
+    if (validator.id != address(0x0)) revert ValidatorAlreadyExists();
+
     validator.id = _id;
     validator.location = _location;
 
@@ -119,7 +131,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   }
 
   function remove(address _id) external onlyOwner {
-    require(validators[_id].id != address(0x0), "validator NOT exists");
+    if (validators[_id].id == address(0x0)) revert ValidatorNotExists();
 
     delete validators[_id];
     emit LogValidatorRemoved(_id);
@@ -147,7 +159,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
   function update(address _id, string calldata _location) override external onlyOwner {
     Validator storage validator = validators[_id];
 
-    require(validator.id != address(0x0), "validator does not exist");
+    if (validator.id == address(0x0)) revert ValidatorNotExists();
 
     validator.location = _location;
 

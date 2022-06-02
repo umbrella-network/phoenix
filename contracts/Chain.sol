@@ -17,11 +17,14 @@ contract Chain is BaseChain {
   event LogMint(address indexed minter, uint256 blockId, uint256 staked, uint256 power);
   event LogVoter(uint256 indexed blockId, address indexed voter, uint256 vote);
 
+  error SignaturesOutOfOrder();
+  error NotEnoughSignatures();
+
   constructor(
     IRegistry _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures
-  ) public BaseChain(_contractRegistry, _padding, _requiredSignatures) {
+  ) BaseChain(_contractRegistry, _padding, _requiredSignatures) {
     stakingBank = IStakingBank(_contractRegistry.requireAndGetAddress("StakingBank"));
   }
 
@@ -98,26 +101,26 @@ contract Chain is BaseChain {
     bytes32[] memory _s
   ) public { // it could be external, but for external we got stack too deep
     uint32 lastBlockId = getLatestBlockId();
-    uint32 dataTimestamp = squashedRoots[lastBlockId].extractTimestamp();
+    uint32 lastDataTimestamp = squashedRoots[lastBlockId].extractTimestamp();
 
     unchecked {
       // we will not overflow with timestamp and padding(uint16)
-      require(dataTimestamp + padding < block.timestamp, "do not spam");
+      if (lastDataTimestamp + padding >= block.timestamp) revert BlockSubmittedToFast();
     }
 
-    require(dataTimestamp < _dataTimestamp, "can NOT submit older data");
+    if (_dataTimestamp <= lastDataTimestamp) revert DataToOld();
     // we can't expect minter will have exactly the same timestamp
     // but for sure we can demand not to be off by a lot, that's why +3sec
     // temporary remove this condition, because recently on ropsten we see cases when minter/node
     // can be even 100sec behind
     // require(_dataTimestamp <= block.timestamp + 3,
     //   string(abi.encodePacked("oh, so you can predict the future:", _dataTimestamp - block.timestamp + 48)));
-    require(_keys.length == _values.length, "numbers of keys and values not the same");
+    if (_keys.length != _values.length) revert ArraysDataDoNotMatch();
 
     bytes memory testimony = abi.encodePacked(_dataTimestamp, _root);
 
     for (uint256 i = 0; i < _keys.length;) {
-      require(uint224(_values[i]) == _values[i], "FCD overflow");
+      if (uint224(_values[i]) != _values[i]) revert FCDOverflow();
 
       fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
       testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
@@ -139,7 +142,7 @@ contract Chain is BaseChain {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
-      require(prevSigner < signer, "validator included more than once");
+      if (prevSigner >= signer) revert SignaturesOutOfOrder();
 
       prevSigner = signer;
       if (balance == 0) continue;
@@ -153,7 +156,7 @@ contract Chain is BaseChain {
       }
     }
 
-    require(signatures >= requiredSignatures, "not enough signatures");
+    if (signatures < requiredSignatures) revert NotEnoughSignatures();
     // we turn on power once we have proper DPoS
     // require(power * 100 / staked >= 66, "not enough power was gathered");
 

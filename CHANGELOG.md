@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - support for sign integers
 
 ### Changed
-- update code to solidity `0.8.13`
+- update code to solidity `0.8.13` (and use custom errors)
 
 ## [4.5.2] - 2022-05-09
 ### Changed

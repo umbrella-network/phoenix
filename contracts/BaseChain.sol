@@ -36,12 +36,18 @@ abstract contract BaseChain is Registrable, Ownable {
   uint16 public padding;
   uint16 public immutable requiredSignatures;
 
+  error NoChangeToState();
+  error DataToOld();
+  error BlockSubmittedToFast();
+  error ArraysDataDoNotMatch();
+  error FCDOverflow();
+
   constructor(
     IRegistry _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures // we have a plan to use signatures also in foreign Chains so lets keep it in base
   ) Registrable(_contractRegistry) {
-    padding = _padding;
+    _setPadding(_padding);
     requiredSignatures = _requiredSignatures;
     BaseChain oldChain = BaseChain(_contractRegistry.getAddress("Chain"));
 
@@ -51,9 +57,8 @@ abstract contract BaseChain is Registrable, Ownable {
       : 0;
   }
 
-  function setPadding(uint16 _padding) external onlyOwner {
-    padding = _padding;
-    emit LogPadding(msg.sender, _padding);
+  function setPadding(uint16 _padding) external {
+    _setPadding(_padding);
   }
 
   function isForeign() virtual external pure returns (bool);
@@ -156,14 +161,17 @@ abstract contract BaseChain is Registrable, Ownable {
     results = new bool[](_leaves.length);
     uint256 offset = 0;
 
-    // we can uncheck because we using `i` and `offset`
-    unchecked {
-      for (uint256 i = 0; i < _leaves.length; i++) {
-        results[i] = squashedRoots[_blockIds[i]].verifySquashedRoot(
-          bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]), _leaves[i]
-        );
+    for (uint256 i = 0; i < _leaves.length;) {
+      results[i] = squashedRoots[_blockIds[i]].verifySquashedRoot(
+        bytesToBytes32Array(_proofs, offset, _proofItemsCounter[i]), _leaves[i]
+      );
 
+      unchecked {
+        // we can uncheck because it will not overflow in a lifetime, and if someone provide invalid counter
+        // we verification will not be valid (or we throw because of invalid memory access)
         offset += _proofItemsCounter[i];
+        // we can uncheck because `i` will not overflow in a lifetime
+        i++;
       }
     }
   }
@@ -200,6 +208,13 @@ abstract contract BaseChain is Registrable, Ownable {
   function getCurrentIntValue(bytes32 _key) external view returns (int256 value, uint256 timestamp) {
     FirstClassData storage numericFCD = fcds[_key];
     return (numericFCD.value.toInt(), numericFCD.dataTimestamp);
+  }
+
+  function _setPadding(uint16 _padding) internal onlyOwner {
+    if (padding == _padding) revert NoChangeToState();
+
+    padding = _padding;
+    emit LogPadding(msg.sender, _padding);
   }
 
   event LogPadding(address indexed executor, uint16 timePadding);

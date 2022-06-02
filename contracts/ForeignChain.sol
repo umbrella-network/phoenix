@@ -15,25 +15,35 @@ contract ForeignChain is BaseChain {
   event LogBlockReplication(address indexed minter, uint32 blockId);
   event LogDeprecation(address indexed deprecator);
 
+  error OnlyReplicator();
+  error OnlyContractRegistryCanRegister();
+  error AlreadyRegistered();
+  error AlreadyDeprecated();
+  error UnregisterFirst();
+  error InvalidContractType();
+  error ContractDeprecated();
+  error DuplicatedBlockId();
+
   constructor(
     IRegistry _contractRegistry,
     uint16 _padding,
     uint16 _requiredSignatures,
     address _replicator
-  ) public BaseChain(_contractRegistry, _padding, _requiredSignatures) {
+  ) BaseChain(_contractRegistry, _padding, _requiredSignatures) {
     replicator = _replicator;
   }
 
   modifier onlyReplicator() {
-    require(msg.sender == replicator, "onlyReplicator");
+    if (msg.sender != replicator) revert OnlyReplicator();
     _;
   }
 
   function register() override external {
-    require(msg.sender == address(contractRegistry), "only contractRegistry can register");
+    if (msg.sender != address(contractRegistry)) revert OnlyContractRegistryCanRegister();
 
     ForeignChain oldChain = ForeignChain(contractRegistry.getAddress("Chain"));
-    require(address(oldChain) != address(this), "registration must be done before address in registry is replaced");
+    // registration must be done before address in registry is replaced
+    if (address(oldChain) == address(this)) revert AlreadyRegistered();
 
     if (address(oldChain) != address(0x0)) {
       lastBlockId = oldChain.lastBlockId();
@@ -61,12 +71,14 @@ contract ForeignChain is BaseChain {
   }
 
   function unregister() override external {
-    require(msg.sender == address(contractRegistry), "only contractRegistry can unregister");
-    require(!deprecated, "contract is already deprecated");
+    if (msg.sender != address(contractRegistry)) revert OnlyContractRegistryCanRegister();
+    if (deprecated) revert AlreadyDeprecated();
 
     ForeignChain newChain = ForeignChain(contractRegistry.getAddress("Chain"));
-    require(address(newChain) != address(this), "unregistering must be done after address in registry is replaced");
-    require(newChain.isForeign(), "can not be replaced with chain of different type");
+    // unregistering must be done after address in registry is replaced
+    if (address(newChain) == address(this)) revert UnregisterFirst();
+    // can not be replaced with chain of different type
+    if (!newChain.isForeign()) revert InvalidContractType();
 
     deprecated = true;
     emit LogDeprecation(msg.sender);
@@ -79,19 +91,23 @@ contract ForeignChain is BaseChain {
     uint256[] calldata _values,
     uint32 _blockId
   ) external onlyReplicator {
-    require(!deprecated, "contract is deprecated");
+    if (deprecated) revert ContractDeprecated();
+
     uint lastDataTimestamp = squashedRoots[lastBlockId].extractTimestamp();
 
-    require(squashedRoots[_blockId].extractTimestamp() == 0, "blockId already taken");
-    require(lastDataTimestamp < _dataTimestamp, "can NOT submit older data");
+    if (squashedRoots[_blockId].extractTimestamp() != 0) revert DuplicatedBlockId();
+    if (_dataTimestamp <= lastDataTimestamp) revert DataToOld();
+
     unchecked {
       // we will not overflow on `timestamp` and `padding` in a life time
-      require(lastDataTimestamp + padding < block.timestamp, "do not spam");
+      if (lastDataTimestamp + padding >= block.timestamp) revert BlockSubmittedToFast();
     }
-    require(_keys.length == _values.length, "numbers of keys and values not the same");
+
+    if (_keys.length != _values.length) revert ArraysDataDoNotMatch();
 
     for (uint256 i = 0; i < _keys.length;) {
-      require(uint224(_values[i]) == _values[i], "FCD overflow");
+      if (uint224(_values[i]) != _values[i]) revert FCDOverflow();
+
       fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
 
       unchecked {
