@@ -212,7 +212,8 @@ contract Chain is BaseChain {
 
         unchecked {
             // we will not overflow on `timestamp` and `padding` in a life time
-            // timePadding + 1 => because padding is a space between blocks, so next round starts on first block after padding
+            // timePadding + 1 => because padding is a space between blocks,
+            // so next round starts on first block after padding
             uint256 validatorIndex = latestBlockId +
             (_timestamp - squashedRoots[latestBlockId].extractTimestamp()) / (padding + 1);
 
