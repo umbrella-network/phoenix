@@ -1,12 +1,13 @@
-import { ethers } from 'hardhat';
-import Chain from '../artifacts/contracts/Chain.sol/Chain.json';
+import { artifacts, ethers } from 'hardhat';
 import { getProvider } from './utils/helpers';
 
 import { BigNumber } from 'ethers';
 import configuration from '../config';
-import Registry from '../artifacts/contracts/Registry.sol/Registry.json';
 
 async function main() {
+  const Registry = artifacts.readArtifactSync('Registry');
+  const Chain = artifacts.readArtifactSync('Chain');
+
   const provider = getProvider();
 
   const registry = new ethers.Contract(configuration().contractRegistry.address, Registry.abi, provider);

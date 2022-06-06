@@ -1,12 +1,12 @@
 import { use, expect } from 'chai';
-import hre, { ethers } from 'hardhat';
+import hre, { ethers, artifacts } from 'hardhat';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { Contract, ContractFactory } from 'ethers';
-
-import Token from '../../artifacts/contracts/mock/LimitedMintingToken.sol/LimitedMintingToken.json';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 use(waffleChai);
+
+const Token = artifacts.readArtifactSync('LimitedMintingToken');
 
 const DAILY_ALLOWANCE = '10000000000000000000';
 

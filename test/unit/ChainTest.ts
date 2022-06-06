@@ -1,23 +1,24 @@
 import 'hardhat';
 import '@nomiclabs/hardhat-ethers';
 
-import { ethers } from 'hardhat';
+import { ethers, artifacts } from 'hardhat';
 import { expect, use } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
 import { constants as SDKConstants, LeafKeyCoder, LeafValueCoder } from '@umb-network/toolbox';
 
-import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
-import Token from '../../artifacts/contracts/mock/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 import { blockTimestamp, increaseTime, mintBlocks } from '../utils';
 import { ChainStatus } from '../types/ChainStatus';
 import { abiUintEncoder, inputs, prepareData, tree } from './chainUtils';
 
 use(waffleChai);
+
+const Registry = artifacts.readArtifactSync('Registry');
+const Chain = artifacts.readArtifactSync('Chain');
+const StakingBank = artifacts.readArtifactSync('StakingBank');
+const Token = artifacts.readArtifactSync('Token');
 
 const { SIGNED_NUMBER_PREFIX } = SDKConstants;
 

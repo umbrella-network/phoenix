@@ -47,6 +47,11 @@ export const toBytes32 = (str: string): string => {
 };
 
 export const pressToContinue = (charToPress = 'y', callback: () => void): void => {
+  if (isLocalNetwork()) {
+    callback();
+    return;
+  }
+
   console.log('-'.repeat(80));
   const { HARDHAT_NETWORK } = process.env;
   console.log('\n\n', { HARDHAT_NETWORK });

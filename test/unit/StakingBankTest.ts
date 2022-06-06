@@ -2,16 +2,17 @@ import 'hardhat';
 import '@nomiclabs/hardhat-ethers';
 
 import { use, expect } from 'chai';
-import { ethers } from 'hardhat';
+import { artifacts, ethers } from 'hardhat';
 import { Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract, MockContract } from '@ethereum-waffle/mock-contract';
-import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
-import Token from '../../artifacts/contracts/mock/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 
 use(waffleChai);
+
+const Registry = artifacts.readArtifactSync('Registry');
+const StakingBank = artifacts.readArtifactSync('StakingBank');
+const Token = artifacts.readArtifactSync('Token');
 
 const defaultMinAmount = 1000;
 
