@@ -166,14 +166,21 @@ contract Chain is BaseChain {
 
     uint256 signatures = 0;
 
-    for (uint256 i; i < _v.length; i++) {
+    for (uint256 i; i < _v.length;) {
       address signer = recoverSigner(affidavit, _v[i], _r[i], _s[i]);
       uint256 balance = stakingBank.balanceOf(signer);
 
       if (prevSigner >= signer) revert SignaturesOutOfOrder();
 
       prevSigner = signer;
-      if (balance == 0) continue;
+
+      if (balance == 0) {
+        unchecked {
+          i++;
+        }
+
+        continue;
+      }
 
       signatures++;
 
