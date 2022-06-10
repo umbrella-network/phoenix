@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.6.0] - 2022-06-10
+### Changed
+- update code to solidity `0.8.13` (and use custom errors)
+- update packages
+
 ## [4.5.2] - 2022-05-09
 ### Changed
 - change required signature number

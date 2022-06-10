@@ -2,16 +2,17 @@ import 'hardhat';
 import '@nomiclabs/hardhat-ethers';
 
 import { use, expect } from 'chai';
-import { ethers } from 'hardhat';
+import { artifacts, ethers } from 'hardhat';
 import { Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract, MockContract } from '@ethereum-waffle/mock-contract';
-import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
-import Token from '../../artifacts/contracts/mock/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
 
 use(waffleChai);
+
+const Registry = artifacts.readArtifactSync('Registry');
+const StakingBank = artifacts.readArtifactSync('StakingBank');
+const Token = artifacts.readArtifactSync('Token');
 
 const defaultMinAmount = 1000;
 
@@ -63,7 +64,7 @@ describe('StakingBank', () => {
     });
 
     it('min amount to stake must be > 0', async () => {
-      await expect(contract.setMinAmountForStake(0)).to.revertedWith('must be positive');
+      await expect(contract.setMinAmountForStake(0)).to.revertedWith('ValueMustBePositive');
       await expect(contract.setMinAmountForStake(1)).not.to.throw;
     });
   });
@@ -120,8 +121,8 @@ describe('ValidatorRegistry', () => {
         await token.mock.transferFrom.withArgs(validatorAddress, contract.address, toStake).returns(true);
 
         expect(await contract.totalSupply()).to.eq(0);
-        await expect(contract.receiveApproval(validatorAddress)).to.revertedWith('_amount is too low');
-        await expect(contract.connect(validator1).stake(toStake)).to.revertedWith('_amount is too low');
+        await expect(contract.receiveApproval(validatorAddress)).to.revertedWith('MinimalStakeAmountRequired');
+        await expect(contract.connect(validator1).stake(toStake)).to.revertedWith('MinimalStakeAmountRequired');
       });
 
       it('expect to receiveApproval when amount is at least minimum', async () => {
@@ -172,13 +173,11 @@ describe('ValidatorRegistry', () => {
         });
 
         it('expect to throw when minAmountForStake is not left as staked amount', async () => {
-          await expect(contract.connect(validator1).withdraw(2)).to.revertedWith('minAmountForStake must be available');
+          await expect(contract.connect(validator1).withdraw(2)).to.revertedWith('MinimalStakeAmountRequired');
         });
 
         it('can not transfer tokens', async () => {
-          await expect(contract.connect(validator1).transfer(validator2Address, 10)).to.revertedWith(
-            'staked tokens can not be transferred'
-          );
+          await expect(contract.connect(validator1).transfer(validator2Address, 10)).to.revertedWith('TransferDenied');
         });
 
         it('expect to unstake when removed', async () => {

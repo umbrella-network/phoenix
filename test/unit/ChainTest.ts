@@ -1,23 +1,24 @@
 import 'hardhat';
 import '@nomiclabs/hardhat-ethers';
 
-import { ethers } from 'hardhat';
+import { ethers, artifacts } from 'hardhat';
 import { expect, use } from 'chai';
 import { BigNumber, Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
-import { LeafKeyCoder, constants as SDKConstants, LeafValueCoder } from '@umb-network/toolbox';
+import { constants as SDKConstants, LeafKeyCoder, LeafValueCoder } from '@umb-network/toolbox';
 
-import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
-import Token from '../../artifacts/contracts/mock/Token.sol/Token.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
-import { blockTimestamp, mintBlocks } from '../utils';
+import { blockTimestamp, increaseTime, mintBlocks } from '../utils';
 import { ChainStatus } from '../types/ChainStatus';
 import { abiUintEncoder, inputs, prepareData, tree } from './chainUtils';
 
 use(waffleChai);
+
+const Registry = artifacts.readArtifactSync('Registry');
+const Chain = artifacts.readArtifactSync('Chain');
+const StakingBank = artifacts.readArtifactSync('StakingBank');
+const Token = artifacts.readArtifactSync('Token');
 
 const { SIGNED_NUMBER_PREFIX } = SDKConstants;
 
@@ -65,8 +66,7 @@ describe('Chain', () => {
     await stakingBank.mock.balanceOf.withArgs(await leader.getAddress()).returns(balance);
   };
 
-  // note - DO NOT use this function if you want to catch eventexpect to getStatus()
-  const executeSubmit = async (blockId: number, dataTimestamp: number, validators = [validator]) => {
+  const executeSubmit = async (blockId: number, dataTimestamp: number, validators = [validator]): Promise<unknown> => {
     await mockSubmit();
 
     if (validators.length > 1) {
@@ -77,51 +77,36 @@ describe('Chain', () => {
     const rr: string[] = [];
     const ss: string[] = [];
 
-    validators.forEach(async (participant) => {
+    for (const participant of validators) {
       const { r, s, v } = await prepareData(participant, dataTimestamp, root);
       vv.push(v);
       rr.push(r);
       ss.push(s);
-    });
+    }
 
-    await contract.connect(validator).submit(dataTimestamp, root, [], [], vv, rr, ss);
+    return contract.connect(validator).submit(dataTimestamp, root, [], [], vv, rr, ss);
   };
 
-  describe('PROD Chain', () => {
+  describe('test signatures', () => {
     beforeEach(async () => {
-      return ({
-        owner,
-        validator,
-        validator2,
-        validatorAddress,
-        contractRegistry,
-        stakingBank,
-        contract,
-        contractFactory,
-      } = await setup(2));
+      ({ owner, validator, validator2, validatorAddress, contractRegistry, stakingBank, contract, contractFactory } =
+        await setup(2));
     });
 
     it('throws when not enough participants', async () => {
-      await expect(executeSubmit(0, await blockTimestamp())).to.revertedWith('not enough signatures');
+      await expect(executeSubmit(0, await blockTimestamp())).to.revertedWith('NotEnoughSignatures');
     });
 
     it('accept block from 2 participants', async () => {
       // order of validators matters
-      await expect(executeSubmit(0, await blockTimestamp(), [validator2, validator])).to.not.throw;
+      await expect(async () => executeSubmit(0, await blockTimestamp(), [validator2, validator])).to.not.throw;
     });
   });
 
-  describe('DEMO Chain', () => {
+  describe('Chain', () => {
     beforeEach(async () => {
-      return ({
-        owner,
-        validator,
-        validatorAddress,
-        contractRegistry,
-        stakingBank,
-        contract,
-        contractFactory,
-      } = await setup());
+      ({ owner, validator, validatorAddress, contractRegistry, stakingBank, contract, contractFactory } =
+        await setup());
     });
 
     describe('when deployed', () => {
@@ -185,61 +170,70 @@ describe('Chain', () => {
     });
 
     describe('.getLeaderIndex()', () => {
-      [1, 2, 3, 4].forEach((numberOfValidators) => {
-        it.skip(`expect to return valid index for ${numberOfValidators}`, async () => {
+      const numberOfValidators = 3;
+
+      it(`expect to return valid index for ${numberOfValidators}`, async () => {
+        const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
+
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          id,
+          'round #1'
+        );
+
+        await mintBlocks(timePadding);
+        console.log(await blockTimestamp());
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          (id + 1) % numberOfValidators,
+          'round #2'
+        );
+
+        await mintBlocks(timePadding);
+        console.log(await blockTimestamp());
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          (id + 2) % numberOfValidators,
+          'round #3'
+        );
+
+        await mintBlocks(timePadding);
+        console.log(await blockTimestamp());
+        expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
+          (id + 3) % numberOfValidators,
+          'round #4'
+        );
+      });
+
+      describe('when block was minted', () => {
+        beforeEach(async () => {
+          const t = await blockTimestamp();
+          await increaseTime(t % timePadding);
+          await executeSubmit(0, await blockTimestamp());
+        });
+
+        it(`expect to return valid index for ${numberOfValidators}`, async () => {
           const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
 
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             id,
             'round #1'
           );
+
           await mintBlocks(timePadding);
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             (id + 1) % numberOfValidators,
             'round #2'
           );
+
           await mintBlocks(timePadding);
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             (id + 2) % numberOfValidators,
             'round #3'
           );
+
           await mintBlocks(timePadding);
           expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
             (id + 3) % numberOfValidators,
             'round #4'
           );
-        });
-      });
-
-      describe('when block was minted', () => {
-        beforeEach(async () => {
-          await executeSubmit(0, await blockTimestamp());
-        });
-
-        [1, 2, 3, 4].forEach((numberOfValidators) => {
-          it.skip(`expect to return valid index for ${numberOfValidators}`, async () => {
-            const id = await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber());
-
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              id,
-              'round #1'
-            );
-            await mintBlocks(timePadding);
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              (id + 1) % numberOfValidators,
-              'round #2'
-            );
-            await mintBlocks(timePadding);
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              (id + 2) % numberOfValidators,
-              'round #3'
-            );
-            await mintBlocks(timePadding);
-            expect(await contract.getLeaderIndex(numberOfValidators, await ethers.provider.getBlockNumber())).to.eq(
-              (id + 3) % numberOfValidators,
-              'round #4'
-            );
-          });
         });
       });
     });
@@ -363,7 +357,7 @@ describe('Chain', () => {
 
             await expect(
               contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-            ).to.be.revertedWith('can NOT submit older data');
+            ).to.be.revertedWith('DataToOld');
           });
 
           describe('verify Proof', () => {
@@ -394,7 +388,7 @@ describe('Chain', () => {
               const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
               await expect(
                 contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-              ).to.revertedWith('do not spam');
+              ).to.revertedWith('BlockSubmittedToFast');
             });
 
             describe('when minimal padding reached', () => {
@@ -418,7 +412,7 @@ describe('Chain', () => {
                   const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
                   await expect(
                     contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-                  ).to.revertedWith('do not spam');
+                  ).to.revertedWith('BlockSubmittedToFast');
                 });
               });
             });

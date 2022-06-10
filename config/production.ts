@@ -9,7 +9,7 @@ const production: GlobalConfig = {
       address: '0x4A28406ECE8fFd7A91789738a5ac15DAc44bFa1b'
     },
     chain: {
-      padding: 60 * 5,
+      padding: 65535,
       requiredSignatures: 1,
       replicator
     },
@@ -19,7 +19,7 @@ const production: GlobalConfig = {
       address: '0xDa9A63D77406faa09d265413F4E128B54b5057e0'
     },
     chain: {
-      padding: 30,
+      padding: 1800,
       requiredSignatures: 1,
       replicator
     },
@@ -29,7 +29,7 @@ const production: GlobalConfig = {
       address: '0x455acbbC2c15c086978083968a69B2e7E4d38d34'
     },
     chain: {
-      padding: 30,
+      padding: 240,
       requiredSignatures: 1,
       replicator
     },
@@ -39,7 +39,7 @@ const production: GlobalConfig = {
       address: '0x41a75b8504fdac22b2152b5cfcdaae01ff50947e'
     },
     chain: {
-      padding: 3600,
+      padding: 65535,
       requiredSignatures: 1,
       replicator
     },
@@ -55,7 +55,7 @@ const production: GlobalConfig = {
       symbol: 'UMB'
     },
     chain: {
-      padding: 60,
+      padding: 240,
       requiredSignatures: 6,
       replicator
     },

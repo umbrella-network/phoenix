@@ -1,17 +1,17 @@
 import { verifyCode } from '../utils/verifyContract';
-import { ethers } from 'hardhat';
+import { artifacts, ethers } from 'hardhat';
 import { Contract, Wallet, BigNumber, Signer } from 'ethers';
-
-import configuration from '../../config';
-import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import { TransactionReceipt } from '@ethersproject/providers';
 
+import configuration from '../../config';
 import { getProvider, isLocalNetwork, isProduction, waitForTx } from '../utils/helpers';
 
 const config = configuration();
 const provider = getProvider();
+
+const Registry = artifacts.readArtifactSync('Registry');
+const Chain = artifacts.readArtifactSync('Chain');
+const ERC20 = artifacts.readArtifactSync('ERC20');
 
 interface Validator {
   wallet: Wallet;

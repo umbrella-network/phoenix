@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { artifacts, ethers } from 'hardhat';
 import { Contract } from 'ethers';
 
 import configuration from '../../config';
@@ -7,10 +7,10 @@ import { getProvider } from './helpers';
 const config = configuration();
 const provider = getProvider();
 
-import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
-import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
-import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import Token from '../../artifacts/contracts/Token.sol/Token.json';
+const Registry = artifacts.readArtifactSync('Registry');
+const StakingBank = artifacts.readArtifactSync('StakingBank');
+const Chain = artifacts.readArtifactSync('Chain');
+const Token = artifacts.readArtifactSync('Token');
 
 export const deployedRegistry = async (): Promise<Contract> => {
   return new ethers.Contract(config.contractRegistry.address, Registry.abi, provider).connect(
