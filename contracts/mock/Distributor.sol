@@ -10,22 +10,14 @@ contract Distributor is Ownable {
   uint256 public bottomLimit = 5e17;
   uint256 public topLimit = 1e18;
 
-  constructor(address[] memory _recipients) public {
+  constructor(address[] memory _recipients) {
     recipients = _recipients;
   }
 
-  function getName() external pure returns (bytes32) {
-    return "Distributor";
+  receive() external payable {
+    distribute();
   }
 
-  function recipientsCount() external view returns (uint256) {
-    return recipients.length;
-  }
-
-  function allRecipients() external view returns (address[] memory) {
-    return recipients;
-  }
-  
   function setLimits(uint256 _bottom, uint256 _top) external onlyOwner {
     bottomLimit = _bottom;
     topLimit = _top;
@@ -45,7 +37,7 @@ contract Distributor is Ownable {
       recipients.push(_recipients[i]);
     }
   }
-  
+
   function removeRecipient(address _recipient) external onlyOwner {
     for (uint256 i = 0; i < recipients.length; i++) {
       if (recipients[i] == _recipient) {
@@ -54,6 +46,18 @@ contract Distributor is Ownable {
         return;
       }
     }
+  }
+
+  function recipientsCount() external view returns (uint256) {
+    return recipients.length;
+  }
+
+  function allRecipients() external view returns (address[] memory) {
+    return recipients;
+  }
+
+  function getName() external pure returns (bytes32) {
+    return "Distributor";
   }
 
   function distribute() public {
@@ -76,9 +80,5 @@ contract Distributor is Ownable {
         totalBalance -= amount;
       }
     }
-  }
-
-  receive() external payable {
-    distribute();
   }
 }

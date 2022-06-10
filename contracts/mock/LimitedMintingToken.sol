@@ -14,11 +14,7 @@ contract LimitedMintingToken is ERC20, Ownable {
 
   MintData public mintData;
 
-  constructor(
-    string memory _name,
-    string memory _symbol,
-    uint256 _dailyAllowance
-    ) public ERC20(_name, _symbol) {
+  constructor(string memory _name, string memory _symbol, uint256 _dailyAllowance) ERC20(_name, _symbol) {
       mintData.dailyAllowance = _dailyAllowance;
   }
 
@@ -33,7 +29,7 @@ contract LimitedMintingToken is ERC20, Ownable {
     uint256 mintedAmount = data.todaysMintedAmount[msg.sender];
 
     uint256 amount = _amount > limit ? limit : _amount;
-    data.lastMintTimestamp[msg.sender] = fullLimit ? block.timestamp : lastTimestamp; 
+    data.lastMintTimestamp[msg.sender] = fullLimit ? block.timestamp : lastTimestamp;
     data.todaysMintedAmount[msg.sender] = fullLimit ? amount : mintedAmount + amount;
 
     _mint(_holder, amount);
@@ -45,12 +41,12 @@ contract LimitedMintingToken is ERC20, Ownable {
     _stakingBank.receiveApproval(_holder);
   }
 
-  function getName() external pure returns (bytes32) {
-    return "UMB";
-  }
-
   function getDailyAllowance() external view returns (uint256) {
     return mintData.dailyAllowance;
+  }
+
+  function getName() external pure returns (bytes32) {
+    return "UMB";
   }
 
   function setDailyAllowance(uint256 newDailyAllowance) public onlyOwner {

@@ -5,11 +5,18 @@ pragma solidity 0.8.13;
 import "./Registry.sol";
 import "./BaseChain.sol";
 
+/// @dev contract for foreign-chains
 contract ForeignChain is BaseChain {
   using MerkleProof for bytes32;
 
+  /// @dev replicator is the one who can replicate consensus from home-chain to this contract
   address public immutable replicator;
+
+  /// @dev last submitted consensus ID
   uint32 public lastBlockId;
+
+  /// @dev flag that lets, if this contract was replaced by newer one
+  /// if TRUE, submissions is not longer available
   bool public deprecated;
 
   event LogBlockReplication(address indexed minter, uint32 blockId);
@@ -24,6 +31,10 @@ contract ForeignChain is BaseChain {
   error ContractDeprecated();
   error DuplicatedBlockId();
 
+  /// @param _contractRegistry Registry address
+  /// @param _padding required "space" between blocks in seconds
+  /// @param _requiredSignatures this is only for compatibility
+  /// @param _replicator address of wallet that is allow to do submit
   constructor(
     IRegistry _contractRegistry,
     uint16 _padding,
@@ -38,7 +49,8 @@ contract ForeignChain is BaseChain {
     _;
   }
 
-  function register() override external {
+  /// @inheritdoc Registrable
+  function register() external override {
     if (msg.sender != address(contractRegistry)) revert OnlyContractRegistryCanRegister();
 
     ForeignChain oldChain = ForeignChain(contractRegistry.getAddress("Chain"));
@@ -70,7 +82,8 @@ contract ForeignChain is BaseChain {
     }
   }
 
-  function unregister() override external {
+  /// @inheritdoc Registrable
+  function unregister() external override {
     if (msg.sender != address(contractRegistry)) revert OnlyContractRegistryCanRegister();
     if (deprecated) revert AlreadyDeprecated();
 
@@ -84,6 +97,13 @@ contract ForeignChain is BaseChain {
     emit LogDeprecation(msg.sender);
   }
 
+  /// @dev method for submitting/replicating consensus data
+  /// @param _dataTimestamp consensus timestamp, this is time for all data in merkle tree including FCDs
+  /// @param _root merkle root
+  /// @param _keys FCDs keys
+  /// @param _values FCDs values
+  /// @param _blockId consensus ID from homechain
+  // solhint-disable-next-line code-complexity
   function submit(
     uint32 _dataTimestamp,
     bytes32 _root,
@@ -121,14 +141,22 @@ contract ForeignChain is BaseChain {
     emit LogBlockReplication(msg.sender, _blockId);
   }
 
-  function isForeign() override external pure returns (bool) {
+  /// @inheritdoc BaseChain
+  function isForeign() external pure override returns (bool) {
     return true;
   }
 
-  function getName() override external pure returns (bytes32) {
+  /// @inheritdoc Registrable
+  function getName() external pure override returns (bytes32) {
     return "Chain";
   }
 
+  /// @dev helper method that returns all important data about current state of contract
+  /// @return blockNumber `block.number`
+  /// @return timePadding `this.padding`
+  /// @return lastDataTimestamp timestamp for last submitted consensus
+  /// @return lastId ID of last submitted consensus
+  /// @return nextBlockId block ID for `block.timestamp + 1`
   function getStatus() external view returns(
     uint256 blockNumber,
     uint16 timePadding,
@@ -148,7 +176,7 @@ contract ForeignChain is BaseChain {
   }
 
   // this function does not works for past timestamps
-  function getBlockIdAtTimestamp(uint256 _timestamp) override public view  returns (uint32) {
+  function getBlockIdAtTimestamp(uint256 _timestamp) public view override returns (uint32) {
     uint32 lastId = lastBlockId;
     uint32 dataTimestamp = squashedRoots[lastId].extractTimestamp();
 
@@ -166,7 +194,8 @@ contract ForeignChain is BaseChain {
     return lastId;
   }
 
-  function getLatestBlockId() override public view returns (uint32) {
+  /// @inheritdoc BaseChain
+  function getLatestBlockId() public view override returns (uint32) {
     return lastBlockId;
   }
 }
