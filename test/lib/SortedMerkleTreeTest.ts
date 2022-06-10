@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers, artifacts } from 'hardhat';
 import { use, expect } from 'chai';
 
 import { ContractFactory, Contract } from 'ethers';
@@ -7,12 +7,13 @@ import { LeafKeyCoder, LeafValueCoder } from '@umb-network/toolbox';
 import { deployMockContract } from '@ethereum-waffle/mock-contract';
 
 import SortedMerkleTree from '../../lib/SortedMerkleTree';
-import Chain from '../../artifacts/contracts/Chain.sol/Chain.json';
-import Registry from '../../artifacts/contracts/Registry.sol/Registry.json';
 import { toBytes32 } from '../../scripts/utils/helpers';
-import StakingBank from '../../artifacts/contracts/StakingBank.sol/StakingBank.json';
 
 use(waffleChai);
+
+const Chain = artifacts.readArtifactSync('Chain');
+const Registry = artifacts.readArtifactSync('Registry');
+const StakingBank = artifacts.readArtifactSync('StakingBank');
 
 describe('Tree', () => {
   let contract: Contract;

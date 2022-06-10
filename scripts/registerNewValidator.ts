@@ -1,14 +1,17 @@
+import { artifacts } from 'hardhat';
 import { ethers, Contract } from 'ethers';
+import { formatEther } from 'ethers/lib/utils';
 import superagent from 'superagent';
 import { deployedContract } from './utils/deployedContracts';
 import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
-import { formatEther } from 'ethers/lib/utils';
-import ERC20 from '../artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json';
 import configuration from '../config';
 
 const provider = getProvider();
 const config = configuration();
+
 const { PEGASUS_VERSION } = process.env;
+
+const ERC20 = artifacts.readArtifactSync('ERC20');
 
 interface Validator {
   id: string;

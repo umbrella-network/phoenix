@@ -7,7 +7,7 @@ import sandbox from './sandbox';
 
 export enum NETWORKS {
   ETH = 'ethereum',
-  BSC = 'smartchain'
+  BSC = 'bsc'
 }
 
 export enum ENVS {
@@ -17,12 +17,17 @@ export enum ENVS {
   sandbox = 'sandbox'
 }
 
-const [blockchain, environment] = process.env.HARDHAT_NETWORK?.split('_') || [NETWORKS.ETH, ENVS.local];
+const defaultNetwork = NETWORKS.BSC;
+const defaultEnv = ENVS.local;
 
-const network = blockchain || NETWORKS.ETH;
-const env = environment || ENVS.local;
+const [blockchain, environment] = process.env.HARDHAT_NETWORK?.split('_') || [defaultNetwork, defaultEnv];
+
+const network = blockchain || defaultNetwork;
+const env = environment || defaultEnv;
 
 const configuration = (environment = env): Config => {
+  console.log({environment, network});
+
   switch (environment) {
     case ENVS.local:
       return (local as any)[network]; // eslint-disable-line @typescript-eslint/no-explicit-any
