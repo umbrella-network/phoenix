@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
-//pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
@@ -192,7 +191,8 @@ contract Chain is BaseChain {
         }
 
         if (signatures < requiredSignatures) revert NotEnoughSignatures();
-        // we turn on power once we have proper DPoS
+        // we turn on power once we have DPoS in action
+        // TODO remember to protect against flash loans when DPoS will be in place
         // require(power * 100 / staked >= 66, "not enough power was gathered");
 
         unchecked {

@@ -65,6 +65,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
         return true;
     }
 
+    // TODO remember to protect against flash loans when DPoS will be in place, eg. use timelock
     /// @inheritdoc IStakingBank
     function withdraw(uint256 _value) external nonReentrant returns (bool success) {
         uint256 balance = balanceOf(msg.sender);
