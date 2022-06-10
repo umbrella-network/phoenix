@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
-//pragma experimental ABIEncoderV2;
 
 import "./Registry.sol";
 import "./BaseChain.sol";
@@ -16,7 +15,7 @@ contract ForeignChain is BaseChain {
     uint32 public lastBlockId;
 
     /// @dev flag that lets, if this contract was replaced by newer one
-    /// if TRUE, submissions is not longer available
+    /// if TRUE, block submission is not longer available
     bool public deprecated;
 
     event LogBlockReplication(address indexed minter, uint32 blockId);
