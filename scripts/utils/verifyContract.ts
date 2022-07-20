@@ -6,6 +6,7 @@ export const verifyCode = async (address: string, constructorArguments: any): Pr
   if (isLocalNetwork()) {
     return;
   }
+
   console.log('verifyCode for ', address, hre.network.name);
 
   // eslint-disable-next-line no-constant-condition
@@ -13,9 +14,9 @@ export const verifyCode = async (address: string, constructorArguments: any): Pr
     try {
       await hre.run('verify:verify', { address, constructorArguments });
       break;
-    } catch (e) {
-      console.log(e.message);
-      if (e.message.includes('Already Verified')) break;
+    } catch (e: unknown) {
+      console.log((<Error>e).message);
+      if ((<Error>e).message.includes('Already Verified')) break;
       console.log('retrying in 5 sec...');
       await sleep(5000);
     }

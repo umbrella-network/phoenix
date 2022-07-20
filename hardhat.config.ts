@@ -94,10 +94,10 @@ const config: HardhatUserConfig = {
       gasPrice: gwei(10)
     },
     ethereum_staging: {
-      url: `https://kovan.infura.io/v3/${INFURA_ID}`,
+      url: `https://goerli.infura.io/v3/${INFURA_ID}`,
       accounts: deployerAccounts,
-      chainId: 42,
-      gasPrice: gwei(1)
+      chainId: 5,
+      gasPrice: 'auto'
     },
     polygon_staging: {
       url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
@@ -130,10 +130,10 @@ const config: HardhatUserConfig = {
       gasPrice: gwei(1)
     },
     ethereum_sandbox: {
-      url: `https://ropsten.infura.io/v3/${INFURA_ID}`,
+      url: `https://goerli.infura.io/v3/${INFURA_ID}`,
       accounts: deployerAccounts,
-      chainId: 3,
-      gasPrice: gwei(10)
+      chainId: 5,
+      gasPrice: 'auto'
     },
     bsc_sandbox: {
       url: bscRpcUrlTestnet,
