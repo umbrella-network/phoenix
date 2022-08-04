@@ -44,11 +44,8 @@ const staging: GlobalConfig = {
     },
   },
   ethereum: {
-    distributor: {
-      address: '0xbb3455F2A94Ea21540c5f91A6e8D946dF1f3c425'
-    },
     contractRegistry: {
-      address: '0x059FDd69e771645fe91d8E1040320DbB845cEaFd'
+      address: '0x51eFAbE1718be9940c5f4D10F1983a46d99EC4D9'
     },
     chain: {
       padding: 300,

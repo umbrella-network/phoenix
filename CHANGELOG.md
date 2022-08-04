@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.6.1] - 2022-07-20
+### Changed
+- replace deprecated testnets `kovan` and `ropsten` with `goerli`
+
 ## [4.6.0] - 2022-06-10
 ### Changed
 - update code to solidity `0.8.13` (and use custom errors)
