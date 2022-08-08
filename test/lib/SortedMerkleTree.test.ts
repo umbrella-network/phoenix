@@ -27,7 +27,7 @@ describe('Tree', () => {
     await contractRegistry.mock.getAddress.withArgs(toBytes32('Chain')).returns(ethers.constants.AddressZero);
     await contractRegistry.mock.requireAndGetAddress.withArgs(toBytes32('StakingBank')).returns(stakingBank.address);
 
-    contract = await chain.deploy(contractRegistry.address, 1, 1);
+    contract = await chain.deploy(contractRegistry.address, 1, 1, false);
   });
 
   describe('hashLeaf()', () => {

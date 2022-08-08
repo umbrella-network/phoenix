@@ -6,7 +6,7 @@ import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract, MockContract } from '@ethereum-waffle/mock-contract';
 import { loadFixture } from 'ethereum-waffle';
 
-import { toBytes32 } from '../../scripts/utils/helpers';
+import { toBytes32 } from '../scripts/utils/helpers';
 
 use(waffleChai);
 

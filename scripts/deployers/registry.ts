@@ -1,17 +1,17 @@
 import { Contract } from 'ethers';
-import { ethers } from 'hardhat';
+import hre, { ethers } from 'hardhat';
 
-import { getProvider, isLocalNetwork } from '../utils/helpers';
+import { isLocalNetwork } from '../utils/helpers';
 import { verifyCode } from '../utils/verifyContract';
 
-const provider = getProvider();
+const provider = hre.ethers.provider;
 
 export const deployContractRegistry = async (): Promise<Contract> => {
   const { DEPLOYER_PK } = process.env;
 
   let ownerWallet;
 
-  if (isLocalNetwork()) {
+  if (isLocalNetwork(hre)) {
     [ownerWallet] = await ethers.getSigners();
   } else {
     if (!DEPLOYER_PK) {
@@ -31,6 +31,6 @@ export const deployContractRegistry = async (): Promise<Contract> => {
 
   console.log('Registry deployed at', registry.address);
 
-  await verifyCode(registry.address, []);
+  await verifyCode(hre, registry.address, []);
   return registry;
 };

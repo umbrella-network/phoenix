@@ -27,17 +27,13 @@ abstract contract Registrable {
         contractRegistry = _contractRegistry;
     }
 
-    /// @dev this is required only for ForeignChain
-    /// in order to use this method, we need new registry
-    function register() virtual external {
-        // for backward compatibility the body is implemented as empty
-    }
+    /// @dev this method will be called as a first method in registration process when old contract will be replaced
+    /// when called, old contract address is still in registry
+    function register() virtual external;
 
-    /// @dev this is required only for ForeignChain
-    /// in order to use this method, we need new registry
-    function unregister() virtual external {
-        // for backward compatibility the body is implemented as empty
-    }
+    /// @dev this method will be called as a last method in registration process when old contract will be replaced
+    /// when called, new contract address is already in registry
+    function unregister() virtual external;
 
     /// @return contract name as bytes32
     function getName() virtual external pure returns (bytes32);

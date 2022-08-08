@@ -1,5 +1,6 @@
-import { ChainContractNames, deployChainAndRegister } from './deployers/contracts';
+import { deployChainAndRegister } from './deployers/contracts';
 import { pressToContinue } from './utils/helpers';
+import { ChainContractNames } from '../types/types';
 
 const deployAndRegister = async () => deployChainAndRegister(ChainContractNames.Chain);
 

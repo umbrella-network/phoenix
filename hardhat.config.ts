@@ -9,9 +9,18 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import 'hardhat-gas-reporter';
 
+import '@typechain/hardhat';
+
+import './tasks';
+
 require('./scripts/customEnv'); // eslint-disable-line
 
-import {HardhatUserConfig} from 'hardhat/types';
+import {HardhatNetworkForkingUserConfig, HardhatUserConfig} from 'hardhat/types';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
 
 const {
   HARDHAT_NETWORK = '',
@@ -23,7 +32,8 @@ const {
   ETHERSCAN_API,
   POLYGONSCAN_API,
   AVASCAN_API,
-  ARBISCAN_API
+  ARBISCAN_API,
+  FORKING_ENV
 } = process.env;
 
 const balance = '1000' + '0'.repeat(18);
@@ -53,8 +63,41 @@ console.log({autoMinting, HARDHAT_MINING_INTERVAL});
 
 const gwei = (n: number): number => n * 1e9;
 
+
+let forkingConfig: {
+  forking: HardhatNetworkForkingUserConfig;
+  deploy: string[];
+} | undefined;
+
+switch (FORKING_ENV) {
+  case 'bsc':
+    forkingConfig = {
+      forking: {
+        enabled: true,
+        url: 'https://bsc-dataseed1.binance.org/',
+      },
+      deploy: ['deploy/bsc'],
+    };
+    break;
+
+  case 'eth':
+    forkingConfig = {
+      forking: {
+        enabled: true,
+        url: `https://mainnet.infura.io/v3/${INFURA_ID}`,
+      },
+      deploy: ['deploy/eth'],
+    };
+    break;
+
+  default:
+    if (FORKING_ENV) throw Error(`unknown forking settings ${FORKING_ENV}`);
+}
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
+
+console.log(forkingConfig);
 
 const config: HardhatUserConfig = {
   networks: {
@@ -72,7 +115,11 @@ const config: HardhatUserConfig = {
         {balance, privateKey: '0x275cc4a2bfd4f612625204a20a2280ab53a6da2d14860c47a9f5affe58ad86d4'},
         {balance, privateKey: '0xee9d129c1997549ee09c0757af5939b2483d80ad649a0eda68e8b0357ad11131'}
       ],
-      mining: {
+      forking: forkingConfig ? { ...forkingConfig.forking } : undefined,
+      live: false,
+      saveDeployments: true,
+      deploy: ['deploy/ethereum'],
+      mining: forkingConfig ? undefined : {
         auto: autoMinting,
         interval: autoMinting ? 0 : parseInt(HARDHAT_MINING_INTERVAL || '0', 10),
       },
@@ -80,6 +127,9 @@ const config: HardhatUserConfig = {
     localhost: {
       blockGasLimit: 80000000,
       url: 'http://localhost:8545',
+      live: false,
+      saveDeployments: true,
+      deploy: ['deploy/ethereum'],
     },
     avalanche_staging: {
       url: 'https://api.avax-test.network/ext/bc/C/rpc',
@@ -192,9 +242,13 @@ const config: HardhatUserConfig = {
     maxMethodDiff: 10,
   },
   paths: {
-    sources: './contracts',
-    tests: './test',
-    artifacts: './artifacts'
+    artifacts: 'artifacts',
+    cache: 'cache',
+    deploy: 'deploy/ethereum',
+    deployments: 'deployments',
+    imports: 'imports',
+    sources: 'contracts',
+    tests: 'test',
   },
   solidity: {
     compilers: [
@@ -202,6 +256,14 @@ const config: HardhatUserConfig = {
         version: '0.8.13'
       },
     ]
+  },
+  namedAccounts: {
+    deployer: 0,
+  },
+  typechain: {
+    outDir: 'typechain',
+    target: 'ethers-v5',
+    alwaysGenerateOverloads: true,
   },
 };
 

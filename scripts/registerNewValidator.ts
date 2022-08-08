@@ -121,14 +121,14 @@ const registerNewValidator = async () => {
   }
 
   let tx = await stakingBank.create(validator.id, validator.location);
-  await waitForTx(tx.hash, provider);
+  await waitForTx(hre, tx.hash);
   console.log('new validator created');
 
   console.log('staking tokens');
 
   try {
     tx = await token.mintApproveAndStake(stakingBank.address, validator.id, stake.toString(10));
-    await waitForTx(tx.hash, provider);
+    await waitForTx(hre, tx.hash);
     console.log('mintApproveAndStake DONE');
   } catch (e) {
     console.log(e);

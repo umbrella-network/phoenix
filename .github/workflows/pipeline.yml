@@ -25,11 +25,22 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+          submodules: recursive
 
       - run: npm install
       - name: Compile contracts
         run: |
           npm run compile
+
+      - name: Install Foundry
+        uses: onbjerg/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Foundry tests
+        run: |
+          git submodule update --init --recursive
+          forge test -vvv
 
       - name: Unit tests
         run: |
