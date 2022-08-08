@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "clear": "rm -rf ./artifacts/ ./cache/ ./typechain/",
     "compile": "npx hardhat compile",
     "node": "hardhat node",
     "test": "hardhat test",
@@ -21,8 +22,8 @@
     "lint:ts": "eslint . --ext .ts,.tsx,.ts --max-warnings=0",
     "lint:fix": "npm run lint:ts -- --fix",
     "lint:sol": "solhint \"contracts/**/*.sol\" --max-warnings=0",
-    "prettier": "prettier --config .prettierrc 'scripts/**/*.ts' 'test/**/*.ts' --check",
-    "prettier:format": "prettier --config .prettierrc 'scripts/**/*.ts' 'test/**/*.ts' --write",
+    "prettier": "prettier --config .prettierrc 'deploy/**/*.ts' 'scripts/**/*.ts' 'tasks/**/*.ts' 'test/**/*.ts' --check",
+    "prettier:format": "prettier --config .prettierrc 'deploy/**/*.ts' 'scripts/**/*.ts' 'tasks/**/*.ts' 'test/**/*.ts' --write",
     "format": "npm run prettier:format && npm run lint:fix && npm run lint:sol"
   },
   "repository": {
@@ -38,6 +39,7 @@
     "@ethereum-waffle/chai": "~3.4.4",
     "@ethereum-waffle/mock-contract": "~3.4.4",
     "@ethereum-waffle/provider": "~3.4.4",
+    "@ethersproject/providers": "~5.6.8",
     "@nomiclabs/hardhat-ethers": "~2.0.6",
     "@nomiclabs/hardhat-etherscan": "~3.0.4",
     "@nomiclabs/hardhat-solhint": "2.0.0",
@@ -45,6 +47,8 @@
     "@nomiclabs/hardhat-web3": "~2.0.0",
     "@openzeppelin/contracts": "~4.6.0",
     "@openzeppelin/contracts-ethereum-package": "~3.0.0",
+    "@typechain/ethers-v5": "~9.0.0",
+    "@typechain/hardhat": "~4.0.0",
     "@types/chai": "~4.3.1",
     "@types/mocha": "~9.1.1",
     "@types/superagent": "~4.1.10",
@@ -63,7 +67,7 @@
     "ethereum-waffle": "~3.4.4",
     "ethers": "~5.5.1",
     "ganache-cli": "~6.12.2",
-    "hardhat": "~2.9.7",
+    "hardhat": "~2.9.9",
     "hardhat-deploy": "~0.11.10",
     "hardhat-deploy-ethers": "~0.3.0-beta.13",
     "hardhat-gas-reporter": "~1.0.8",
@@ -74,7 +78,8 @@
     "solidity-coverage": "~0.7.10",
     "superagent": "~6.1.0",
     "ts-node": "~9.1.1",
-    "typescript": "~4.1.5",
+    "typechain": "~7.0.0",
+    "typescript": "~4.5.4",
     "web3": "~1.6.0"
   }
 }

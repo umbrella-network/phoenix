@@ -14,5 +14,11 @@ node_modules
 cache
 artifacts
 
+typechain
+
 vr.sol
 flattened_*
+
+foundry/out/
+
+deployments/localhost

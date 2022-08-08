@@ -1,36 +1,33 @@
-import hre from 'hardhat';
-import { HttpNetworkUserConfig } from 'hardhat/types';
-import { ethers } from 'ethers';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import '@nomiclabs/hardhat-web3';
-import { Provider, TransactionReceipt } from '@ethersproject/providers';
+import { TransactionReceipt } from '@ethersproject/providers';
 
 export const sleep = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const constructorAbi = (types: string[], values: any[]): string => {
-  return ethers.utils.defaultAbiCoder.encode(types, values).replace('0x', '');
+export const doSnapshot = async (hre: HardhatRuntimeEnvironment): Promise<unknown> =>
+  hre.network.provider.request({ method: 'evm_snapshot', params: [] });
+
+export const revertSnapshot = async (hre: HardhatRuntimeEnvironment, snapshotId: unknown): Promise<void> => {
+  console.log(`${'-'.repeat(20)} evm_revert: ${snapshotId}`);
+  await hre.network.provider.request({ method: 'evm_revert', params: [snapshotId] });
 };
 
-export const isLocalNetwork = (): boolean =>
+export const isLocalNetwork = (hre: HardhatRuntimeEnvironment): boolean =>
   ['buidlerevm', 'localhost', 'docker', 'hardhat'].includes(hre.network.name);
 
 export const isProduction = (): boolean => {
   return Boolean(process.env.HARDHAT_NETWORK?.toLowerCase().match(/prod/));
 };
 
-export const getProvider = (): Provider => {
-  return new ethers.providers.JsonRpcProvider((<HttpNetworkUserConfig>hre.config.networks[hre.network.name]).url);
-};
-
-export const waitForTx = async (txHash: string, provider: Provider): Promise<TransactionReceipt | null> => {
-  if (isLocalNetwork()) {
+export const waitForTx = async (hre: HardhatRuntimeEnvironment, txHash: string): Promise<TransactionReceipt | null> => {
+  if (isLocalNetwork(hre)) {
     return null;
   }
 
   console.log('waiting for tx to be mined...', txHash);
-  const receipt = await provider.waitForTransaction(txHash);
+  const receipt = await hre.ethers.provider.waitForTransaction(txHash);
 
   if (receipt.status !== 1) {
     console.log(receipt);
@@ -46,8 +43,8 @@ export const toBytes32 = (str: string): string => {
   return `0x${bytes}${'0'.repeat(64 - bytes.length)}`;
 };
 
-export const pressToContinue = (charToPress = 'y', callback: () => void): void => {
-  if (isLocalNetwork()) {
+export const pressToContinue = (hre: HardhatRuntimeEnvironment, charToPress = 'y', callback: () => void): void => {
+  if (isLocalNetwork(hre)) {
     callback();
     return;
   }

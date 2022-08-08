@@ -1,9 +1,12 @@
-import hre from 'hardhat';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { isLocalNetwork, sleep } from './helpers';
 
-// eslint-disable-next-line
-export const verifyCode = async (address: string, constructorArguments: any): Promise<void> => {
-  if (isLocalNetwork()) {
+export const verifyCode = async (
+  hre: HardhatRuntimeEnvironment,
+  address: string,
+  constructorArguments: any // eslint-disable-line @typescript-eslint/no-explicit-any
+): Promise<void> => {
+  if (isLocalNetwork(hre)) {
     return;
   }
 

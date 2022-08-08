@@ -27,6 +27,13 @@ cd gitflow
 sudo ./install.sh
 ```
 
+3. Foundry 
+
+Install foundry on your machine: https://book.getfoundry.sh/getting-started/installation.html
+
+In case on missing lib: `brew install libusb`.
+
+
 ---
 
 ## Setup
@@ -34,12 +41,16 @@ sudo ./install.sh
 1. `git clone git@github.com:umbrella-network/phoenix.git`
 2. `git hf init`
 3. `npm install`
+4. `git submodule update --init --recursive`
 
 ---
 
 ## Testing
 
-1. `npm run test`
+```
+npm run test
+forge test -vvv
+```
 
 ---
 
@@ -58,6 +69,16 @@ sudo ./install.sh
 
 ```shell script
 npm run deploy:all
+```
+
+## New deployment scripts
+
+Note: we need to use `HARDHAT_NETWORK` until we deprecate all old scripts and configuration.
+
+```shell
+hardhat deploy --network <name>
+
+HARDHAT_NETWORK=bsc_staging hardhat redeploy-homechain --network bsc_staging
 ```
 
 For sidechain deployment you need `VALIDATOR_PK` to be setup in `.env`.
@@ -87,6 +108,15 @@ In case of any errors, please read error message. There should be some tips what
 **NOTE**: in case script stuck on deployment, try to use another RPC endpoint
 
 ### Home Chain
+
+#### New hardhat tasks
+
+```
+FORKING_ENV=bsc npx hardhat node --no-deploy --no-reset
+npx hardhat redeploy-homechain
+```
+
+#### Old scripts
 
 ```shell
 hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/reDeployToken.ts

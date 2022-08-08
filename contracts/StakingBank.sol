@@ -39,12 +39,23 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
         string memory _name,
         string memory _symbol
     )
-    Registrable(_contractRegistry)
-    ERC20(string.concat("staked ", _name), string.concat("sb", _symbol))
+        Registrable(_contractRegistry)
+        ERC20(string.concat("staked ", _name), string.concat("sb", _symbol))
     {
         token = ERC20(_contractRegistry.requireAndGetAddress("UMB"));
         _setMinAmountForStake(_minAmountForStake);
     }
+
+    /// @inheritdoc Registrable
+    function register() external override {
+        // there are no requirements atm
+    }
+
+    /// @inheritdoc Registrable
+    function unregister() external override {
+        // there are no requirements atm
+    }
+
 
     /// @inheritdoc IStakingBank
     function setMinAmountForStake(uint256 _minAmountForStake) external onlyOwner {
