@@ -273,7 +273,7 @@ describe('Chain', () => {
     describe('.getLeaderIndex()', () => {
       const numberOfValidators = 3;
 
-      it(`expect to return valid index for ${numberOfValidators}`, async () => {
+      it(`expect to return valid index for ${numberOfValidators} validators`, async () => {
         const id = await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber());
 
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
@@ -281,21 +281,22 @@ describe('Chain', () => {
           'round #1'
         );
 
-        await mintBlocks(timePadding);
+        await mintBlocks(timePadding + 1);
         console.log(await blockTimestamp());
+
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
           (id + 1) % numberOfValidators,
           'round #2'
         );
 
-        await mintBlocks(timePadding);
+        await mintBlocks(timePadding + 1);
         console.log(await blockTimestamp());
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
           (id + 2) % numberOfValidators,
           'round #3'
         );
 
-        await mintBlocks(timePadding);
+        await mintBlocks(timePadding + 1);
         console.log(await blockTimestamp());
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
           (id + 3) % numberOfValidators,
@@ -669,7 +670,7 @@ describe('Chain', () => {
       const status: ChainStatus = await contract.getStatus();
 
       expect(status.lastDataTimestamp).to.eq(dataTimestamp, 'invalid lastDataTimestamp');
-      expect(status.lastBlockId).to.eq(dataTimestamp, 'invalid block ID');
+      expect(status.lastId).to.eq(dataTimestamp, 'invalid block ID');
       expect(status.nextBlockId).to.eq(dataTimestamp + timePadding + 1, 'invalid next block ID');
       expect(status.nextLeader).to.eq(validatorAddress, 'invalid validator');
       expect(status.validators).to.eql([validatorAddress], 'invalid validators list');

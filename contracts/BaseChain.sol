@@ -85,11 +85,6 @@ abstract contract BaseChain is Registrable, Ownable {
     /// @param _contractRegistry Registry address
     /// @param _padding required "space" between blocks in seconds
     /// @param _requiredSignatures number of required signatures for accepting consensus submission
-    /// we have a plan to use signatures also in foreign Chains so lets keep it in BaseChain
-    /// @param _allowForMixedType we have two "types" of Chain: HomeChain and ForeignChain, when we redeploying
-    /// we don't want to mix up them, so we checking, if new Chain has the same type as current one.
-    /// However, when we will be switching from one homechain to another one, we have to allow for this mixing up.
-    /// This flag will tell contract, if this is the case.
     constructor(
         IRegistry _contractRegistry,
         uint32 _padding,
@@ -165,6 +160,11 @@ abstract contract BaseChain is Registrable, Ownable {
         emit LogDeprecation(msg.sender);
     }
 
+    /// @dev getter for `_consensusData`
+    function getConsensusData() external view returns (ConsensusData memory) {
+        return _consensusData;
+    }
+
     /// @dev number of blocks (consensus rounds) saved in this contract
     function blocksCount() external view returns (uint256) {
         return _consensusData.sequence - _consensusData.blocksCountOffset;
@@ -179,7 +179,7 @@ abstract contract BaseChain is Registrable, Ownable {
     }
 
     /// @return TRUE if contract is ForeignChain, FALSE otherwise
-    function isForeign() virtual external pure returns (bool);
+    function isForeign() external pure virtual returns (bool);
 
     /// @inheritdoc Registrable
     function getName() external pure override returns (bytes32) {
@@ -213,11 +213,6 @@ abstract contract BaseChain is Registrable, Ownable {
 
     function requiredSignatures() external view returns (uint16) {
         return _REQUIRED_SIGNATURES;
-    }
-
-    /// @dev getter for `_consensusData`
-    function getConsensusData() public view returns (ConsensusData memory) {
-        return _consensusData;
     }
 
     /// @dev calculates block ID for provided timestamp

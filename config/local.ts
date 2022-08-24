@@ -6,7 +6,7 @@ const replicator = '0x620583C75BB474E06485893B795b0883b5816D10';
 const local: GlobalConfig = {
   arbitrum: {
     contractRegistry: {
-      address: '0x4A28406ECE8fFd7A91789738a5ac15DAc44bFa1b'
+      address: '0x7c2C195CD6D34B8F845992d380aADB2730bB9C6F'
     },
     chain: {
       padding: 65535,

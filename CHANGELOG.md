@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Changed
 - use `timestamp` as block ID
+- new multichain architecture
 
 ## [4.6.1] - 2022-07-20
 ### Changed

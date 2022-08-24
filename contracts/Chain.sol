@@ -1,24 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@umb-network/toolbox/dist/contracts/lib/ValueDecoder.sol";
-
-import "./interfaces/IStakingBank.sol";
-
 import "./BaseChain.sol";
 
-/// @dev contract for homechain
 contract Chain is BaseChain {
-    using MerkleProof for bytes32;
-
     IStakingBank public immutable stakingBank;
 
     event LogMint(address indexed minter, uint256 blockId, uint256 staked, uint256 power);
     event LogVoter(uint256 indexed blockId, address indexed voter, uint256 vote);
 
-    error SignaturesOutOfOrder();
     error NotEnoughSignatures();
+    error SignaturesOutOfOrder();
 
     /// @param _contractRegistry Registry address
     /// @param _padding required "space" between blocks in seconds
@@ -34,81 +26,6 @@ contract Chain is BaseChain {
         bool _allowForMixedType
     ) BaseChain(_contractRegistry, _padding, _requiredSignatures, _allowForMixedType) {
         stakingBank = IStakingBank(_contractRegistry.requireAndGetAddress("StakingBank"));
-    }
-
-    /// @inheritdoc BaseChain
-    function isForeign() external pure override returns (bool) {
-        return false;
-    }
-
-    /// @dev helper method that returns all important data about current state of contract
-    /// @return blockNumber `block.number`
-    /// @return timePadding `this.padding`
-    /// @return lastDataTimestamp timestamp for last submitted consensus
-    /// @return lastBlockId ID of last submitted consensus
-    /// @return nextLeader leader for `block.timestamp + 1`
-    /// @return nextBlockId block ID for `block.timestamp + padding`
-    /// @return validators array of all validators addresses
-    /// @return powers array of all validators powers
-    /// @return locations array of all validators locations
-    /// @return staked total UMB staked by validators
-    /// @return minSignatures `this.requiredSignatures`
-    function getStatus() external view returns(
-        uint256 blockNumber,
-        uint32 timePadding,
-        uint32 lastDataTimestamp,
-        uint32 lastBlockId,
-        address nextLeader,
-        uint32 nextBlockId,
-        address[] memory validators,
-        uint256[] memory powers,
-        string[] memory locations,
-        uint256 staked,
-        uint16 minSignatures
-    ) {
-        ConsensusData memory data = _consensusData;
-
-        blockNumber = block.number;
-        timePadding = data.padding;
-        lastBlockId = data.lastTimestamp;
-        lastDataTimestamp = lastBlockId;
-        minSignatures = _REQUIRED_SIGNATURES;
-
-        staked = stakingBank.totalSupply();
-        uint256 numberOfValidators = stakingBank.getNumberOfValidators();
-        powers = new uint256[](numberOfValidators);
-        validators = new address[](numberOfValidators);
-        locations = new string[](numberOfValidators);
-
-        for (uint256 i = 0; i < numberOfValidators;) {
-            validators[i] = stakingBank.addresses(i);
-            (, locations[i]) = stakingBank.validators(validators[i]);
-            powers[i] = stakingBank.balanceOf(validators[i]);
-
-            unchecked {
-                i++;
-            }
-        }
-
-        unchecked {
-            // we will not overflow with timestamp in a lifetime
-            nextBlockId = lastBlockId + data.padding + 1;
-
-            nextLeader = numberOfValidators > 0
-                // we will not overflow with timestamp in a lifetime
-                ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
-                : address(0);
-        }
-    }
-
-    /// @return address of leader for next second
-    function getNextLeaderAddress() external view returns (address) {
-        return getLeaderAddressAtTime(block.timestamp + 1);
-    }
-
-    /// @return address of current leader
-    function getLeaderAddress() external view returns (address) {
-        return getLeaderAddressAtTime(block.timestamp);
     }
 
     /// @dev method for submitting consensus data
@@ -149,6 +66,7 @@ contract Chain is BaseChain {
             testimony = abi.encodePacked(testimony, _keys[i], _values[i]);
 
             unchecked {
+                // we can't pass enough data to overflow
                 i++;
             }
         }
@@ -181,7 +99,7 @@ contract Chain is BaseChain {
 
             unchecked {
                 // we can't overflow because that means token overflowed
-                // also even if we do, we will get lower power
+                // and even if we do, we will get lower power
                 power += balance;
                 i++;
             }
@@ -199,10 +117,86 @@ contract Chain is BaseChain {
         _consensusData.lastTimestamp = _dataTimestamp;
     }
 
+    /// @inheritdoc BaseChain
+    function isForeign() external pure virtual override returns (bool) {
+        return false;
+    }
+
+    /// @dev helper method that returns all important data about current state of contract
+    /// @return blockNumber `block.number`
+    /// @return timePadding `this.padding`
+    /// @return lastDataTimestamp timestamp for last submitted consensus
+    /// @return lastId ID of last submitted consensus
+    /// @return nextLeader leader for `block.timestamp + 1`
+    /// @return nextBlockId block ID for `block.timestamp + padding`
+    /// @return validators array of all validators addresses
+    /// @return powers array of all validators powers
+    /// @return locations array of all validators locations
+    /// @return staked total UMB staked by validators
+    /// @return minSignatures `this.requiredSignatures`
+    function getStatus() external view virtual returns(
+        uint256 blockNumber,
+        uint32 timePadding,
+        uint32 lastDataTimestamp,
+        uint32 lastId,
+        address nextLeader,
+        uint32 nextBlockId,
+        address[] memory validators,
+        uint256[] memory powers,
+        string[] memory locations,
+        uint256 staked,
+        uint16 minSignatures
+    ) {
+        ConsensusData memory data = _consensusData;
+
+        blockNumber = block.number;
+        timePadding = data.padding;
+        lastId = data.lastTimestamp;
+        lastDataTimestamp = lastId;
+        minSignatures = _REQUIRED_SIGNATURES;
+
+        staked = stakingBank.totalSupply();
+        uint256 numberOfValidators = stakingBank.getNumberOfValidators();
+        powers = new uint256[](numberOfValidators);
+        validators = new address[](numberOfValidators);
+        locations = new string[](numberOfValidators);
+
+        for (uint256 i = 0; i < numberOfValidators;) {
+            validators[i] = stakingBank.addresses(i);
+            (, locations[i]) = stakingBank.validators(validators[i]);
+            powers[i] = stakingBank.balanceOf(validators[i]);
+
+            unchecked {
+                // we will run out of gas before overflow happen
+                i++;
+            }
+        }
+
+        unchecked {
+            // we will not overflow with timestamp in a lifetime
+            nextBlockId = lastId + data.padding + 1;
+
+            nextLeader = numberOfValidators > 0
+                // we will not overflow with timestamp in a lifetime
+                ? validators[getLeaderIndex(numberOfValidators, block.timestamp + 1)]
+                : address(0);
+        }
+    }
+
+    /// @return address of leader for next second
+    function getNextLeaderAddress() external view returns (address) {
+        return getLeaderAddressAtTime(block.timestamp + 1);
+    }
+
+    /// @return address of current leader
+    function getLeaderAddress() external view returns (address) {
+        return getLeaderAddressAtTime(block.timestamp);
+    }
+
     /// @param _numberOfValidators total number of validators
     /// @param _timestamp timestamp for which you want to calculate index
     /// @return leader index, use it for StakingBank.addresses[index] to fetch leader address
-    function getLeaderIndex(uint256 _numberOfValidators, uint256 _timestamp) public view returns (uint256) {
+    function getLeaderIndex(uint256 _numberOfValidators, uint256 _timestamp) public view virtual returns (uint256) {
         ConsensusData memory data = _consensusData;
 
         unchecked {
@@ -219,7 +213,7 @@ contract Chain is BaseChain {
     // @todo - properly handled non-enabled validators, newly added validators, and validators with low stake
     /// @param _timestamp timestamp for which you want to calculate leader address
     /// @return leader address for provider timestamp
-    function getLeaderAddressAtTime(uint256 _timestamp) public view returns (address) {
+    function getLeaderAddressAtTime(uint256 _timestamp) public view virtual returns (address) {
         uint256 numberOfValidators = stakingBank.getNumberOfValidators();
 
         if (numberOfValidators == 0) {

@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
+
 import { networks, REGISTRY, UMB, UMB_BYTES32, ERC20 } from '../../constants';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -7,22 +8,22 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy, execute, read } = deployments;
   const [deployer] = await hre.ethers.getSigners();
 
-  let umbAddress: string;
+  const umbAddress = await read(REGISTRY, 'getAddressByString', UMB);
+  console.log(`${UMB} address => ${umbAddress}`);
+
+  if (umbAddress != hre.ethers.constants.AddressZero) {
+    return;
+  }
 
   switch (hre.network.name) {
     case networks.LOCALHOST:
     case networks.HARDHAT:
-      umbAddress = await read(REGISTRY, 'getAddressByString', UMB);
-      console.log(`${UMB} address => ${umbAddress}`);
-
-      if (umbAddress != hre.ethers.constants.AddressZero) {
-        return;
-      }
-
+      // we will deploy mock UMB
       break;
 
     default:
-      throw Error(`missing UMB address for ${hre.network.name}`);
+      console.log(`missing UMB address for ${hre.network.name}`);
+      return;
   }
 
   const erc20 = await deploy('ERC20', {
