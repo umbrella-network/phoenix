@@ -7,11 +7,12 @@ import { Contract, ContractFactory, Signer } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { deployMockContract, MockContract } from '@ethereum-waffle/mock-contract';
 import { toBytes32 } from '../scripts/utils/helpers';
+import { REGISTRY, STAKING_BANK } from '../constants';
 
 use(waffleChai);
 
-const Registry = artifacts.readArtifactSync('Registry');
-const StakingBank = artifacts.readArtifactSync('StakingBank');
+const Registry = artifacts.readArtifactSync(REGISTRY);
+const StakingBank = artifacts.readArtifactSync(STAKING_BANK);
 const Token = artifacts.readArtifactSync('Token');
 
 const defaultMinAmount = 1000;

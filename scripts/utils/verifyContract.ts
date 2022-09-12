@@ -19,7 +19,7 @@ export const verifyCode = async (
       break;
     } catch (e: unknown) {
       console.log((<Error>e).message);
-      if ((<Error>e).message.includes('Already Verified')) break;
+      if ((<Error>e).message.toLowerCase().includes('already verified')) break;
       console.log('retrying in 5 sec...');
       await sleep(5000);
     }

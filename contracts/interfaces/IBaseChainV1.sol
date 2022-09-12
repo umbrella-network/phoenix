@@ -13,4 +13,12 @@ interface IBaseChainV1 {
     function getLatestBlockId() external view returns (uint32);
 
     function getBlockTimestamp(uint32 _blockId) external view returns (uint32);
+
+    function getStatus() external view returns (
+        uint256 blockNumber,
+        uint16 timePadding,
+        uint32 lastDataTimestamp,
+        uint32 lastId,
+        uint32 nextBlockId
+    );
 }

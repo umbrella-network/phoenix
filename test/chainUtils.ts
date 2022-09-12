@@ -9,7 +9,7 @@ import { deployMockContract, MockContract } from '@ethereum-waffle/mock-contract
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { toBytes32 } from '../scripts/utils/helpers';
 import { Receipt } from 'hardhat-deploy/dist/types';
-import { CHAIN } from '../constants';
+import { CHAIN, REGISTRY, STAKING_BANK } from '../constants';
 import { SubmitPreparedData } from '../types/types';
 
 const { SIGNED_NUMBER_PREFIX } = SDKConstants;
@@ -119,9 +119,9 @@ export const setupForChainWithMocks = async (props: {
 }) => {
   const { hre } = props;
 
-  const Registry = artifacts.readArtifactSync('Registry');
-  const Chain = artifacts.readArtifactSync('Chain');
-  const StakingBank = artifacts.readArtifactSync('StakingBank');
+  const Registry = artifacts.readArtifactSync(REGISTRY);
+  const Chain = artifacts.readArtifactSync(CHAIN);
+  const StakingBank = artifacts.readArtifactSync(STAKING_BANK);
   const Token = artifacts.readArtifactSync('Token');
 
   const timePadding = props.padding || 100;

@@ -1,8 +1,8 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-import { CHAIN, networks } from '../../constants';
+import { CHAIN, FOREIGN_CHAIN, networks, REGISTRY } from '../../constants';
 import { DeploymentData } from '../_helpers/types';
-import { resolveRegistry } from '../../tasks/_helpers/resolveRegistry';
+import { isMasterChain } from '../../constants/networks';
 
 type ChainArgs = {
   contractRegistry: string;
@@ -11,15 +11,15 @@ type ChainArgs = {
   allowForMixedType: boolean;
 };
 
-const deploymentData = (chainArgs: ChainArgs): DeploymentData => {
+const deploymentData = async (hre: HardhatRuntimeEnvironment, chainArgs: ChainArgs): Promise<DeploymentData> => {
   return {
     args: Object.values(chainArgs),
-    contractName: CHAIN,
+    contractName: isMasterChain(await hre.getChainId()) ? CHAIN : FOREIGN_CHAIN,
   };
 };
 
 export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promise<DeploymentData> => {
-  const registry = await resolveRegistry(hre);
+  const registry = await hre.deployments.get(REGISTRY);
 
   let padding: number;
   let requiredSignatures: number;
@@ -38,7 +38,7 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
       throw Error(`missing ${hre.network.name} settings for ${CHAIN}`);
   }
 
-  return deploymentData({
+  return deploymentData(hre, {
     contractRegistry: registry.address,
     padding,
     requiredSignatures,

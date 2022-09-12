@@ -1,90 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import "./Registry.sol";
-import "./BaseChain.sol";
+import "./Chain.sol";
 
-/// @dev contract for foreign-chains
-contract ForeignChain is BaseChain {
-    using MerkleProof for bytes32;
-
-    /// @dev replicator is the one who can replicate consensus from home-chain to this contract
-    address public immutable replicator;
-
-    event LogBlockReplication(address indexed minter, uint32 blockId);
-
-    error OnlyReplicator();
-    error ContractDeprecated();
-    error DuplicatedBlockId();
-    error IDConflict();
+/// @dev contract for foreign chains
+contract ForeignChain is Chain {
+    error NotSupported();
 
     /// @param _contractRegistry Registry address
     /// @param _padding required "space" between blocks in seconds
-    /// @param _requiredSignatures this is only for compatibility
-    /// @param _replicator address of wallet that is allow to do submit
+    /// @param _requiredSignatures number of required signatures for accepting consensus submission
     constructor(
         IRegistry _contractRegistry,
         uint32 _padding,
         uint16 _requiredSignatures,
-        address _replicator,
         bool _allowForMixedType
-    ) BaseChain(_contractRegistry, _padding, _requiredSignatures, _allowForMixedType) {
-        replicator = _replicator;
-    }
-
-    modifier onlyReplicator() {
-        if (msg.sender != replicator) revert OnlyReplicator();
-        _;
-    }
-
-    /// @dev method for submitting/replicating consensus data
-    /// @param _dataTimestamp consensus timestamp, this is time for all data in merkle tree including FCDs
-    /// @param _root merkle root
-    /// @param _keys FCDs keys
-    /// @param _values FCDs values
-    /// @param _blockId consensus ID from homechain, it must be equal to `_dataTimestamp`
-    /// this parameter can be remove in a future, it is kept for backward compatibility
-    // solhint-disable-next-line code-complexity
-    function submit(
-        uint32 _dataTimestamp,
-        bytes32 _root,
-        bytes32[] calldata _keys,
-        uint256[] calldata _values,
-        uint32 _blockId
-    ) external onlyReplicator {
-        ConsensusData memory data = _consensusData;
-
-        if (_dataTimestamp != _blockId) revert IDConflict();
-        if (data.deprecated) revert ContractDeprecated();
-        if (roots[_blockId] != bytes32(0)) revert DuplicatedBlockId();
-        if (_dataTimestamp <= data.lastTimestamp) revert DataToOld();
-
-        unchecked {
-            // we will not overflow on `timestamp` and `padding` in a life time
-            if (data.lastTimestamp + data.padding >= block.timestamp) revert BlockSubmittedToFast();
-        }
-
-        if (_keys.length != _values.length) revert ArraysDataDoNotMatch();
-
-        for (uint256 i = 0; i < _keys.length;) {
-            if (uint224(_values[i]) != _values[i]) revert FCDOverflow();
-
-            fcds[_keys[i]] = FirstClassData(uint224(_values[i]), _dataTimestamp);
-
-            unchecked {
-                i++;
-            }
-        }
-
-        roots[_blockId] = _root;
-        _consensusData.lastTimestamp = _dataTimestamp;
-
-        unchecked {
-            // we will not overflow in a lifetime
-            _consensusData.sequence = data.sequence + 1;
-        }
-
-        emit LogBlockReplication(msg.sender, _blockId);
+    ) Chain(_contractRegistry, _padding, _requiredSignatures, _allowForMixedType) {
+        // no additional configuration needed
     }
 
     /// @inheritdoc BaseChain
@@ -92,27 +24,59 @@ contract ForeignChain is BaseChain {
         return true;
     }
 
-    /// @dev helper method that returns all important data about current state of contract
+    /// @inheritdoc Chain
+    /// @notice this method is made to be compatible with MasterChain, but it does not return full data eg validators
+    /// data will be missing.
     /// @return blockNumber `block.number`
-    /// @return timePadding `consensusData.padding`
+    /// @return timePadding `this.padding`
     /// @return lastDataTimestamp timestamp for last submitted consensus
-    /// @return lastId ID same as `lastDataTimestamp` because ID is timestamp
-    /// @return nextBlockId block ID for `block.timestamp + 1`
-    function getStatus() external view returns(
+    /// @return lastId ID of last submitted consensus
+    /// @return nextLeader will be always address(0)
+    /// @return nextBlockId block ID for `block.timestamp + padding`
+    /// @return validators array will be always empty
+    /// @return powers array will be always empty
+    /// @return locations array will be always empty
+    /// @return staked total UMB staked by validators
+    /// @return minSignatures `this.requiredSignatures`
+    function getStatus() external view override returns(
         uint256 blockNumber,
         uint32 timePadding,
         uint32 lastDataTimestamp,
         uint32 lastId,
-        uint32 nextBlockId
+        address nextLeader,
+        uint32 nextBlockId,
+        address[] memory validators,
+        uint256[] memory powers,
+        string[] memory locations,
+        uint256 staked,
+        uint16 minSignatures
     ) {
+        ConsensusData memory data = _consensusData;
+
         blockNumber = block.number;
-        timePadding = _consensusData.padding;
-        lastId = _consensusData.lastTimestamp;
+        timePadding = data.padding;
+        lastId = data.lastTimestamp;
         lastDataTimestamp = lastId;
+        minSignatures = _REQUIRED_SIGNATURES;
+
+        staked = stakingBank.totalSupply();
+        uint256 numberOfValidators = 0;
+        powers = new uint256[](numberOfValidators);
+        validators = new address[](numberOfValidators);
+        locations = new string[](numberOfValidators);
+        nextLeader = address(0);
 
         unchecked {
-            // we will not overflow on `timestamp` in a life time
-            nextBlockId = getBlockIdAtTimestamp(block.timestamp + 1);
+            // we will not overflow with timestamp in a lifetime
+            nextBlockId = lastId + data.padding + 1;
         }
+    }
+
+    function getLeaderIndex(uint256, uint256) public pure override returns (uint256) {
+        revert NotSupported();
+    }
+
+    function getLeaderAddressAtTime(uint256) public pure override returns (address) {
+        revert NotSupported();
     }
 }

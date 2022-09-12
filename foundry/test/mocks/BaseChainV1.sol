@@ -41,4 +41,14 @@ contract BaseChainV1 is IBaseChainV1 {
     function getBlockTimestamp(uint32 _blockId) external view returns (uint32) {
         return blockTimestamp;
     }
+
+    function getStatus() external view returns (
+        uint256 blockNumber,
+        uint16 timePadding,
+        uint32 lastDataTimestamp,
+        uint32 lastId,
+        uint32 nextBlockId
+    ) {
+        revert("not in use");
+    }
 }
