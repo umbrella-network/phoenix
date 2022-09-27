@@ -22,7 +22,7 @@ const staging: GlobalConfig = {
       address: '0xbC758FCB97e06Ec635DFf698f55e41aCC35e1d2d'
     },
     contractRegistry: {
-      address: '0x65833489170A55374786B97C96e691949C60175a'
+      address: '0xc94A585C1bC804C03A864Ee766Dd1B432f73f9A8'
     },
     chain: {
       padding: 60,
@@ -35,7 +35,7 @@ const staging: GlobalConfig = {
       address: '0x3fBdba5E516611e2E9C1aA6cdFB8376c7cA7d7CE'
     },
     contractRegistry: {
-      address: '0xaB61f05a9dabCEd63c9100b623A4c29FfD9bf077'
+      address: '0x22Cdc7608067870cf42a4CB568582Cf56aca2436'
     },
     chain: {
       padding: 60,
@@ -58,7 +58,7 @@ const staging: GlobalConfig = {
       address: '0x2BB2B0df0DB14EAfd5FCaBc46Fd543F7a6dFF8E9'
     },
     contractRegistry: {
-      address: '0x8f98d3B5C911206C1Ac08B9938875620A03BCd59'
+      address: '0xcA702946B0f7d5537B3B6791F45F2E2459374C75'
     },
     token: {
       totalSupply: '1000000' + '0'.repeat(18),
