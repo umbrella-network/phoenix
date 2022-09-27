@@ -1,6 +1,6 @@
 {
   "name": "phoenix",
-  "version": "4.6.1",
+  "version": "4.6.2",
   "description": "A proof-of-stake contract for minting sidechain blocks.",
   "main": "hardhat.config.ts",
   "directories": {
