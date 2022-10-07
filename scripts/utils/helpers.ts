@@ -1,5 +1,4 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import '@nomiclabs/hardhat-web3';
 import { TransactionReceipt } from '@ethersproject/providers';
 
 export const sleep = (ms: number): Promise<void> => {

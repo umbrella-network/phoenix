@@ -27,10 +27,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           submodules: recursive
 
-      - run: npm install
-      - name: Compile contracts
-        run: |
-          npm run compile
+      - run: yarn install
 
       - name: Install Foundry
         uses: onbjerg/foundry-toolchain@v1
@@ -42,17 +39,19 @@ jobs:
           git submodule update --init --recursive
           forge test -vvv
 
+      - name: Compile contracts
+        run: yarn compile
+        
       - name: Unit tests
-        run: |
-          npm run test
+        run: yarn test
 
       - name: Solidity Lint
         run: |
-          npm run lint:sol
+          yarn lint:sol
 
       - name: JS Lint
         run: |
-          npm run lint:ts
+          yarn lint:ts
 
       - name: Prettier
-        run: npm run prettier
+        run: yarn prettier

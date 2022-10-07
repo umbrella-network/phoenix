@@ -23,6 +23,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       if (bytes32 != '0x436861696e000000000000000000000000000000000000000000000000000000') {
         throw new Error(`sanity check failed: ${bytes32}`);
       }
+
+      console.log('sanity check', CHAIN, bytes32);
     } catch (e) {
       console.log(e);
 
