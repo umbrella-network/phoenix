@@ -123,7 +123,7 @@ contract StakingBank is IStakingBank, ERC20, ReentrancyGuard, Registrable, Ownab
         uint256 balance = balanceOf(_id);
 
         if (balance != 0) {
-            _unstake(_id, balanceOf(_id));
+            _unstake(_id, balance);
         }
 
         if (addresses.length == 1) {
