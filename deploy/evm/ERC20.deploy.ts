@@ -22,7 +22,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       break;
 
     default:
-      console.log(`missing UMB address for ${hre.network.name}`);
+      console.log(`missing UMB address for ${hre.network.name}, probably not deployed on that network.`);
       return;
   }
 

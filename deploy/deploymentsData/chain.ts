@@ -29,13 +29,15 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
     case networks.LOCALHOST:
     case networks.HARDHAT:
     case networks.BSC_STAGING:
+    case networks.POLYGON_STAGING:
+    case networks.AVALANCHE_STAGING:
       padding = 60;
       requiredSignatures = 1;
       allowForMixedType = false; // !!process.env.ALLOW_FOR_MIXED_TYPE
       break;
 
     default:
-      throw Error(`missing ${hre.network.name} settings for ${CHAIN}`);
+      throw Error(`missing ${hre.network.name} settings for ${CHAIN}, copy them from old config.`);
   }
 
   return deploymentData(hre, {

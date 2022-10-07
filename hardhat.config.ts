@@ -1,19 +1,18 @@
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
-import '@nomiclabs/hardhat-web3';
+import '@typechain/hardhat';
+import 'hardhat-deploy';
+import 'hardhat-deploy-ethers';
+import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
 import '@nomiclabs/hardhat-etherscan';
 import 'solidity-coverage';
 
-import 'hardhat-deploy';
-import 'hardhat-deploy-ethers';
-import 'hardhat-gas-reporter';
-
-import '@typechain/hardhat';
-
-import './tasks';
-
-require('./scripts/customEnv'); // eslint-disable-line
+// there is undefined issue in this repo, ts-node is ignoring flag TS_NODE_TRANSPILE_ONLY=1 and throw errors
+// on missing typechain/
+if (!process.env.TS_NODE_TRANSPILE_ONLY) {
+  require('./tasks');
+}
 
 import {HardhatNetworkForkingUserConfig, HardhatUserConfig} from 'hardhat/types';
 import {ARBITRUM, AVALANCHE, BSC, ETH, FORKED_BSC_ID, FORKED_ETH_ID, POLYGON} from './constants/networks';
@@ -37,6 +36,7 @@ const {
   AVASCAN_API = '',
   ARBISCAN_API = '',
   FORKING_ENV,
+  FORKING_BLOCK_NUMBER,
   STAGING
 } = process.env;
 
@@ -110,6 +110,7 @@ switch (FORKING_ENV) {
     forkingConfig = {
       forking: {
         enabled: true,
+        blockNumber: FORKING_BLOCK_NUMBER ? parseInt(FORKING_BLOCK_NUMBER, 10) : undefined,
         url: 'https://flashy-fittest-lambo.bsc.discover.quiknode.pro/72b200feabb7787e65699c8a082aa27ac59ddcf2/',
       },
       deploy: ['deploy/evm'],
@@ -120,6 +121,7 @@ switch (FORKING_ENV) {
     forkingConfig = {
       forking: {
         enabled: true,
+        blockNumber: FORKING_BLOCK_NUMBER ? parseInt(FORKING_BLOCK_NUMBER, 10) : undefined,
         url: `https://mainnet.infura.io/v3/${INFURA_ID}`,
       },
       deploy: ['deploy/evm'],

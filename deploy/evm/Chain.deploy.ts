@@ -97,6 +97,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   const inRegistry = await read(REGISTRY, 'getAddressByString', CHAIN);
+  console.log({ inRegistry });
 
   if (inRegistry != chain.address) {
     console.log(`current ${CHAIN_NAME}: ${inRegistry}`);
@@ -167,7 +168,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       await Promise.all([registerTx, importContractsTx, (await unregisterTx).wait(1)]);
     }
   } else {
-    console.log(`${CHAIN_NAME} already registered`);
+    console.log(`${CHAIN_NAME} already registered`, inRegistry);
 
     const consensusData: BaseChain.ConsensusDataStruct = await read(CHAIN_NAME, 'getConsensusData');
     console.log({ consensusData });
