@@ -360,6 +360,26 @@ describe('Chain', () => {
             .revertedWith('Mock on the method is not initialized');
         });
 
+        it('fail when signature arrays do not match', async () => {
+          await mockSubmitWrapper();
+          const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
+
+          await expect(
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [], [r], [s])
+          ).to.be.revertedWith('NotEnoughSignatures');
+
+          await expect(
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [], [s])
+          ).to.be.revertedWith('out-of-bounds or negative index');
+
+          await expect(
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [])
+          ).to.be.revertedWith('out-of-bounds or negative index');
+
+          await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).not.to.be
+            .reverted;
+        });
+
         describe('check the future dataTimestamp', () => {
           it('NOT failing when timestamp in acceptable range', async () => {
             await mockSubmitWrapper();
@@ -465,7 +485,7 @@ describe('Chain', () => {
 
             await expect(
               contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-            ).to.be.revertedWith('BlockSubmittedToFast');
+            ).to.be.revertedWith('BlockSubmittedToFastOrDataToOld');
           });
 
           describe('verify Proof', () => {
@@ -485,6 +505,30 @@ describe('Chain', () => {
               const { proofs, proofItemsCounter } = tree.getFlatProofsForKeys(keys);
               const leaves = keys.map((k) => tree.getLeafForKey(k));
               const result = new Array(keys.length).fill(true);
+
+              expect(await contract.verifyProofs(blockIds, proofs, proofItemsCounter, leaves)).to.eql(result);
+            });
+
+            it('throws when array length not match', async () => {
+              const keys = Object.keys(inputs).slice(-3);
+              const blockIds = new Array(keys.length).fill(dataTimestamp);
+              const { proofs, proofItemsCounter } = tree.getFlatProofsForKeys(keys);
+              const leaves = keys.map((k) => tree.getLeafForKey(k));
+              const result = new Array(keys.length).fill(true);
+
+              expect(blockIds.length).gt(1);
+
+              await expect(contract.verifyProofs([blockIds[0]], proofs, proofItemsCounter, leaves)).to.revertedWith(
+                'out-of-bounds or negative index'
+              );
+
+              await expect(contract.verifyProofs(blockIds, proofs, [proofItemsCounter[0]], leaves)).to.revertedWith(
+                'out-of-bounds or negative index'
+              );
+
+              const verified = await contract.verifyProofs(blockIds, proofs, proofItemsCounter, [leaves[0]]);
+              expect(verified.length).eq(1, 'returned array length is based on leaves');
+              expect(verified).to.eql([true]);
 
               expect(await contract.verifyProofs(blockIds, proofs, proofItemsCounter, leaves)).to.eql(result);
             });
@@ -530,7 +574,7 @@ describe('Chain', () => {
                   console.log({ dataTimestamp, root });
                   await expect(
                     contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
-                  ).to.revertedWith('BlockSubmittedToFast');
+                  ).to.revertedWith('BlockSubmittedToFastOrDataToOld');
                 });
               });
             });
@@ -560,7 +604,7 @@ describe('Chain', () => {
           await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not.be.reverted;
         });
 
-        it.skip('accept max FCD value GAS', async () => {
+        it.skip('accept max FCD value (GAS calculations)', async () => {
           await mockSubmitWrapper();
 
           for (let i = 0; i < 20; i++) {
@@ -572,6 +616,31 @@ describe('Chain', () => {
             // 1FCD avg = 104497 gas
             // 0 FCD => 87092
           }
+        });
+
+        it('throw when key/value array not match', async () => {
+          await mockSubmitWrapper();
+          const values = [1, 2, '0x' + 'F'.repeat(56)];
+
+          const { r, s, v, dataTimestamp } = await prepareData(
+            validator,
+            await blockTimestamp(),
+            root,
+            fcdKeys,
+            values
+          );
+
+          // recover sig will return some other address than validator (because we will loop over just one fcd element),
+          // so mock function will fail
+          await expect(contract.submit(dataTimestamp, root, [fcdKeys[0]], values, [v], [r], [s])).to.be.revertedWith(
+            'Mock on the method is not initialized'
+          );
+
+          await expect(contract.submit(dataTimestamp, root, fcdKeys, [values[0]], [v], [r], [s])).to.be.revertedWith(
+            'out-of-bounds or negative index'
+          );
+
+          await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not.be.reverted;
         });
 
         it('throw when FCD overflows', async () => {

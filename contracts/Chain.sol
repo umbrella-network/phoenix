@@ -46,7 +46,9 @@ contract Chain is BaseChain {
         bytes32[] memory _r,
         bytes32[] memory _s
     ) external {
-        if (_keys.length != _values.length) revert ArraysDataDoNotMatch();
+        // below two checks are only for pretty errors, so we can safe gas and allow for raw revert
+        // if (_keys.length != _values.length) revert ArraysDataDoNotMatch();
+        // if (_v.length != _r.length || _r.length != _s.length) revert ArraysDataDoNotMatch();
 
         _verifySubmitTimestampAndIncSequence(_dataTimestamp);
 
@@ -87,10 +89,7 @@ contract Chain is BaseChain {
             prevSigner = signer;
 
             if (balance == 0) {
-                unchecked {
-                    i++;
-                }
-
+                unchecked { i++; }
                 continue;
             }
 
@@ -225,7 +224,7 @@ contract Chain is BaseChain {
         return stakingBank.addresses(validatorIndex);
     }
 
-    /// @dev we had stack too dip in `submit` so this method was created as a solution
+    /// @dev we had stack too deep in `submit` so this method was created as a solution
     // we increasing `_consensusData.sequence` here so we don't have to read sequence again in other place
     function _verifySubmitTimestampAndIncSequence(uint256 _dataTimestamp) internal {
         ConsensusData memory data = _consensusData;
@@ -236,10 +235,8 @@ contract Chain is BaseChain {
 
         unchecked {
             // we will not overflow with timestamp and padding in a life time
-            if (data.lastTimestamp + data.padding >= _dataTimestamp) revert BlockSubmittedToFast();
+            if (data.lastTimestamp + data.padding >= _dataTimestamp) revert BlockSubmittedToFastOrDataToOld();
         }
-
-        if (_dataTimestamp <= data.lastTimestamp) revert DataToOld();
 
         unchecked {
             // we will not overflow in a life time

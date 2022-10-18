@@ -68,9 +68,8 @@ abstract contract BaseChain is Registrable, Ownable {
     error ArraysDataDoNotMatch();
     error AlreadyDeprecated();
     error AlreadyRegistered();
-    error BlockSubmittedToFast();
+    error BlockSubmittedToFastOrDataToOld();
     error ContractNotReady();
-    error DataToOld();
     error FCDOverflow();
     error InvalidContractType();
     error NoChangeToState();
