@@ -45,7 +45,7 @@ const staging: GlobalConfig = {
   },
   ethereum: {
     contractRegistry: {
-      address: '0x51eFAbE1718be9940c5f4D10F1983a46d99EC4D9'
+      address: '0x77922965C12bD55d6BA71b0c87E68D9F04a919Ba'
     },
     chain: {
       padding: 300,
