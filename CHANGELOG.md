@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.6.3] - 2022-10-10
+### Changed
+- New deployments of sandbox contracts for goerli
+
 ## [4.6.2] - 2022-09-27
 ### Changed
 - redeployment of staging contracts for avalanche and polygon
