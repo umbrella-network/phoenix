@@ -6,7 +6,7 @@ export const verifyCode = async (
   address: string,
   constructorArguments: any // eslint-disable-line @typescript-eslint/no-explicit-any
 ): Promise<void> => {
-  if (isLocalNetwork(hre)) {
+  if (isLocalNetwork(hre) || process.env.FAKE_MAINNET) {
     return;
   }
 

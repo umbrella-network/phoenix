@@ -1,11 +1,13 @@
 import { task } from 'hardhat/config';
 import { BigNumber } from 'ethers';
+import { string } from 'hardhat/internal/core/params/argumentTypes';
 
 import { REGISTRY, STAKING_BANK_STATE } from '../constants';
 import { chainDeploymentData } from '../deploy/deploymentsData';
 import { fetchValidatorsData, resolveMasterChainValidators, ValidatorData } from './_helpers/resolveValidators';
 import { isMasterChain } from '../constants/networks';
 import { Registry, Registry__factory } from '../typechain';
+import { deployerSigner } from './_helpers/jsonRpcProvider';
 
 const concatValidators = (current: ValidatorData[], toClone: ValidatorData[]): ValidatorData[] => {
   const result: Record<string, bigint> = {};
@@ -26,10 +28,11 @@ const concatValidators = (current: ValidatorData[], toClone: ValidatorData[]): V
   });
 };
 
-task('clone-validators', 'Clone validators data from MasterChain to current blockchain').setAction(
-  async (taskArgs, hre) => {
+task('clone-validators', 'Clone validators data from MasterChain to current blockchain')
+  .addParam('masterChainName', 'master chain network name', undefined, string)
+  .setAction(async (taskArgs, hre) => {
     const { deployments } = hre;
-    const [deployerSigner] = await hre.ethers.getSigners();
+    const deployerWallet = deployerSigner(hre);
 
     console.log({ taskArgs });
     const chainId = (await hre.ethers.provider.getNetwork()).chainId;
@@ -38,11 +41,11 @@ task('clone-validators', 'Clone validators data from MasterChain to current bloc
     if (await isMasterChain(chainId)) throw Error('you can not clone to masterchain');
 
     const registryDeployments = await deployments.get(REGISTRY);
-    const registry: Registry = Registry__factory.connect(registryDeployments.address, hre.ethers.provider);
+    const registry: Registry = Registry__factory.connect(registryDeployments.address, deployerWallet);
 
     const [currentValidators, bankData] = await Promise.all([
       fetchValidatorsData(registry),
-      resolveMasterChainValidators(hre),
+      resolveMasterChainValidators(hre, taskArgs.masterChainName),
     ]);
 
     if (bankData.validatorsData.length == 0) {
@@ -65,7 +68,7 @@ task('clone-validators', 'Clone validators data from MasterChain to current bloc
       STAKING_BANK_STATE,
       {
         log: true,
-        from: deployerSigner.address,
+        from: deployerWallet.address,
         waitConfirmations: 1,
       },
       'setBalances',
@@ -89,5 +92,4 @@ task('clone-validators', 'Clone validators data from MasterChain to current bloc
 
     console.log('number of validators before', addressesBefore);
     console.log('number of validators now', addressesAfter);
-  }
-);
+  });

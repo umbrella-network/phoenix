@@ -2,11 +2,12 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
 import { networks, REGISTRY, UMB, UMB_BYTES32, ERC20 } from '../../constants';
+import { deployerSigner } from '../../tasks/_helpers/jsonRpcProvider';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments } = hre;
   const { deploy, execute, read } = deployments;
-  const [deployer] = await hre.ethers.getSigners();
+  const deployer = deployerSigner(hre);
 
   const umbAddress = await read(REGISTRY, 'getAddressByString', UMB);
   console.log(`${UMB} address => ${umbAddress}`);

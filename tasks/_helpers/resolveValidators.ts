@@ -6,6 +6,7 @@ import { HttpNetworkConfig } from 'hardhat/src/types/config';
 
 import { STAKING_BANK } from '../../constants';
 import { Registry, Registry__factory, StakingBank, StakingBank__factory } from '../../typechain';
+import { isMasterChain, MASTER_CHAIN_NAME } from '../../constants/networks';
 
 export type ValidatorData = {
   address: string;
@@ -39,14 +40,12 @@ export const fetchValidatorsData = async (registry: Registry): Promise<Validator
 };
 
 export const resolveMasterChainValidators = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  masterChainName: string
 ): Promise<{
   validatorsData: ValidatorData[];
   totalSupply: bigint;
 }> => {
-  // const masterChainRpc = process.env.MASTER_CHAIN_RPC;
-  const masterChainName = process.env.MASTER_CHAIN_NAME;
-
   if (!masterChainName) {
     throw new Error('missing MASTER_CHAIN_NAME');
   }
@@ -55,7 +54,7 @@ export const resolveMasterChainValidators = async (
   console.log({ masterChainConfig });
 
   if (!masterChainConfig) {
-    throw new Error('missing masterChainConfig');
+    throw new Error(`missing masterChainConfig for ${MASTER_CHAIN_NAME}`);
   }
 
   const masterChainRpc = masterChainConfig.url;
@@ -68,6 +67,12 @@ export const resolveMasterChainValidators = async (
   const registryDeployments = JSON.parse(fs.readFileSync(path.join(mainnetDeployments, 'Registry.json'), 'utf-8'));
 
   const provider = new ethers.providers.JsonRpcProvider(masterChainRpc);
+  const { chainId } = await provider.getNetwork();
+
+  if (!isMasterChain(chainId)) {
+    throw new Error(`${masterChainName} (${chainId}) is not marsterchain`);
+  }
+
   const registry: Registry = Registry__factory.connect(registryDeployments.address, provider);
   const stakingBankAddress = await registry.getAddressByString(STAKING_BANK);
   const stakingBank: StakingBank = StakingBank__factory.connect(stakingBankAddress, provider);
