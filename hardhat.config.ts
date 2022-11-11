@@ -289,7 +289,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     gasPrice: 1,
     currency: 'USD',
-    enabled: !!process.env.REPORT_GAS,
+    enabled: true || !!process.env.REPORT_GAS,
     maxMethodDiff: 10,
   },
   paths: {
