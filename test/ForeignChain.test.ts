@@ -12,6 +12,8 @@ import { blockTimestamp, mintBlocks } from './utils';
 import { ChainStatus } from './types/ChainStatus';
 import { prepareData, tree } from './chainUtils';
 import { FOREIGN_CHAIN, STAKING_BANK_STATE } from '../constants';
+import { registerChain } from '../tasks/_helpers/registerChain';
+import { deployerSigner } from '../tasks/_helpers/jsonRpcProvider';
 
 use(waffleChai);
 
@@ -20,7 +22,7 @@ const totalSupply = 100;
 
 const root = tree.getRoot();
 
-describe('ForeignChain', () => {
+describe('ForeignChain @foreignchain', () => {
   let owner: SignerWithAddress, validator: SignerWithAddress, contract: Contract;
 
   let genesisSnapshotId: unknown;
@@ -35,11 +37,12 @@ describe('ForeignChain', () => {
 
   beforeEach(async () => {
     const { deployments, ethers } = hre;
+    [owner, validator] = await ethers.getSigners();
 
     await deployments.fixture(FOREIGN_CHAIN);
-
-    [owner, validator] = await ethers.getSigners();
     const contractDeployments = await deployments.get(FOREIGN_CHAIN);
+
+    await registerChain(hre);
 
     await deployments.execute(
       STAKING_BANK_STATE,
@@ -50,7 +53,7 @@ describe('ForeignChain', () => {
       totalSupply
     );
 
-    contract = new Contract(contractDeployments.address, contractDeployments.abi, owner);
+    contract = new Contract(contractDeployments.address, contractDeployments.abi, hre.ethers.provider);
   });
 
   describe('when deployed', () => {
@@ -74,7 +77,7 @@ describe('ForeignChain', () => {
   it('expect to getStatus()', async () => {
     await mintBlocks(timePadding);
     const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
-    await contract.submit(dataTimestamp, root, [], [], [v], [r], [s]);
+    await contract.connect(deployerSigner(hre)).submit(dataTimestamp, root, [], [], [v], [r], [s]);
     console.log(await contract.blocks(dataTimestamp));
 
     await mintBlocks(timePadding + 1);

@@ -1,6 +1,6 @@
 {
   "name": "phoenix",
-  "version": "4.6.3",
+  "version": "4.7.0",
   "description": "A proof-of-stake contract for minting sidechain blocks.",
   "engines": {
     "node": "^14.17.0 || >=16.0.0"
@@ -9,7 +9,8 @@
     "clear": "rm -rf ./artifacts/ ./cache/ ./typechain/ ./foundry/out/ && forge clean && TS_NODE_TRANSPILE_ONLY=1 npx hardhat clean",
     "compile": "TS_NODE_TRANSPILE_ONLY=1 hardhat typechain && hardhat compile",
     "node": "hardhat node",
-    "test": "hardhat test",
+    "test": "npx hardhat test",
+    "test:foreign": "CHAIN_ID=8555 npx hardhat test",
     "block-listener": "npx hardhat run --network localhost scripts/blockListener.ts",
     "deploy:registry": "npx hardhat run scripts/deployRegistry.ts",
     "deploy:contracts": "npx hardhat run scripts/deployContracts.ts",
@@ -55,6 +56,7 @@
     "@umb-network/toolbox": "~5.10.0",
     "abi-decoder": "~2.4.0",
     "chai": "~4.3.6",
+    "dotenv": "~16.0.3",
     "eslint": "~8.24.0",
     "eslint-config-standard": "~17.0.0",
     "eslint-plugin-import": "~2.26.0",

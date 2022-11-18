@@ -45,6 +45,9 @@ jobs:
       - name: Unit tests
         run: yarn test
 
+      - name: Unit tests (foreign)
+        run: yarn test:foreign
+
       - name: Solidity Lint
         run: |
           yarn lint:sol

@@ -1,35 +1,35 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import { CHAIN, REGISTRY } from '../../constants';
-import { HARDHAT } from '../../constants/networks';
+import { CHAIN, CHAIN_BYTES32, REGISTRY } from '../../constants';
+import { HARDHAT, LOCALHOST } from '../../constants/networks';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments } = hre;
   const { deploy, read } = deployments;
   const [deployer] = await hre.ethers.getSigners();
 
-  const canDeploy = [HARDHAT].includes(hre.network.name);
-
-  if (canDeploy) {
+  if ([HARDHAT, LOCALHOST].includes(hre.network.name)) {
+    console.log(`deploying Registry on ${hre.network.name} (${await hre.getChainId()})`);
     await deploy(REGISTRY, { from: deployer.address, log: true, waitConfirmations: 1 });
-  } else {
-    try {
-      const registry = await deployments.get(REGISTRY);
-      console.log(`Registry exists at ${registry.address}`);
+    return;
+  }
 
-      const bytes32 = await read(REGISTRY, 'stringToBytes32', CHAIN);
+  try {
+    const registry = await deployments.get(REGISTRY);
+    console.log(`Registry exists at ${registry.address}`);
 
-      if (bytes32 != '0x436861696e000000000000000000000000000000000000000000000000000000') {
-        throw new Error(`sanity check failed: ${bytes32}`);
-      }
+    const bytes32 = await read(REGISTRY, 'stringToBytes32', CHAIN);
 
-      console.log('sanity check', CHAIN, bytes32);
-    } catch (e) {
-      console.log(e);
-
-      throw Error(`we can't deploy new registry, but we need file with deployment address for: ${hre.network.name}`);
+    if (bytes32 != CHAIN_BYTES32) {
+      throw new Error(`sanity check failed: ${bytes32}`);
     }
+
+    console.log('sanity check', CHAIN, bytes32);
+  } catch (e) {
+    console.log(e);
+
+    throw Error(`we can't deploy new registry, but we need file with deployment address for: ${hre.network.name}`);
   }
 };
 
