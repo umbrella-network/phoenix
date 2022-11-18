@@ -1,0 +1,14 @@
+[default]
+src = 'foundry/src'
+out = 'foundry/out'
+libs = ['lib']
+test = 'foundry/test'
+cache = true
+
+[hardhat]
+src = "contracts"
+out = "artifacts"
+libs = ["node_modules"]
+
+verbosity = 4
+# See more config options https://github.com/gakonst/foundry/tree/master/config

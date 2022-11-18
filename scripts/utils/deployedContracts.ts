@@ -1,11 +1,10 @@
-import { artifacts, ethers } from 'hardhat';
+import hre, { artifacts, ethers } from 'hardhat';
 import { Contract } from 'ethers';
 
 import configuration from '../../config';
-import { getProvider } from './helpers';
 
 const config = configuration();
-const provider = getProvider();
+const provider = hre.ethers.provider;
 
 const Registry = artifacts.readArtifactSync('Registry');
 const StakingBank = artifacts.readArtifactSync('StakingBank');
@@ -32,6 +31,8 @@ export const deployedContract = async (name: 'StakingBank' | 'UMB' | 'Chain'): P
     case 'UMB':
       abi = Token.abi;
       break;
+    default:
+      throw Error(`${name} not deployed`);
   }
 
   return new ethers.Contract(address, abi, provider).connect((await ethers.getSigners())[0]);

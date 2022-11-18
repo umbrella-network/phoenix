@@ -4,7 +4,7 @@ export interface ChainStatus {
   blockNumber: BigNumber;
   timePadding: number;
   lastDataTimestamp: number;
-  lastBlockId: number;
+  lastId: number;
   nextLeader: string;
   nextBlockId: number;
   validators: string[];

@@ -1,11 +1,11 @@
-import configuration from '../config';
-import { deployedContract } from './utils/deployedContracts';
+import hre from 'hardhat';
 import { Contract } from 'ethers';
 
+import configuration from '../config';
+import { deployedContract } from './utils/deployedContracts';
 import { deployStakingBank, registerContract } from './deployers/contracts';
-import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
+import { pressToContinue, waitForTx } from './utils/helpers';
 
-const provider = getProvider();
 const config = configuration();
 
 interface Validator {
@@ -39,7 +39,7 @@ const migrateValidators = async (stakingBank: Contract, validators: Validator[])
   for (const validator of validators) {
     console.log('re-creating', validator);
     const tx = await stakingBank.create(validator.id, validator.location);
-    await waitForTx(tx.hash, provider);
+    await waitForTx(hre, tx.hash);
   }
 
   console.log('validators migrated.');
@@ -63,7 +63,7 @@ const reDeployAndRegister = async () => {
   await registerContract([stakingBank.address]);
 };
 
-pressToContinue('y', () => {
+pressToContinue(hre, 'y', () => {
   reDeployAndRegister()
     .then(() => process.exit(0))
     .catch((error) => {

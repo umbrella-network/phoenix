@@ -14,5 +14,16 @@ node_modules
 cache
 artifacts
 
+package-lock.json
+yarn.lock
+
+yarn-error.log
+
+typechain
+
 vr.sol
 flattened_*
+
+foundry/out/
+
+deployments/localhost

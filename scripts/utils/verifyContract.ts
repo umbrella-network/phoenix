@@ -1,9 +1,12 @@
-import hre from 'hardhat';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { isLocalNetwork, sleep } from './helpers';
 
-// eslint-disable-next-line
-export const verifyCode = async (address: string, constructorArguments: any): Promise<void> => {
-  if (isLocalNetwork()) {
+export const verifyCode = async (
+  hre: HardhatRuntimeEnvironment,
+  address: string,
+  constructorArguments: any // eslint-disable-line @typescript-eslint/no-explicit-any
+): Promise<void> => {
+  if (isLocalNetwork(hre) || process.env.FAKE_MAINNET) {
     return;
   }
 
@@ -16,7 +19,7 @@ export const verifyCode = async (address: string, constructorArguments: any): Pr
       break;
     } catch (e: unknown) {
       console.log((<Error>e).message);
-      if ((<Error>e).message.includes('Already Verified')) break;
+      if ((<Error>e).message.toLowerCase().includes('already verified')) break;
       console.log('retrying in 5 sec...');
       await sleep(5000);
     }

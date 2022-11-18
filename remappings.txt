@@ -1,0 +1,4 @@
+@openzeppelin/=node_modules/@openzeppelin/
+@umb-network/=node_modules/@umb-network/
+ds-test/=foundry/lib/ds-test/src/
+contracts/=contracts/

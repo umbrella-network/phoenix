@@ -1,16 +1,17 @@
 import { verifyCode } from '../utils/verifyContract';
-import { artifacts, ethers } from 'hardhat';
+import hre, { artifacts, ethers } from 'hardhat';
 import { Contract, Wallet, BigNumber, Signer } from 'ethers';
 import { TransactionReceipt } from '@ethersproject/providers';
 
 import configuration from '../../config';
-import { getProvider, isLocalNetwork, isProduction, waitForTx } from '../utils/helpers';
+import { isLocalNetwork, isProduction, waitForTx } from '../utils/helpers';
+import { ensureCanRegisterChain } from '../../tasks/_helpers/ensureCanRegisterChain';
+import { ChainContractNames } from '../../types/types';
 
 const config = configuration();
-const provider = getProvider();
+const provider = hre.ethers.provider;
 
 const Registry = artifacts.readArtifactSync('Registry');
-const Chain = artifacts.readArtifactSync('Chain');
 const ERC20 = artifacts.readArtifactSync('ERC20');
 
 interface Validator {
@@ -28,7 +29,7 @@ export const deployDistributor = async (recipients: string[]): Promise<Contract>
   const contract = await Contract.deploy(...args);
   await contract.deployed();
 
-  await verifyCode(contract.address, args);
+  await verifyCode(hre, contract.address, args);
 
   return contract;
 };
@@ -69,42 +70,14 @@ export const deployChain = async (
   await chain.deployed();
   console.log(`${chainName} deployed at`, chain.address);
 
-  await verifyCode(chain.address, chainArgs);
+  await verifyCode(hre, chain.address, chainArgs);
 
   return chain;
 };
 
-export enum ChainContractNames {
-  Chain = 'Chain',
-  ForeignChain = 'ForeignChain',
-}
-
 export const deployChainAndRegister = async (chainName: ChainContractNames): Promise<void> => {
   const registry = new ethers.Contract(config.contractRegistry.address, Registry.abi, provider);
-  const address = await registry.getAddressByString('Chain');
-  let isForeign = false;
-
-  if (address !== ethers.constants.AddressZero) {
-    const currentChain = new ethers.Contract(address, Chain.abi, provider);
-
-    try {
-      isForeign = await currentChain.isForeign();
-    } catch (e) {
-      console.log(e);
-      console.log('if chain throw,then it is "old" regular chain');
-    }
-
-    console.log({ isForeign, chainName });
-
-    if (
-      (!isForeign && chainName === ChainContractNames.ForeignChain) ||
-      (isForeign && chainName !== ChainContractNames.ForeignChain)
-    ) {
-      throw Error(
-        `One type of chain allowed per setup, isForeign: ${isForeign} in conflict with chainName: ${chainName}`
-      );
-    }
-  }
+  const isForeign = await ensureCanRegisterChain(hre, registry, chainName);
 
   const chain = await deployChain(config.contractRegistry.address, chainName);
 
@@ -114,6 +87,7 @@ export const deployChainAndRegister = async (chainName: ChainContractNames): Pro
   } else {
     await registerContract([chain.address]);
   }
+
   console.log(`${chainName} registered at ${chain.address}`);
 };
 
@@ -139,7 +113,7 @@ export const deployStakingBank = async (contractRegistryAddress: string): Promis
     console.log('StakingBank deployed to:', stakingBank.address);
   }
 
-  await verifyCode(stakingBank.address, stakingBankArgs);
+  await verifyCode(hre, stakingBank.address, stakingBankArgs);
 
   return stakingBank;
 };
@@ -155,7 +129,7 @@ export const registerContract = async (addresses: string[], names?: string[]): P
   const tx = await (names
     ? contractRegistry.importAddresses(names, addresses)
     : contractRegistry.importContracts(addresses));
-  return waitForTx(tx.hash, provider);
+  return waitForTx(hre, tx.hash);
 };
 
 export const updateChain = async (chain: string): Promise<TransactionReceipt | null> => {
@@ -165,7 +139,7 @@ export const updateChain = async (chain: string): Promise<TransactionReceipt | n
   }
 
   const tx = await contractRegistry.atomicUpdate(chain);
-  return waitForTx(tx.hash, provider);
+  return waitForTx(hre, tx.hash);
 };
 
 export const registerValidator = async (stakingBank: Contract, token: Contract, validatorId: number): Promise<void> => {
@@ -174,7 +148,7 @@ export const registerValidator = async (stakingBank: Contract, token: Contract, 
   const id = await validatorWallet.getAddress();
 
   let tx = await stakingBank.create(id, validator.location);
-  await waitForTx(tx.hash, provider);
+  await waitForTx(hre, tx.hash);
 
   const validatorData = await stakingBank.validators(id);
   console.log('Added validator with address ' + id + ' at location ' + validatorData.location);
@@ -193,13 +167,13 @@ export const registerValidator = async (stakingBank: Contract, token: Contract, 
     console.log(`validator ${id} balance: ${balance.toString()}`);
 
     tx = await token.connect(validatorWallet).approve(stakingBank.address, balance);
-    await waitForTx(tx.hash, provider);
+    await waitForTx(hre, tx.hash);
 
     tx = await stakingBank.receiveApproval(id);
-    await waitForTx(tx.hash, provider);
+    await waitForTx(hre, tx.hash);
   } else {
     tx = await token.mintApproveAndStake(stakingBank.address, id, stake);
-    await waitForTx(tx.hash, provider);
+    await waitForTx(hre, tx.hash);
   }
 
   console.log('validator balance:', (await token.balanceOf(id)).toString());
@@ -218,7 +192,7 @@ export const deployDummyToken = async (): Promise<Contract> => {
   await token.deployed();
   console.log('test token deployed');
 
-  await verifyCode(token.address, tokenArgs);
+  await verifyCode(hre, token.address, tokenArgs);
   return token;
 };
 
@@ -234,7 +208,7 @@ export const deployLimitedMintingDummyToken = async (): Promise<Contract> => {
   await token.deployed();
   console.log('test token deployed at', token.address);
 
-  await verifyCode(token.address, tokenArgs);
+  await verifyCode(hre, token.address, tokenArgs);
   return token;
 };
 
@@ -282,7 +256,7 @@ export const deployAllContracts = async (
 
   const validators = await resolveValidators();
 
-  if (isLocalNetwork()) {
+  if (isLocalNetwork(hre)) {
     for (const { balance, wallet } of validators) {
       if (balance.toString() === '0') {
         console.log('sending ETH to validator');
@@ -292,7 +266,7 @@ export const deployAllContracts = async (
           to: wallet.address,
           value: ownerBalance.div(validators.length + 1).toHexString(),
         });
-        await waitForTx(tx.hash, provider);
+        await waitForTx(hre, tx.hash);
       }
     }
   } else {

@@ -1,3 +1,5 @@
+import hre from 'hardhat';
+
 import { deployAllContracts } from './deployers/contracts';
 import { deployContractRegistry } from './deployers/registry';
 import { isLocalNetwork, pressToContinue } from './utils/helpers';
@@ -5,7 +7,7 @@ import { isLocalNetwork, pressToContinue } from './utils/helpers';
 async function main() {
   const registry = await deployContractRegistry();
 
-  if (isLocalNetwork()) {
+  if (isLocalNetwork(hre)) {
     console.log('registering contracts...');
     await deployAllContracts(registry.address, true);
     console.log('...done - local network ready.');
