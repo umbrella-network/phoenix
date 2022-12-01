@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.7.1] - 2022-12-01
+### Changed
+- adjust hardhat scripts for avax production
+
 ## [4.7.0] - 2022-10-18
 ### Changed
 - use `timestamp` as block ID

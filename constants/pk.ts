@@ -1,4 +1,4 @@
-import {BNB_PRODUCTION, LOCALHOST} from './networks';
+import {AVALANCHE_PRODUCTION, BNB_PRODUCTION, LOCALHOST} from './networks';
 
 const {
   DEPLOYER_PK,
@@ -26,6 +26,8 @@ export function getPrivteKeys(network = ''): string[] {
     case LOCALHOST:
       return stagingAccounts;
 
+    case PROD_PK:
+    case AVALANCHE_PRODUCTION:
     case BNB_PRODUCTION:
       return prodAccounts;
 

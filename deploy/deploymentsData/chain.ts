@@ -28,11 +28,16 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
   switch (hre.network.name) {
     case networks.LOCALHOST:
     case networks.HARDHAT:
+      padding = 60;
+      requiredSignatures = 1;
+      allowForMixedType = false;
+      break;
+
     case networks.POLYGON_STAGING:
     case networks.AVALANCHE_STAGING:
     case networks.AVALANCHE_SANDBOX:
-      padding = 60;
-      requiredSignatures = 1;
+      padding = 180;
+      requiredSignatures = 2;
       allowForMixedType = false; // !!process.env.ALLOW_FOR_MIXED_TYPE
       break;
 
@@ -43,8 +48,8 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
       break;
 
     case networks.BNB_SANDBOX:
-      padding = 60;
-      requiredSignatures = 1;
+      padding = 240;
+      requiredSignatures = 2;
       allowForMixedType = false;
       break;
 
