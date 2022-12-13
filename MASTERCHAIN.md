@@ -45,3 +45,11 @@ npx hardhat clone-validators --master-chain-name bnb_staging --network avalanche
 npx hardhat registerChain --network avalanche_staging
 FAKE_MAINNET=1 npx hardhat registerChain --network bnb_production
 ```
+
+### Production switch
+
+```shell
+npx hardhat deploy --network avalanche_production
+npx hardhat clone-validators --master-chain-name bnb_production --network avalanche_production
+npx hardhat registerChain --network avalanche_production
+```

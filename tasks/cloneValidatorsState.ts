@@ -7,7 +7,6 @@ import { chainDeploymentData } from '../deploy/deploymentsData';
 import { fetchValidatorsData, resolveMasterChainValidators, ValidatorData } from './_helpers/resolveValidators';
 import { isMasterChain } from '../constants/networks';
 import { Registry, Registry__factory } from '../typechain';
-import { deployerSigner } from './_helpers/jsonRpcProvider';
 
 const concatValidators = (current: ValidatorData[], toClone: ValidatorData[]): ValidatorData[] => {
   const result: Record<string, bigint> = {};
@@ -32,7 +31,7 @@ task('clone-validators', 'Clone validators data from MasterChain to current bloc
   .addParam('masterChainName', 'master chain network name', undefined, string)
   .setAction(async (taskArgs, hre) => {
     const { deployments } = hre;
-    const deployerWallet = deployerSigner(hre);
+    const [deployerWallet] = await hre.ethers.getSigners();
 
     console.log({ taskArgs });
     const chainId = (await hre.ethers.provider.getNetwork()).chainId;
