@@ -4,7 +4,7 @@ pragma solidity 0.8.13;
 import "hardhat/console.sol";
 import "./CRbank.sol";
 
-
+// contract for estimating Custom solution for deri finance
 contract CR {
     uint256 constant public TIMESTAMP_MASK = 2 ** 64 - 1; // 0xffffffffffffffff;
 
