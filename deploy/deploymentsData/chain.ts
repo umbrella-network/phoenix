@@ -37,6 +37,8 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
     case networks.POLYGON_SANDBOX:
     case networks.AVALANCHE_STAGING:
     case networks.AVALANCHE_SANDBOX:
+    case networks.ARBITRUM_STAGING:
+    case networks.ARBITRUM_SANDBOX:
       padding = 180;
       requiredSignatures = 2;
       allowForMixedType = false; // !!process.env.ALLOW_FOR_MIXED_TYPE

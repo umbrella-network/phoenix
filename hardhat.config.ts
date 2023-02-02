@@ -63,7 +63,7 @@ const apiKey = (): string | Record<string, string> => {
     'polygonMumbai': POLYGONSCAN_API,
     // arbitrum
     'arbitrumOne': ARBISCAN_API,
-    'arbitrumTestnet': ARBISCAN_API,
+    'arbitrumGoerli': ARBISCAN_API,
     // avalanche
     'avalanche': AVASCAN_API,
     'avalancheFujiTestnet': AVASCAN_API,

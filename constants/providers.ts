@@ -43,8 +43,8 @@ const localProviderData: ProviderData = {
 };
 
 const arbitrumTestnetProviderData: ProviderData = {
-  url: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(421611)
+  url: `https://arbitrum-goerli.infura.io/v3/${INFURA_ID}`,
+  chainId: chainId(421613)
 };
 
 const avaxTestnetProviderData: ProviderData = {
