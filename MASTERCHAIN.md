@@ -40,9 +40,9 @@ FAKE_MAINNET=1 npx hardhat registerChain --network bnb_production
 ### Sandbox switch
 
 ```shell
-npx hardhat deploy --network avalanche_staging
-npx hardhat clone-validators --master-chain-name bnb_staging --network avalanche_staging 
-npx hardhat registerChain --network avalanche_staging
+npx hardhat deploy --network polygon_sandbox
+npx hardhat clone-validators --master-chain-name bnb_sandbox --network polygon_sandbox
+npx hardhat registerChain --network polygon_sandbox
 FAKE_MAINNET=1 npx hardhat registerChain --network bnb_production
 ```
 

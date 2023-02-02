@@ -34,6 +34,7 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
       break;
 
     case networks.POLYGON_STAGING:
+    case networks.POLYGON_SANDBOX:
     case networks.AVALANCHE_STAGING:
     case networks.AVALANCHE_SANDBOX:
       padding = 180;
