@@ -179,7 +179,8 @@ const config: HardhatUserConfig = {
       url: getProviderData(POLYGON_STAGING).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(POLYGON_STAGING).chainId,
-      gasPrice: gwei(1)
+      gasPrice: 'auto',
+      gasMultiplier: 2
     },
     arbitrum_staging: {
       url: getProviderData(ARBITRUM_STAGING).url,
@@ -203,7 +204,8 @@ const config: HardhatUserConfig = {
       url: getProviderData(POLYGON_SANDBOX).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(POLYGON_SANDBOX).chainId,
-      gasPrice: gwei(1)
+      gasPrice: 'auto',
+      gasMultiplier: 2
     },
     ethereum_sandbox: {
       url: getProviderData(ETH_SANDBOX).url,

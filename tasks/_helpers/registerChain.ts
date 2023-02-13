@@ -64,7 +64,7 @@ const verifyChainRegistration = async (
   console.log('_'.repeat(30));
 };
 
-export const registerChain = async (hre: HardhatRuntimeEnvironment) => {
+export const registerChain = async (hre: HardhatRuntimeEnvironment, gasPrice?: number | string) => {
   const { read } = hre.deployments;
   const deployer = deployerSigner(hre);
 
@@ -108,9 +108,18 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment) => {
         to: registry.address,
         value: 0,
         data: registryIface.encodeFunctionData(method, [args]),
+        gasPrice,
       });
     } catch (e) {
       if (atomicUpdate != method) {
+        throw e;
+      }
+
+      if ((e as Error).message.includes('transaction underpriced')) {
+        throw e;
+      }
+
+      if ((e as Error).message.includes('cannot estimate gas')) {
         throw e;
       }
 
@@ -127,6 +136,7 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment) => {
         value: 0,
         nonce,
         data: chainInterface.encodeFunctionData('register', []),
+        gasPrice,
       });
 
       const importContractsTx = deployer.sendTransaction({
@@ -134,6 +144,7 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment) => {
         value: 0,
         nonce: nonce + 1,
         data: registryIface.encodeFunctionData(importContracts, [[chain.address]]),
+        gasPrice,
       });
 
       console.log(`unregistering old chain: ${inRegistry}`);
@@ -142,6 +153,7 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment) => {
         to: inRegistry,
         nonce: nonce + 2,
         data: hre.ethers.utils.id('unregister()').slice(0, 10),
+        gasPrice,
       });
 
       const txs = await Promise.all([registerTx, importContractsTx, unregisterTx]);
