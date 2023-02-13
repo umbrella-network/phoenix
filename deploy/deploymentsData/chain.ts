@@ -81,7 +81,7 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
       break;
 
     case networks.POLYGON_PRODUCTION:
-      padding = 240;
+      padding = 60;
       requiredSignatures = 6;
       allowForMixedType = false;
       break;

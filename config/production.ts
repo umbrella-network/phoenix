@@ -29,7 +29,7 @@ const production: GlobalConfig = {
       address: '0x455acbbC2c15c086978083968a69B2e7E4d38d34'
     },
     chain: {
-      padding: 240,
+      padding: 60,
       requiredSignatures: 1,
       replicator
     },
