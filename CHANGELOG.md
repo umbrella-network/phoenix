@@ -5,8 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [4.8.1] - 2023-02-13
 ### Changed
+- change padding on polygon to be 1 minute
 - switch arbitrum testnet to goerli (dev and sbx)
+- hardhat update
 
 ## [4.8.0] - 2023-01-04
 ### Added
