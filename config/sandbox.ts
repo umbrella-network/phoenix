@@ -9,7 +9,7 @@ const staging: GlobalConfig = {
       address: ''
     },
     contractRegistry: {
-      address: '0x65833489170A55374786B97C96e691949C60175a'
+      address: '0x85853685b5165Da1AAB09B10e927da3c2eCD429f'
     },
     chain: {
       padding: 60 * 50,
