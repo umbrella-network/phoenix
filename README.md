@@ -73,7 +73,9 @@ npm run deploy:all
 
 ## New deployment scripts
 
-Note: we need to use `HARDHAT_NETWORK` until we deprecate all old scripts and configuration.
+[see new multichain architecture deployment steps](./MASTERCHAIN.md)
+
+**Note:** we need to use `HARDHAT_NETWORK` until we deprecate all old scripts and configuration.
 
 ```shell
 hardhat deploy --network <name>
@@ -116,7 +118,7 @@ FORKING_ENV=bsc npx hardhat node --no-deploy --no-reset
 npx hardhat redeploy-homechain
 ```
 
-#### Old scripts
+### Old scripts
 
 ```shell
 hardhat compile && HARDHAT_NETWORK= npx hardhat run ./scripts/reDeployToken.ts
@@ -129,14 +131,14 @@ hardhat compile && HARDHAT_NETWORK=bsc_staging npm run deploy:chain
 hardhat compile && HARDHAT_NETWORK=bsc_staging npx hardhat run ./scripts/registerNewValidator.ts
 ```
 
-### Multichain
+### Multichain (deprecated)
 
 #### EVM chains
 
 Please see [this commit](https://github.com/umbrella-network/phoenix/commit/4185f543fc73a686a58c82aa20e4120060053320) 
 for steps to adopt EVM compatible blockchain.
 
-#### Foreign Chain
+#### Foreign Chain (deprecated)
 
 ```shell
 HARDHAT_NETWORK=<network_env> npm run deploy:all
