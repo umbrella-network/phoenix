@@ -63,7 +63,7 @@ const apiKey = (): string | Record<string, string> => {
     'polygonMumbai': POLYGONSCAN_API,
     // arbitrum
     'arbitrumOne': ARBISCAN_API,
-    'arbitrumTestnet': ARBISCAN_API,
+    'arbitrumGoerli': ARBISCAN_API,
     // avalanche
     'avalanche': AVASCAN_API,
     'avalancheFujiTestnet': AVASCAN_API,
@@ -251,8 +251,8 @@ const config: HardhatUserConfig = {
       accounts: getPrivteKeys(PROD_PK),
       chainId: getProviderData(POLYGON_PRODUCTION).chainId,
       live: true,
-      gasPrice: 'auto',
-      gasMultiplier: 2
+      gasMultiplier: 2,
+      blockGasLimit: 40_000_000,
     },
     docker: {
       url: 'http://eth:8545',
