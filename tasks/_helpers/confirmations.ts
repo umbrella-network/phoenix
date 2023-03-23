@@ -3,8 +3,12 @@ import {
   ARBITRUM_SANDBOX,
   ARBITRUM_STAGING,
   AVALANCHE_PRODUCTION,
-  AVALANCHE_SANDBOX, AVALANCHE_STAGING, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING
-} from "../../constants/networks";
+  AVALANCHE_SANDBOX,
+  AVALANCHE_STAGING,
+  POLYGON_PRODUCTION,
+  POLYGON_SANDBOX,
+  POLYGON_STAGING,
+} from '../../constants/networks';
 
 export function confirmations(networkName: string): number {
   switch (networkName) {
@@ -21,6 +25,7 @@ export function confirmations(networkName: string): number {
     case POLYGON_STAGING:
       return 3;
 
-    default: return 1;
+    default:
+      return 1;
   }
 }

@@ -4,15 +4,9 @@ import { CHAIN, FOREIGN_CHAIN, REGISTRY } from '../../constants';
 import { BaseChain, Registry__factory } from '../../typechain';
 import { resolveChainName } from './resolveChainName';
 import { Contract, ethers } from 'ethers';
-import {
-  ARBITRUM_PRODUCTION,
-  ARBITRUM_SANDBOX,
-  ARBITRUM_STAGING, AVALANCHE_PRODUCTION, AVALANCHE_SANDBOX, AVALANCHE_STAGING,
-  isMasterChain,
-  POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING
-} from '../../constants/networks';
+import { isMasterChain } from '../../constants/networks';
 import { ChainStatus } from '../../test/types/ChainStatus';
-import {confirmations} from "./confirmations";
+import { confirmations } from './confirmations';
 
 const { AddressZero } = ethers.constants;
 

@@ -7,7 +7,7 @@ import { chainDeploymentData } from '../deploy/deploymentsData';
 import { fetchValidatorsData, resolveMasterChainValidators, ValidatorData } from './_helpers/resolveValidators';
 import { isMasterChain } from '../constants/networks';
 import { Registry, Registry__factory } from '../typechain';
-import {confirmations} from "./_helpers/confirmations";
+import { confirmations } from './_helpers/confirmations';
 
 const concatValidators = (current: ValidatorData[], toClone: ValidatorData[]): ValidatorData[] => {
   const result: Record<string, bigint> = {};
