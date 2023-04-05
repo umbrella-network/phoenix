@@ -22,7 +22,8 @@
 6. Make sure `chainDeploymentData` has config for `<network>`
 7. `MASTER_CHAIN_NAME=bsc_staging hardhat deploy --network <network>` - this should deploy chain and staking bank state contracts.
 7. `MASTER_CHAIN_NAME=bsc_staging hardhat deploy --network bsc_staging` - this should deploy chain and staking bank state contracts.
-8. Clone validators balances: `hardhat clone-validators --network <network>`
+8. Clone validators balances: `hardhat clone-validators --master-chain-name <network> --network <network>`
+9. `npx hardhat registerChain --network <network>`
 
 ### Sandbox
 
@@ -49,7 +50,7 @@ FAKE_MAINNET=1 npx hardhat registerChain --network bnb_production
 ### Production switch
 
 ```shell
-npx hardhat deploy --network avalanche_production
-npx hardhat clone-validators --master-chain-name bnb_production --network avalanche_production
-npx hardhat registerChain --network avalanche_production
+npx hardhat deploy --network arbitrum_production
+npx hardhat clone-validators --master-chain-name bnb_production --network arbitrum_production
+npx hardhat registerChain --network arbitrum_production
 ```
