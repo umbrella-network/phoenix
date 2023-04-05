@@ -6,6 +6,7 @@ import { resolveChainName } from './resolveChainName';
 import { Contract, ethers } from 'ethers';
 import { isMasterChain } from '../../constants/networks';
 import { ChainStatus } from '../../test/types/ChainStatus';
+import { confirmations } from './confirmations';
 
 const { AddressZero } = ethers.constants;
 
@@ -159,7 +160,7 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment, gasPrice?: n
       const txs = await Promise.all([registerTx, importContractsTx, unregisterTx]);
       console.log(txs.map((tx) => tx.hash));
       console.log('waiting for confirmation...');
-      await Promise.all(txs.map((tx) => tx.wait(1)));
+      await Promise.all(txs.map((tx) => tx.wait(confirmations(hre.network.name))));
     }
   } else {
     console.log(`${CHAIN_NAME} already registered`, inRegistry);

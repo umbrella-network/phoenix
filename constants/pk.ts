@@ -1,4 +1,4 @@
-import {AVALANCHE_PRODUCTION, BNB_PRODUCTION, LOCALHOST, POLYGON_PRODUCTION} from './networks';
+import {ARBITRUM_PRODUCTION, AVALANCHE_PRODUCTION, BNB_PRODUCTION, LOCALHOST, POLYGON_PRODUCTION} from './networks';
 
 const {
   DEPLOYER_PK,
@@ -28,6 +28,7 @@ export function getPrivteKeys(network = ''): string[] {
 
     case PROD_PK:
     case AVALANCHE_PRODUCTION:
+    case ARBITRUM_PRODUCTION:
     case BNB_PRODUCTION:
     case POLYGON_PRODUCTION:
       return prodAccounts;

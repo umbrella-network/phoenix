@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+
+## [4.9.0] - 2023-01-04
+### Added
+- add multichain architecture on Arbitrum
+
 ## [4.8.1] - 2023-02-13
 ### Changed
 - change padding on polygon to be 1 minute
