@@ -63,7 +63,7 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
       break;
 
     case networks.ARBITRUM_PRODUCTION:
-      padding = 65535;
+      padding = 60 * 60 * 6; // 6h
       requiredSignatures = 6;
       allowForMixedType = false;
       break;
