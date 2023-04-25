@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 
+## [4.9.1] - 2023-04-06
+### Changed
+- re-deploy Arbitrum with padding 6h
+
 ## [4.9.0] - 2023-01-04
 ### Added
 - add multichain architecture on Arbitrum
