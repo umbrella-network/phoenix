@@ -11,19 +11,19 @@ import { doSnapshot, revertSnapshot } from '../scripts/utils/helpers';
 import { blockTimestamp, mintBlocks } from './utils';
 import { ChainStatus } from './types/ChainStatus';
 import { prepareData, tree } from './chainUtils';
-import { FOREIGN_CHAIN, STAKING_BANK_STATE } from '../constants';
+import { FOREIGN_CHAIN } from '../constants';
 import { registerChain } from '../tasks/_helpers/registerChain';
 import { deployerSigner } from '../tasks/_helpers/jsonRpcProvider';
 
 use(waffleChai);
 
 const timePadding = 100;
-const totalSupply = 100;
+const totalSupply = 10n ** 18n;
 
 const root = tree.getRoot();
 
 describe('ForeignChain @foreignchain', () => {
-  let owner: SignerWithAddress, validator: SignerWithAddress, contract: Contract;
+  let validator: SignerWithAddress, contract: Contract;
 
   let genesisSnapshotId: unknown;
 
@@ -37,21 +37,12 @@ describe('ForeignChain @foreignchain', () => {
 
   beforeEach(async () => {
     const { deployments, ethers } = hre;
-    [owner, validator] = await ethers.getSigners();
+    [, validator] = await ethers.getSigners();
 
-    await deployments.fixture(FOREIGN_CHAIN);
+    await deployments.fixture([FOREIGN_CHAIN]);
     const contractDeployments = await deployments.get(FOREIGN_CHAIN);
 
     await registerChain(hre);
-
-    await deployments.execute(
-      STAKING_BANK_STATE,
-      { from: owner.address },
-      'setBalances',
-      [validator.address],
-      [totalSupply],
-      totalSupply
-    );
 
     contract = new Contract(contractDeployments.address, contractDeployments.abi, hre.ethers.provider);
   });

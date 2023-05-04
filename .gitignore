@@ -14,9 +14,6 @@ node_modules
 cache
 artifacts
 
-package-lock.json
-yarn.lock
-
 yarn-error.log
 
 typechain
@@ -27,3 +24,12 @@ flattened_*
 foundry/out/
 
 deployments/localhost
+
+# https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
