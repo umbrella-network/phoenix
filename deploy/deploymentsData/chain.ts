@@ -45,7 +45,7 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
       break;
 
     case networks.BNB_STAGING:
-      padding = 40;
+      padding = 240;
       requiredSignatures = 2;
       allowForMixedType = false;
       break;
