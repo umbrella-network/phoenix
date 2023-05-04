@@ -6,6 +6,13 @@ import { resolveChainName } from '../../tasks/_helpers/resolveChainName';
 import { deployChains } from '../_helpers/deployChains';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  if (hre.network.name.includes('linea')) {
+    console.log('-'.repeat(80));
+    console.log(`chain is not supported on ${hre.network.name}`);
+    console.log('-'.repeat(80));
+    return;
+  }
+
   const chainId = parseInt(await hre.getChainId(), 10);
   const chainName: ChainType = resolveChainName(chainId);
 

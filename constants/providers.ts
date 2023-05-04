@@ -5,7 +5,7 @@ import {
   AVALANCHE_STAGING, BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING, ETH_PRODUCTION, ETH_SANDBOX, ETH_STAGING, FORKED_BNB_ID, FORKED_ETH_ID,
+  BNB_STAGING, ETH_PRODUCTION, ETH_SANDBOX, ETH_STAGING, FORKED_BNB_ID, FORKED_ETH_ID, LINEA_STAGING,
   POLYGON_PRODUCTION, POLYGON_SANDBOX,
   POLYGON_STAGING
 } from './networks';
@@ -40,6 +40,11 @@ export const forkingChainId = (): number => {
 const localProviderData: ProviderData = {
   url: 'http://localhost:8545',
   chainId: forkingChainId()
+};
+
+const lineaTestnetProviderData: ProviderData = {
+  url: 'https://rpc.goerli.linea.build',
+  chainId: chainId(59140)
 };
 
 const arbitrumTestnetProviderData: ProviderData = {
@@ -95,6 +100,9 @@ const ethMainnetProviderData: ProviderData = {
 
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
+    case LINEA_STAGING:
+      return lineaTestnetProviderData;
+
     case ARBITRUM_STAGING:
     case ARBITRUM_SANDBOX:
       return arbitrumTestnetProviderData;
