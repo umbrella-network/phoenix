@@ -23,7 +23,7 @@ import {
   AVALANCHE_STAGING,
   BNB, BNB_PRODUCTION, BNB_SANDBOX,
   BNB_STAGING, ETH, ETH_PRODUCTION, ETH_SANDBOX,
-  ETH_STAGING,
+  ETH_STAGING, LINEA_STAGING,
   LOCALHOST, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
@@ -157,6 +157,11 @@ const config: HardhatUserConfig = {
       live: false,
       saveDeployments: true,
       deploy: ['deploy/evm'],
+    },
+    linea_staging: {
+      url: getProviderData(LINEA_STAGING).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(LINEA_STAGING).chainId,
     },
     avalanche_staging: {
       url: getProviderData(AVALANCHE_STAGING).url,
