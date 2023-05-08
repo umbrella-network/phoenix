@@ -69,7 +69,7 @@ export const chainDeploymentData = async (hre: HardhatRuntimeEnvironment): Promi
       break;
 
     case networks.AVALANCHE_PRODUCTION:
-      padding = 1800;
+      padding = 65535;
       requiredSignatures = 6;
       allowForMixedType = false;
       break;
