@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - `StakingBankStatic` - for gas optimisation
 
+## [4.9.2] - 2023-05-08
+### Changed
+- re-deploy Avalanche with padding 18h
+
 ## [4.9.1] - 2023-04-06
 ### Changed
 - re-deploy Arbitrum with padding 6h

@@ -1,6 +1,6 @@
 {
   "name": "phoenix",
-  "version": "4.9.1",
+  "version": "4.9.2",
   "description": "A proof-of-stake contract for minting sidechain blocks.",
   "engines": {
     "node": "^14.17.0 || >=16.0.0"
