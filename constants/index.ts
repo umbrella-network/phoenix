@@ -11,6 +11,8 @@ export const STAKING_BANK_STATIC_LOCAL = 'StakingBankStaticLocal';
 export const STAKING_BANK_STATIC_DEV = 'StakingBankStaticDev';
 export const STAKING_BANK_STATIC_PROD = 'StakingBankStaticProd';
 export const STAKING_BANK_STATE = 'StakingBankState';
+export const UMBRELLA_FEEDS = 'UmbrellaFeeds';
+export const UMBRELLA_FEEDS_READER_FACTORY = 'UmbrellaFeedsReaderFactory';
 export const UMB = 'UMB';
 export const UMB_BYTES32 = '0x554d420000000000000000000000000000000000000000000000000000000000';
 
