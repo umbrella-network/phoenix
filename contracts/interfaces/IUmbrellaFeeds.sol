@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+pragma solidity ^0.8.0;
 
 /// @dev Main contract for all deviation triggered fees.
 /// This contract has build in fallback feature in case it will be replaced by newer version.
