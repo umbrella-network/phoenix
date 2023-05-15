@@ -1,9 +1,12 @@
 # phoenix
-A delegated proof-of-stake contract for minting sidechain blocks.
+A delegated proof-of-authority contract for minting sidechain blocks.
 
 ## Overview
 Each block is signed by a set of validators.
 A minimum stake quorum must be achieved in order for a sidechain block to be mined.
+
+- [Multichain docs](./MASTERCHAIN.md)
+- [On-chain docs](./ON-CHAIN.md)
 
 ## Prerequisites
 

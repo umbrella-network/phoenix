@@ -291,8 +291,14 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.8.13'
-      },
+        version: '0.8.13',
+        settings: {
+          optimizer: {
+            enabled: false,
+            runs: 0,
+          },
+        },
+      }
     ]
   },
   namedAccounts: {
