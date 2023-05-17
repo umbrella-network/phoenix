@@ -16,7 +16,7 @@ contract UmbrellaFeedsReader {
     /// @dev decimals for feed
     uint8 public immutable DECIMALS;  // solhint-disable-line var-name-mixedcase
 
-    /// @dev string representation of feed key
+    /// @dev string representation of feed key (feed name)
     string public DESCRIPTION;  // solhint-disable-line var-name-mixedcase
 
     error FeedNotExist();
@@ -48,7 +48,7 @@ contract UmbrellaFeedsReader {
     /// @dev this method follows chainlink interface for easy migration, NOTE: not all returned data are covered!
     /// latestRoundData() raise exception when there is no data, instead of returning unset values,
     /// which could be misinterpreted as actual reported values.
-    /// It DOES NOT raise when data is outdated (based on heartbeat and last timestamp).
+    /// It DOES NOT raise when data is outdated (based on heartbeat and timestamp).
     /// @notice You can save some gas by doing call directly to `UMBRELLA_FEEDS` contract.
     /// @return uint80 originally `roundId`, not in use, always 0
     /// @return answer price

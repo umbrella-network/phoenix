@@ -35,44 +35,57 @@ There is option to create dedicated contract reader that also provides chainlink
       IMPORTANT: only `answer` and `updatedAt` are in use.
     - `getPriceData()` - it returns `PriceData`
 
-## Deployments
+### Fallback
 
-On blockchain where we do have L2 consensus:
+Fallback job is to make sure, that even when contract address will be updated you will be able to read data in
+transparent way.
+It is almost as a proxy but cheaper in a long run.
 
-```shell
-npx hardhat deploy --network avalanche_staging
-npx hardhat registerStakingBankStatic --network avalanche_staging
-# just in case chain needs to be redeployed
-npx hardhat deploy --network avalanche_staging
+With proxy contract is forced to read `implementation` address all the time. With fallback, search for new address is
+done ONLY when it is needed and only then, additional cost is added to the tx.
 
-npx hardhat registerChain --network avalanche_staging
-npx hardhat registerUmbrellaFeeds --network avalanche_staging
-npx hardhat registerReaderFactory --network avalanche_staging
+Redeployments of contracts are very rare, so it is more effective to simply update contract address when needed than
+paying additional fee all the time.
+
+If data is not present in destination contract, fallback will resolve current contract (1 additional storage read) and
+will do a call to new contract for the data (second additional storage read).
+
+Fallback is also more flexible solution:
+
+- you can use direct calls for maximum gas efficiency + fallback in case of emergency  
+  in most cases, redeploying contract with new constant address might be the most efficient option
+- you can use resolve current address by your own to avoid fallback
+
+How to resolve newest `UmbrellaFeeds` contract address:
+
+```solidity
+IRegistry.getAddress(bytes32("UmbrellaFeeds"))
 ```
 
-On blockchain with only on-chain data:
+## Gas calculations
 
-```
-npx hardhat deploy --network linea_staging
+- `OnchainDataCompareGasTest` contract (foundry tests) was used to compare costs.
+- Avalanche blockchain was used to fork network
+- Calculation done at: May 16, 2023.
 
-npx hardhat registerStakingBankStatic --network linea_staging
-npx hardhat registerUmbrellaFeeds --network linea_staging
-npx hardhat registerReaderFactory --network linea_staging
-```
 
-## Code verification on Linea
+Chainlink cost for calling `latestRoundData()` (proxy): 18753 gas. \
+Chainlink cost for calling `latestRoundData()` directly on aggregator: 10508 gas but only proxy can call (there is
+access control here).
 
-At the moment of developing hardhat verification not supporting linea, hardhat flattener was not working all the time.
 
-Here are steps that seems to be working always:
+Umbrella has multiple ways for pulling price. They can be chosen based on case.
 
-```
-# we need deploy to other network and verify code there
+- Fallback will add `15485` gas.
+- Resolving current contract address (you have to do it inside your contract) will add `5792` gas.
 
-# UmbrellaFeedsReader
-npx hardhat linea-verify --network avalanche_staging --address 0xAE9F0717E854285Ff8446fD9a75182e8ECf1d80D --name UmbrellaFeedsReader
-npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeeds  
-npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeedsReaderFactory  
-```
+| contract            | method                     | min gas cost | compare to Chainlink |
+|---------------------|----------------------------|--------------|----------------------|
+| UmbrellaFeeds       | getPrice                   | 6889         | 2.7x less            |
+| UmbrellaFeeds       | getPriceTimestamp          | 7131         | 2.6x less            |        
+| UmbrellaFeeds       | getPriceTimestampHeartbeat | 7313         | 2.6x less            |
+| UmbrellaFeeds       | getPriceData               | 7479         | 2.5x less            |
+| UmbrellaFeedsReader | latestRoundData            | 12466        | 1.5x less            |
+| UmbrellaFeedsReader | getPriceData               | 12431        | 1.5x less            |
 
-As result of `linea-verify`, stardard JSON file is created. Use it to verify contract on linea.
+###

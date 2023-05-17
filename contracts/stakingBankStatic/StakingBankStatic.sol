@@ -3,7 +3,7 @@ pragma solidity 0.8.13;
 
 import "../interfaces/StakingBankStaticNotSupported.sol";
 
-/// @dev Because we are using PoA in UMB oracle, staked balance does not matter. What's matter is if signer is
+/// @dev Because we are using PoA in UMB oracle, staked balance does not matter. What's matter is, if signer is
 /// validator or not. In this case  we can optimise `StakingBank` and make it static for better gas performance.
 abstract contract StakingBankStatic is StakingBankStaticNotSupported {
     uint256 public constant ONE = 1e18;

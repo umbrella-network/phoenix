@@ -26,7 +26,7 @@ contract StakingBankStaticDev is StakingBankStatic {
         return list;
     }
 
-    function _isValidator(address _validator) internal view override returns (bool) {
+    function _isValidator(address _validator) internal pure override returns (bool) {
         return (_validator == VALIDATOR_0 || _validator == VALIDATOR_1);
     }
 }

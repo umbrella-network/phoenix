@@ -21,7 +21,7 @@
     "lint": "yarn lint:ts && yarn lint:sol",
     "lint:ts": "eslint . --ext .ts,.tsx,.ts --max-warnings=0",
     "lint:fix": "eslint . --ext .ts,.tsx,.ts --max-warnings=0 --fix",
-    "lint:sol": "solhint \"contracts/**/*.sol\" --max-warnings=0",
+    "lint:sol": "solhint 'contracts/**/*.sol' --max-warnings=0",
     "prettier": "prettier --config .prettierrc 'deploy/**/*.ts' 'scripts/**/*.ts' 'tasks/**/*.ts' 'test/**/*.ts' --check",
     "prettier:format": "prettier --config .prettierrc 'deploy/**/*.ts' 'scripts/**/*.ts' 'tasks/**/*.ts' 'test/**/*.ts' --write",
     "format": "yarn prettier:format && yarn lint:fix && yarn lint:sol"
@@ -72,7 +72,7 @@
     "husky": "~4.3.0",
     "prettier": "~2.7.1",
     "solc": "0.8.13",
-    "solhint": "~3.3.7",
+    "solhint": "~3.4.1",
     "solidity-coverage": "~0.8.2",
     "superagent": "~8.0.0",
     "ts-node": "~10.9.1",
