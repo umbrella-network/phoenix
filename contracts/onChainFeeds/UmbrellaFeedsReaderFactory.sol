@@ -6,11 +6,15 @@ import "../interfaces/IStakingBank.sol";
 
 import "./UmbrellaFeedsReader.sol";
 
-/// @dev Factory to deploy UmbrellaFeedsReader contract
+/// @notice Factory to deploy UmbrellaFeedsReader contract
 contract UmbrellaFeedsReaderFactory {
+    /// @dev Registry contract where list of all addresses is stored. Used to resolve newest `UmbrellaFeeds` address
     IRegistry public immutable REGISTRY; // solhint-disable-line var-name-mixedcase
 
+    /// @dev list of all readers
     mapping (bytes32 => UmbrellaFeedsReader) public readers;
+
+    event NewUmbrellaFeedsReader(UmbrellaFeedsReader indexed umbrellaFeedsReader, string feedName);
 
     error EmptyAddress();
 
@@ -27,10 +31,10 @@ contract UmbrellaFeedsReaderFactory {
     /// Check UmbrellaFeedsReader docs for more details.
     ///
     /// We not using minimal proxy because it does not allow for immutable variables.
-    /// @param _key string Feed key that is registered in UmbrellaFeeds
+    /// @param _feedName string Feed name that is registered in UmbrellaFeeds
     /// @return reader UmbrellaFeedsReader contract address, in case anyone wants to use it from Layer1
-    function deploy(string memory _key) external returns (UmbrellaFeedsReader reader) {
-        reader = deployed(_key);
+    function deploy(string memory _feedName) external returns (UmbrellaFeedsReader reader) {
+        reader = deployed(_feedName);
         IUmbrellaFeeds umbrellaFeeds = IUmbrellaFeeds(REGISTRY.getAddressByString("UmbrellaFeeds"));
 
         // if UmbrellaFeeds contract is up to date, there is no need to redeploy
@@ -38,16 +42,18 @@ contract UmbrellaFeedsReaderFactory {
             return reader;
         }
 
-        reader = new UmbrellaFeedsReader(umbrellaFeeds, _key);
-        readers[hash(_key)] = reader;
+        reader = new UmbrellaFeedsReader(umbrellaFeeds, _feedName);
+        readers[hash(_feedName)] = reader;
+
+        emit NewUmbrellaFeedsReader(reader, _feedName);
     }
 
-    function deployed(string memory _key) public view returns (UmbrellaFeedsReader) {
-        return readers[hash(_key)];
+    function deployed(string memory _feedName) public view returns (UmbrellaFeedsReader) {
+        return readers[hash(_feedName)];
     }
 
-    function hash(string memory _key) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_key));
+    function hash(string memory _feedName) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_feedName));
     }
 
     /// @dev to follow Registrable interface

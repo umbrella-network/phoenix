@@ -5,31 +5,38 @@ import "../interfaces/IUmbrellaFeeds.sol";
 import "../interfaces/IRegistry.sol";
 import "../interfaces/IStakingBank.sol";
 
-/// @dev Main contract for all deviation triggered fees.
-/// This contract has build in fallback feature in case it will be replaced by newer version.
+/// @notice Main contract for all on-chain data.
+/// This contract has build in fallback feature in case, it will be replaced by newer contract.
 /// Fallback is transparent for the user, no additional setup is needed.
 ///
 /// How fallback feature works? If data for provided key is empty, contract will execute following procedure:
-/// 1. triggered feeds, that needs to be updated will be updated in new contract and erased from this one
-/// 2. if data is empty, check, if new deployment of UmbrellaFeeds is done, if not stop.
-/// 3. forward the call to that new contract.
+/// 1. When new contract is deployed, data from ols one are erased
+/// 2. if data is empty, contract will check if there is new contract with requested data
+/// 3. if data is found in new contract it will be returned
+/// 4. if there is no data or there is no new contract tx will revert.
 ///
-/// After new deployment done it is recommended to update address to avoid fallback and reduce gas cost.
+/// After new deployment, it is recommended to update address to avoid fallback and reduce gas cost to minimum.
 /// In long run this is most efficient solution, better than any proxy.
 contract UmbrellaFeeds is IUmbrellaFeeds {
     bytes constant public ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
     string constant public NAME = "UmbrellaFeeds";
 
-    IStakingBank public immutable STAKING_BANK;  // solhint-disable-line var-name-mixedcase
+    /// @dev Registry contract where list of all addresses is stored. Fallback feature uses this registry to
+    /// resolve newest `UmbrellaFeeds` address
     IRegistry public immutable REGISTRY;  // solhint-disable-line var-name-mixedcase
 
-    /// @dev minimal number of signatures required for accepting submission (PoA)
+    /// @dev StakingBank contract where list of validators is stored
+    IStakingBank public immutable STAKING_BANK;  // solhint-disable-line var-name-mixedcase
+
+    /// @dev minimal number of signatures required for accepting price submission (PoA)
     uint16 public immutable REQUIRED_SIGNATURES; // solhint-disable-line var-name-mixedcase
 
     /// @dev decimals for prices stored in this contract
     uint8 public immutable DECIMALS;  // solhint-disable-line var-name-mixedcase
 
-    mapping (bytes32 => PriceData) public prices;
+    /// @notice map of all prices stored in this contract, key for map is hash of feed name
+    /// eg for "ETH-USD" feed, key will be hash("ETH-USD")
+    mapping (bytes32 => PriceData) private _prices;
 
     error ArraysDataDoNotMatch();
     error FeedNotExist();
@@ -61,7 +68,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         PriceData[] calldata _priceDatas,
         Signature[] calldata _signatures
     ) external {
-        // below two checks are only for pretty errors, so we can safe gas and allow for raw revert
+        // below check is only for pretty errors, so we can safe gas and allow for raw revert
         // if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();
 
         bytes32 priceDataHash = keccak256(abi.encode(_priceKeys, _priceDatas));
@@ -72,9 +79,9 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         while (i < _priceDatas.length) {
             // we do not allow for older prices
             // at the same time it prevents from reusing signatures
-            if (prices[_priceKeys[i]].timestamp >= _priceDatas[i].timestamp) revert OldData();
+            if (_prices[_priceKeys[i]].timestamp >= _priceDatas[i].timestamp) revert OldData();
 
-            prices[_priceKeys[i]] = _priceDatas[i];
+            _prices[_priceKeys[i]] = _priceDatas[i];
 
             // atm there is no need for events, so in order to save gas, we do not emit any
             unchecked { i++; }
@@ -87,16 +94,127 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         verifySignatures(resetHash, _signatures);
 
         for (uint256 i; i < _priceKeys.length;) {
-            delete prices[_priceKeys[i]];
+            delete _prices[_priceKeys[i]];
             // atm there is no need for events, so in order to save gas, we do not emit any
             unchecked { i++; }
         }
     }
 
-    /// @dev method for submitting consensus data
+    /// @inheritdoc IUmbrellaFeeds
+    function getManyPriceData(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {
+        data = new PriceData[](_keys.length);
+
+        for (uint256 i; i < _keys.length;) {
+            data[i] = _prices[_keys[i]];
+
+            if (data[i].timestamp == 0) {
+                data[i] = _fallbackCall(_keys[i]);
+            }
+
+            unchecked { i++; }
+        }
+    }
+
+    /// @inheritdoc IUmbrellaFeeds
+    function getManyPriceDataRaw(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {
+        data = new PriceData[](_keys.length);
+
+        for (uint256 i; i < _keys.length;) {
+            data[i] = _prices[_keys[i]];
+
+            if (data[i].timestamp == 0) {
+                data[i] = _fallbackCallRaw(_keys[i]);
+            }
+
+            unchecked { i++; }
+        }
+    }
+
+    /// @inheritdoc IUmbrellaFeeds
+    function prices(bytes32 _key) external view returns (PriceData memory data) {
+        return _prices[_key];
+    }
+
+    /// @inheritdoc IUmbrellaFeeds
+    function getPriceData(bytes32 _key) external view returns (PriceData memory data) {
+        data = _prices[_key];
+
+        if (data.timestamp == 0) {
+            data = _fallbackCall(_key);
+        }
+    }
+
+    /// @inheritdoc IUmbrellaFeeds
+    function getPriceDataRaw(bytes32 _key) external view returns (PriceData memory data) {
+        data = _prices[_key];
+
+        if (data.timestamp == 0) {
+            data = _fallbackCallRaw(_key);
+        }
+    }
+
+    /// @inheritdoc IUmbrellaFeeds
+    function getPrice(bytes32 _key) external view returns (uint128 price) {
+        PriceData memory data = _prices[_key];
+
+        if (data.timestamp == 0) {
+            data = _fallbackCall(_key);
+        }
+
+        return data.price;
+    }
+
+    function getPriceTimestamp(bytes32 _key) external view returns (uint128 price, uint32 timestamp) {
+        PriceData memory data = _prices[_key];
+
+        if (data.timestamp == 0) {
+            data = _fallbackCall(_key);
+        }
+
+        return (data.price, data.timestamp);
+    }
+
+    function getPriceTimestampHeartbeat(bytes32 _key)
+        external
+        view
+        returns (uint128 price, uint32 timestamp, uint24 heartbeat)
+    {
+        PriceData memory data = _prices[_key];
+
+        if (data.timestamp == 0) {
+            data = _fallbackCall(_key);
+        }
+
+        return (data.price, data.timestamp, data.heartbeat);
+    }
+
+    /// @dev this is helper method for UI
+    function priceData(string memory _key) external view returns (PriceData memory) {
+        return _prices[keccak256(abi.encodePacked(_key))];
+    }
+
+    /// @inheritdoc IUmbrellaFeeds
+    function getPriceDataByName(string calldata _name) external view returns (PriceData memory data) {
+        bytes32 key = keccak256(abi.encodePacked(_name));
+        data = _prices[key];
+
+        if (data.timestamp == 0) {
+            data = _fallbackCallRaw(key);
+        }
+    }
+
+    /// @dev helper method for QA purposes
+    /// @return hash of data that are signed by validators (keys and priced data)
+    function hashData(bytes32[] calldata _priceKeys, PriceData[] calldata _priceDatas)
+        external
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encode(_priceKeys, _priceDatas));
+    }
+
     /// @param _hash hash of signed data
     /// @param _signatures array of validators signatures
-    // ss solhint-disable-next-line function-max-lines, code-complexity
     function verifySignatures(bytes32 _hash, Signature[] calldata _signatures) public view {
         address prevSigner = address(0x0);
 
@@ -127,82 +245,20 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         return ecrecover(hash, _v, _r, _s);
     }
 
-    /// @dev helper method for QA purposes
-    /// @return hash of data that are signed by validators (keys and priced data)
-    function hashSubmitData(bytes32[] calldata _priceKeys, PriceData[] calldata _priceDatas)
-        external
-        pure
-        returns (bytes32)
-    {
-        return keccak256(abi.encode(_priceKeys, _priceDatas));
-    }
-
-    /// @inheritdoc IUmbrellaFeeds
-    function getPricesData(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {
-        data = new PriceData[](_keys.length);
-
-        for (uint256 i; i < _keys.length;) {
-            data[i] = prices[_keys[i]];
-
-            if (data[i].timestamp == 0) {
-                data[i] = _fallbackCall(_keys[i]);
-            }
-
-            unchecked { i++; }
-        }
-    }
-
-    /// @inheritdoc IUmbrellaFeeds
-    function getPricesDataRaw(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {
-        data = new PriceData[](_keys.length);
-
-        for (uint256 i; i < _keys.length;) {
-            data[i] = prices[_keys[i]];
-
-            if (data[i].timestamp == 0) {
-                data[i] = _fallbackCallRaw(_keys[i]);
-            }
-
-            unchecked { i++; }
-        }
-    }
-
-    /// @dev this is only for dev debug,
-    /// please use `getPriceData` directly for lower has cost and fallback functionality
-    function priceData(string memory _key) external view returns (PriceData memory) {
-        return prices[keccak256(abi.encodePacked(_key))];
-    }
-
-    /// @inheritdoc IUmbrellaFeeds
-    function getPriceData(bytes32 _key) external view returns (PriceData memory data) {
-        data = prices[_key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCall(_key);
-        }
-    }
-
-    /// @inheritdoc IUmbrellaFeeds
-    function getPriceDataRaw(bytes32 _key) external view returns (PriceData memory data) {
-        data = prices[_key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCallRaw(_key);
-        }
-    }
-
     /// @dev to follow Registrable interface
     function getName() public pure returns (bytes32) {
         return "UmbrellaFeeds";
     }
 
-    function _fallbackCall(bytes32 _key) internal view returns (PriceData memory) {
+    function _fallbackCall(bytes32 _key) internal view returns (PriceData memory data) {
         address umbrellaFeeds = REGISTRY.getAddressByString(NAME);
 
-        // if contract was NOT updated - revert
+        // if contract was NOT updated, fallback is not needed, data does not exist - revert
         if (umbrellaFeeds == address(this)) revert FeedNotExist();
 
-        return UmbrellaFeeds(umbrellaFeeds).getPriceDataRaw(_key);
+        data = IUmbrellaFeeds(umbrellaFeeds).prices(_key);
+        // if contract WAS updated but there is no data - revert
+        if (data.timestamp == 0) revert FeedNotExist();
     }
 
     function _fallbackCallRaw(bytes32 _key) internal view returns (PriceData memory data) {
@@ -210,7 +266,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
         // if contract was updated, we do a fallback call
         if (umbrellaFeeds != address(this) && umbrellaFeeds != address(0)) {
-            return UmbrellaFeeds(umbrellaFeeds).getPriceDataRaw(_key);
+            data = IUmbrellaFeeds(umbrellaFeeds).prices(_key);
         }
 
         // else - we return empty data

@@ -161,6 +161,52 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 ```
 
 
+### On-Chain data
+
+#### Deployments
+
+On blockchain where we do have L2 consensus:
+
+```shell
+npx hardhat deploy --network avalanche_staging
+npx hardhat registerStakingBankStatic --network avalanche_staging
+# just in case chain needs to be redeployed
+npx hardhat deploy --network avalanche_staging
+
+npx hardhat registerChain --network avalanche_staging
+npx hardhat registerUmbrellaFeeds --network avalanche_staging
+npx hardhat registerReaderFactory --network avalanche_staging
+```
+
+On blockchain with only on-chain data:
+
+```
+npx hardhat deploy --network linea_staging
+
+npx hardhat registerStakingBankStatic --network linea_staging
+npx hardhat registerUmbrellaFeeds --network linea_staging
+npx hardhat registerReaderFactory --network linea_staging
+```
+
+#### Code verification on Linea
+
+At the moment of developing hardhat verification not supporting linea, hardhat flattener was not working all the time.
+
+Here are steps that seems to be working always:
+
+```
+# we need deploy to other network and verify code there
+
+# UmbrellaFeedsReader
+npx hardhat linea-verify --network avalanche_staging --address 0xAE9F0717E854285Ff8446fD9a75182e8ECf1d80D --name UmbrellaFeedsReader
+npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeeds  
+npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeedsReaderFactory  
+```
+
+As result of `linea-verify`, stardard JSON file is created. Use it to verify contract on linea.
+
+
+
 ### Distributor
 
 Only for testnets
@@ -183,26 +229,6 @@ cd ../pegasus
 # start hardhat network with contracts
 echo 'BLOCKCHAIN_PROVIDER_URL=http://eth:8545' >> .env
 docker-compose up
-```
-
-## Troubleshoot for avalanche
-
-In order to make hardhat work with avalanche, please edit this file:
-
-`node_modules/@nomiclabs/hardhat-etherscan/dist/src/network/prober.js`
-
-```aidl
-    NetworkID[NetworkID["AVALANCHE"] = 43114] = "AVALANCHE";
-    NetworkID[NetworkID["AVALANCHE_FUJI_TESTNET"] = 43113] = "AVALANCHE_FUJI_TESTNET";
-
-    [NetworkID.AVALANCHE]: {
-        apiURL: "https://api.snowtrace.io/api",
-        browserURL: "https://snowtrace.io/",
-    },
-    [NetworkID.AVALANCHE_FUJI_TESTNET]: {
-        apiURL: "https://api-testnet.snowtrace.io/api",
-        browserURL: "https://testnet.snowtrace.io/",
-    },
 ```
 
 ## Licensed under MIT.

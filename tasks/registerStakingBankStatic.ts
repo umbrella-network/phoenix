@@ -34,11 +34,11 @@ task('registerStakingBankStatic', 'chain contract registration')
         console.log('!'.repeat(80));
         return;
       }
-    }
 
-    const tx = await registry.importContracts([stakingBankStatic.address]);
-    console.log(`${STAKING_BANK_STATIC} (${stakingBankStatic.address}) registered, waiting for confirmation...`);
-    await tx.wait(1);
+      const tx = await registry.importContracts([stakingBankStatic.address]);
+      console.log(`${STAKING_BANK_STATIC} (${stakingBankStatic.address}) registered, waiting for confirmation...`);
+      await tx.wait(1);
+    }
 
     console.log('next steps:');
     console.log('npx hardhat deploy --network', hre.network.name);
