@@ -40,7 +40,6 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     error ArraysDataDoNotMatch();
     error FeedNotExist();
-    error FallbackFeedNotExist();
     error NotEnoughSignatures();
     error InvalidRequiredSignatures();
     error SignaturesOutOfOrder();
