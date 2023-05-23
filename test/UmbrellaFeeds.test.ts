@@ -18,21 +18,31 @@ type PriceDataStruct = IUmbrellaFeeds.PriceDataStruct;
 use(waffleChai);
 
 class DeviationSigner {
-  async apply(validator: SignerWithAddress, keys: string[], priceDatas: PriceDataStruct[]): Promise<string> {
-    const hash = await this.hashData(keys, priceDatas);
+  async apply(
+    networkId: number,
+    target: string,
+    validator: SignerWithAddress,
+    keys: string[],
+    priceDatas: PriceDataStruct[]
+  ): Promise<string> {
+    const hash = await this.hashData(networkId, target, keys, priceDatas);
     const toSign = ethers.utils.arrayify(hash);
     return validator.signMessage(toSign);
   }
 
-  async hashData(keys: string[], priceDatas: PriceDataStruct[]): Promise<string> {
-    const testimony = ethers.utils.defaultAbiCoder.encode(await this.priceDatasAbi(), [keys, priceDatas]);
+  async hashData(networkId: number, target: string, keys: string[], priceDatas: PriceDataStruct[]): Promise<string> {
+    const testimony = ethers.utils.defaultAbiCoder.encode(
+      ['uint256', 'address', ...(await this.priceDatasAbi())],
+      [networkId, target, keys, priceDatas]
+    );
+
     return ethers.utils.keccak256(testimony);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected async priceDatasAbi(): Promise<any> {
     const artifacts = await hre.artifacts.readArtifact(UMBRELLA_FEEDS);
-    const submitAbi = artifacts.abi.find((data: { name?: string }) => data?.name === 'submit');
+    const submitAbi = artifacts.abi.find((data: { name?: string }) => data?.name === 'update');
     if (!submitAbi) throw new Error('missing submit in ABI');
 
     const { inputs } = submitAbi;
@@ -75,18 +85,16 @@ const setupForFeedsWithMocks = async (props: {
   };
 };
 
-const w = hre.ethers.Wallet.createRandom(Math.random().toString(10));
-console.log(w.address);
-console.log(w.privateKey);
-
-describe.skip('UmbrellaFeeds', () => {
+describe('UmbrellaFeeds', () => {
   const deviationSigner = new DeviationSigner();
 
+  let networkId: number;
   let validator: SignerWithAddress, contract: UmbrellaFeeds;
 
   describe('test signatures', () => {
     beforeEach(async () => {
       ({ validator, contract } = await setupForFeedsWithMocks({ hre }));
+      networkId = (await hre.ethers.provider.getNetwork()).chainId;
     });
 
     it('#hashSubmitData', async () => {
@@ -108,7 +116,7 @@ describe.skip('UmbrellaFeeds', () => {
       const keys = Object.keys(data).map((k) => ethers.utils.id(k));
       const expectedHash = await contract.hashData(keys, Object.values(data));
 
-      expect(deviationSigner.hashData(keys, Object.values(data)), expectedHash);
+      expect(deviationSigner.hashData(networkId, contract.address, keys, Object.values(data)), expectedHash);
     });
 
     it('#recoverSigner', async () => {
@@ -128,8 +136,8 @@ describe.skip('UmbrellaFeeds', () => {
       };
 
       const keys = Object.keys(data).map((k) => ethers.utils.id(k));
-      const hash = deviationSigner.hashData(keys, Object.values(data));
-      const signature = await deviationSigner.apply(validator, keys, Object.values(data));
+      const hash = deviationSigner.hashData(networkId, contract.address, keys, Object.values(data));
+      const signature = await deviationSigner.apply(networkId, contract.address, validator, keys, Object.values(data));
       const { v, r, s } = ethers.utils.splitSignature(signature);
 
       const expectedAddress = await contract.recoverSigner(hash, v, r, s);

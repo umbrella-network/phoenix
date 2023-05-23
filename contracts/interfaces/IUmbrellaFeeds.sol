@@ -3,7 +3,8 @@ pragma solidity ^0.8.0;
 
 interface IUmbrellaFeeds {
     struct PriceData {
-        /// @dev placeholder, not in use yet
+        /// @dev this is placeholder, that can be used for some additional data
+        /// atm of creating this smart contract, it is only used as marker for removed data (when == type(uint8).max)
         uint8 data;
         /// @dev heartbeat: how often price data will be refreshed in case price stay flat
         uint24 heartbeat;
