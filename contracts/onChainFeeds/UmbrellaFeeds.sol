@@ -21,6 +21,9 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     bytes constant public ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
     string constant public NAME = "UmbrellaFeeds";
 
+    /// @dev marker that will tell us, that price data was reset
+    uint8 constant public DATA_RESET = type(uint8).max;
+
     /// @dev Registry contract where list of all addresses is stored. Fallback feature uses this registry to
     /// resolve newest `UmbrellaFeeds` address
     IRegistry public immutable REGISTRY;  // solhint-disable-line var-name-mixedcase
@@ -41,9 +44,11 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     error ArraysDataDoNotMatch();
     error FeedNotExist();
     error NotEnoughSignatures();
+    error InvalidSigner();
     error InvalidRequiredSignatures();
     error SignaturesOutOfOrder();
     error OldData();
+    error DataReset();
 
     /// @param _contractRegistry Registry address
     /// @param _requiredSignatures number of required signatures for accepting consensus submission
@@ -70,7 +75,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         // below check is only for pretty errors, so we can safe gas and allow for raw revert
         // if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();
 
-        bytes32 priceDataHash = keccak256(abi.encode(_priceKeys, _priceDatas));
+        bytes32 priceDataHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, _priceDatas));
         verifySignatures(priceDataHash, _signatures);
 
         uint256 i;
@@ -79,6 +84,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
             // we do not allow for older prices
             // at the same time it prevents from reusing signatures
             if (_prices[_priceKeys[i]].timestamp >= _priceDatas[i].timestamp) revert OldData();
+            if (_prices[_priceKeys[i]].data == DATA_RESET) revert DataReset();
 
             _prices[_priceKeys[i]] = _priceDatas[i];
 
@@ -89,11 +95,11 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function reset(bytes32[] calldata _priceKeys, Signature[] calldata _signatures) external {
-        bytes32 resetHash = keccak256(abi.encodePacked(_priceKeys, "RESET"));
+        bytes32 resetHash = keccak256(abi.encodePacked(getChainId(), address(this), _priceKeys, "RESET"));
         verifySignatures(resetHash, _signatures);
 
         for (uint256 i; i < _priceKeys.length;) {
-            delete _prices[_priceKeys[i]];
+            _prices[_priceKeys[i]] = PriceData(DATA_RESET, 0, 0, 0);
             // atm there is no need for events, so in order to save gas, we do not emit any
             unchecked { i++; }
         }
@@ -206,10 +212,10 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     /// @return hash of data that are signed by validators (keys and priced data)
     function hashData(bytes32[] calldata _priceKeys, PriceData[] calldata _priceDatas)
         external
-        pure
+        view
         returns (bytes32)
     {
-        return keccak256(abi.encode(_priceKeys, _priceDatas));
+        return keccak256(abi.encode(getChainId(), address(this), _priceKeys, _priceDatas));
     }
 
     /// @param _hash hash of signed data
@@ -226,11 +232,18 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
             if (prevSigner >= signer) revert SignaturesOutOfOrder();
 
             // because we check only required number of signatures, any invalid one will cause revert
-            if (STAKING_BANK.balanceOf(signer) == 0) revert NotEnoughSignatures();
+            if (STAKING_BANK.balanceOf(signer) == 0) revert InvalidSigner();
 
             prevSigner = signer;
 
             unchecked { i++; }
+        }
+    }
+
+    function getChainId() public view returns (uint256 id) {
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            id := chainid()
         }
     }
 
