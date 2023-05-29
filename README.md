@@ -198,7 +198,9 @@ Here are steps that seems to be working always:
 # we need deploy to other network and verify code there
 
 # UmbrellaFeedsReader
-npx hardhat linea-verify --network avalanche_staging --address 0xAE9F0717E854285Ff8446fD9a75182e8ECf1d80D --name UmbrellaFeedsReader
+npx hardhat verify --network avalanche_staging 0x5A7De8db02e206f726804Ce96b65394996EFa89f --constructor-args ./arguments.js
+npx hardhat linea-verify --network avalanche_staging --address 0x5A7De8db02e206f726804Ce96b65394996EFa89f --name UmbrellaFeedsReader
+
 npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeeds  
 npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeedsReaderFactory  
 ```

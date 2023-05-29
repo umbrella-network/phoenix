@@ -112,5 +112,3 @@ Umbrella has multiple ways for pulling price. They can be chosen based on case.
 | UmbrellaFeeds       | getPriceData               | 7479         | 2.5x less            |
 | UmbrellaFeedsReader | latestRoundData            | 12466        | 1.5x less            |
 | UmbrellaFeedsReader | getPriceData               | 12431        | 1.5x less            |
-
-###
