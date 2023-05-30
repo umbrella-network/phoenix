@@ -89,7 +89,7 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment, gasPrice?: n
   }
 
   const inRegistry = await registry.getAddressByString(CHAIN);
-  console.log({ inRegistry });
+  console.log({ inRegistry, deployed: chain.address });
 
   if (inRegistry.toLowerCase() != chain.address.toLowerCase()) {
     console.log(`current ${CHAIN_NAME}: ${inRegistry}`);
