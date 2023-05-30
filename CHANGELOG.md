@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `StakingBankStatic` - for gas optimisation
 - On chain data contracts
 
+## [4.9.3] - 2023-05-29
+### Changed
+- re-deploy Polygon with padding 3m
+
 ## [4.9.2] - 2023-05-08
 ### Changed
 - re-deploy Avalanche with padding 18h
