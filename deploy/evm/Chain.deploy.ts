@@ -1,9 +1,10 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import { CHAIN, ChainType, FOREIGN_CHAIN, REGISTRY, STAKING_BANK, STAKING_BANK_STATIC } from '../../constants';
+import { CHAIN, ChainType, FOREIGN_CHAIN, REGISTRY, STAKING_BANK_STATIC } from '../../constants';
 import { resolveChainName } from '../../tasks/_helpers/resolveChainName';
 import { deployChains } from '../_helpers/deployChains';
+import { checkStakingBankStaticUpdated } from '../_helpers/checkStakingBankStaticUpdated';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if (hre.network.name.includes('linea')) {
@@ -17,16 +18,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const chainName: ChainType = resolveChainName(chainId);
 
   // check if we are using newest staking bank
-  const { address: stakingBankAddress } = await hre.deployments.get(STAKING_BANK_STATIC);
-  const registeredBank = await hre.deployments.read(REGISTRY, 'getAddressByString', STAKING_BANK);
-
-  if (registeredBank.toLowerCase() !== stakingBankAddress.toLowerCase()) {
-    console.warn('!'.repeat(80));
-    console.log({ stakingBankAddress, registeredBank });
-    console.warn('bank in registry is different than deployed one, register bank first before deployment of chain');
-    console.warn('run:');
-    console.warn('npx hardhat registerStakingBankStatic --network', hre.network.name);
-    console.warn('!'.repeat(80));
+  if (!(await checkStakingBankStaticUpdated(hre))) {
     return;
   }
 
