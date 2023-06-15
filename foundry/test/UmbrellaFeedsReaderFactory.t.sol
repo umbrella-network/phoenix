@@ -31,7 +31,7 @@ contract UmbrellaFeedsReaderFactoryTest is SignerHelper {
         priceDatas.push(IUmbrellaFeeds.PriceData(0, 86400, 1683410179, 1409031));
         priceDatas.push(IUmbrellaFeeds.PriceData(0, 86400, 1683410179, 124760000));
 
-        feeds.update(priceKeys, priceDatas, _signData(feeds, priceKeys, priceDatas));
+        feeds.update(priceKeys, priceDatas, _signData(2, feeds, priceKeys, priceDatas));
     }
 
     function test_factory_deploy() public {

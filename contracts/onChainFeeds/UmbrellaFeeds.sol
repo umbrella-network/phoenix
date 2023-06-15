@@ -3,7 +3,7 @@ pragma solidity 0.8.13;
 
 import "../interfaces/IUmbrellaFeeds.sol";
 import "../interfaces/IRegistry.sol";
-import "../interfaces/IStakingBank.sol";
+import "../interfaces/IStakingBankStatic.sol";
 
 /// @notice Main contract for all on-chain data.
 /// This contract has build in fallback feature in case, it will be replaced by newer contract.
@@ -29,7 +29,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     IRegistry public immutable REGISTRY;  // solhint-disable-line var-name-mixedcase
 
     /// @dev StakingBank contract where list of validators is stored
-    IStakingBank public immutable STAKING_BANK;  // solhint-disable-line var-name-mixedcase
+    IStakingBankStatic public immutable STAKING_BANK;  // solhint-disable-line var-name-mixedcase
 
     /// @dev minimal number of signatures required for accepting price submission (PoA)
     uint16 public immutable REQUIRED_SIGNATURES; // solhint-disable-line var-name-mixedcase
@@ -62,7 +62,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
         REGISTRY = _contractRegistry;
         REQUIRED_SIGNATURES = _requiredSignatures;
-        STAKING_BANK = IStakingBank(_contractRegistry.requireAndGetAddress("StakingBank"));
+        STAKING_BANK = IStakingBankStatic(_contractRegistry.requireAndGetAddress("StakingBank"));
         DECIMALS = _decimals;
     }
 
@@ -225,6 +225,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
         if (_signatures.length < REQUIRED_SIGNATURES) revert NotEnoughSignatures();
 
+        address[] memory validators = new address[](REQUIRED_SIGNATURES);
+
         // to save gas we check only required number of signatures
         // case, where you can have part of signatures invalid but still enough valid in total is not supported
         for (uint256 i; i < REQUIRED_SIGNATURES;) {
@@ -232,12 +234,14 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
             if (prevSigner >= signer) revert SignaturesOutOfOrder();
 
             // because we check only required number of signatures, any invalid one will cause revert
-            if (STAKING_BANK.balanceOf(signer) == 0) revert InvalidSigner();
-
             prevSigner = signer;
+            validators[i] = signer;
 
             unchecked { i++; }
         }
+
+        // bulk verification can optimise gas when we have 5 or more validators
+        if (!STAKING_BANK.verifyValidators(validators)) revert InvalidSigner();
     }
 
     function getChainId() public view returns (uint256 id) {

@@ -20,6 +20,15 @@ abstract contract StakingBankStatic is StakingBankStaticNotSupported {
         return _isValidator(_validator) ? ONE : 0;
     }
 
+    function verifyValidators(address[] calldata _validators) external view returns (bool) {
+        for (uint256 i; i < _validators.length;) {
+            if (!_isValidator(_validators[i])) return false;
+            unchecked { i++; }
+        }
+
+        return true;
+    }
+
     function getNumberOfValidators() external view returns (uint256) {
         return NUMBER_OF_VALIDATORS;
     }

@@ -143,7 +143,7 @@ contract OnchainDataCompareGasTest is DSTest {
 
     function _umbrellaFeeds_gasCost(address _destination, bytes memory _calldata) internal {
         uint256 gasLeft = gasleft();
-        (bool success, bytes memory data) = _destination.staticcall(_calldata);
+        (bool success,) = _destination.staticcall(_calldata);
         uint256 umbrellaGas = gasLeft - gasleft();
 
         assertTrue(success);
