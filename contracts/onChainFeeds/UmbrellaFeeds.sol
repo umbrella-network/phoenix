@@ -96,7 +96,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function reset(bytes32[] calldata _priceKeys, Signature[] calldata _signatures) external {
-        bytes32 resetHash = keccak256(abi.encodePacked(getChainId(), address(this), _priceKeys, "RESET"));
+        bytes32 resetHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, bytes32("RESET")));
         verifySignatures(resetHash, _signatures);
 
         for (uint256 i; i < _priceKeys.length;) {

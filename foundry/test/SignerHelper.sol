@@ -76,7 +76,7 @@ contract SignerHelper is DSTest {
         UmbrellaFeeds _feeds,
         bytes32[] memory _priceKeys
     ) internal returns (IUmbrellaFeeds.Signature[] memory signatures) {
-        bytes32 resetHash = keccak256(abi.encodePacked(_feeds.getChainId(), address(_feeds), _priceKeys, "RESET"));
+        bytes32 resetHash = keccak256(abi.encode(_feeds.getChainId(), address(_feeds), _priceKeys, bytes32("RESET")));
         bytes32 hash = keccak256(abi.encodePacked(_feeds.ETH_PREFIX(), resetHash));
 
         signatures = new UmbrellaFeeds.Signature[](_numSigs);
