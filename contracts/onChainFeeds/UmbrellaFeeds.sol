@@ -72,8 +72,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         PriceData[] calldata _priceDatas,
         Signature[] calldata _signatures
     ) external {
-        // below check is only for pretty errors, so we can safe gas and allow for raw revert
-        // if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();
+        if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();
 
         bytes32 priceDataHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, _priceDatas));
         verifySignatures(priceDataHash, _signatures);
@@ -81,12 +80,14 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         uint256 i;
 
         while (i < _priceDatas.length) {
+            bytes32 priceKey = _priceKeys[i];
+
             // we do not allow for older prices
             // at the same time it prevents from reusing signatures
-            if (_prices[_priceKeys[i]].timestamp >= _priceDatas[i].timestamp) revert OldData();
-            if (_prices[_priceKeys[i]].data == DATA_RESET) revert DataReset();
+            if (_prices[priceKey].timestamp >= _priceDatas[i].timestamp) revert OldData();
+            if (_prices[priceKey].data == DATA_RESET) revert DataReset();
 
-            _prices[_priceKeys[i]] = _priceDatas[i];
+            _prices[priceKey] = _priceDatas[i];
 
             // atm there is no need for events, so in order to save gas, we do not emit any
             unchecked { i++; }
