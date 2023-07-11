@@ -9,6 +9,7 @@ export const STAKING_BANK = 'StakingBank';
 export const STAKING_BANK_STATIC = 'StakingBankStatic';
 export const STAKING_BANK_STATIC_LOCAL = 'StakingBankStaticLocal';
 export const STAKING_BANK_STATIC_DEV = 'StakingBankStaticDev';
+export const STAKING_BANK_STATIC_SBX = 'StakingBankStaticSbx';
 export const STAKING_BANK_STATIC_PROD = 'StakingBankStaticProd';
 export const STAKING_BANK_STATE = 'StakingBankState';
 export const UMBRELLA_FEEDS = 'UmbrellaFeeds';

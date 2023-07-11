@@ -4,6 +4,7 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import { REGISTRY, STAKING_BANK_STATIC, UMBRELLA_FEEDS } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { umbrellaFeedsDeploymentData } from '../deploymentsData/umbrellaFeeds';
+import { checkStakingBankStaticUpdated } from '../_helpers/checkStakingBankStaticUpdated';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -12,7 +13,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { args, contractName } = await umbrellaFeedsDeploymentData(hre);
 
-  const stakingBank = await deploy(UMBRELLA_FEEDS, {
+  // check if we are using newest staking bank
+  if (!(await checkStakingBankStaticUpdated(hre))) {
+    return;
+  }
+
+  const feeds = await deploy(UMBRELLA_FEEDS, {
     contract: contractName,
     from: deployer,
     log: true,
@@ -20,7 +26,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     waitConfirmations: 1,
   });
 
-  await verifyCode(hre, stakingBank.address, args);
+  await verifyCode(hre, feeds.address, args);
 };
 
 func.dependencies = [REGISTRY, STAKING_BANK_STATIC];

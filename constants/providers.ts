@@ -5,7 +5,7 @@ import {
   AVALANCHE_STAGING, BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING, ETH_PRODUCTION, ETH_SANDBOX, ETH_STAGING, FORKED_BNB_ID, FORKED_ETH_ID, LINEA_STAGING,
+  BNB_STAGING, ETH_PRODUCTION, ETH_SANDBOX, ETH_STAGING, FORKED_BNB_ID, FORKED_ETH_ID, LINEA_SANDBOX, LINEA_STAGING,
   POLYGON_PRODUCTION, POLYGON_SANDBOX,
   POLYGON_STAGING
 } from './networks';
@@ -101,6 +101,7 @@ const ethMainnetProviderData: ProviderData = {
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
     case LINEA_STAGING:
+    case LINEA_SANDBOX:
       return lineaTestnetProviderData;
 
     case ARBITRUM_STAGING:
