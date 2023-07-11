@@ -1,13 +1,16 @@
 pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
+import "../lib/CheatCodes.sol";
 import "../../contracts/stakingBankStatic/StakingBankStaticProd.sol";
 
 /*
-    forge test -vvv --match-contract StaticBankStaticTest
+    forge test -vv --match-contract StaticBankStaticTest
 */
 contract StaticBankStaticTest is DSTest {
     StakingBankStaticProd public immutable bank;
+
+    CheatCodes constant cheats = CheatCodes(HEVM_ADDRESS);
 
     mapping (address => string) locations;
 
@@ -32,6 +35,14 @@ contract StaticBankStaticTest is DSTest {
         locations[address(0x93FdcAB283b0BcAc48157590af482E1CFd6af6aC)] = "https://umbrella.crazywhale.es";
         locations[address(0xCd733E06B06083d52fC5867E8E3432aA5c103A38)] = "https://umbrella-node.gateomega.com";
         locations[address(0x57F404aD75e371c1A539589C1eFCA12e0C6980AD)] = "https://umbrella.artemahr.tech";
+    }
+
+    function test_constructor() public {
+        cheats.expectRevert();
+        new StakingBankStaticProd(17);
+
+        cheats.expectRevert();
+        new StakingBankStaticProd(100);
     }
 
     function test_addresses() public {

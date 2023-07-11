@@ -4,26 +4,26 @@ pragma solidity 0.8.13;
 import "./StakingBankStatic.sol";
 
 contract StakingBankStaticProd is StakingBankStatic {
-    address public constant VALIDATOR_0 = address(0x977Ba523420110e230643B772Fe9cF955e11dA7B);
-    address public constant VALIDATOR_1 = address(0xe2422b23e52bc13ebA04d7FbB9F332Deb43360fB);
+    address public constant VALIDATOR_0 = 0x977Ba523420110e230643B772Fe9cF955e11dA7B;
+    address public constant VALIDATOR_1 = 0xe2422b23e52bc13ebA04d7FbB9F332Deb43360fB;
 
     // external order is based on validators submits on AVAX for Apr 2023
-    address public constant VALIDATOR_2 = address(0x57F404aD75e371c1A539589C1eFCA12e0C6980AD);
-    address public constant VALIDATOR_3 = address(0xD56C6A4f64E0bD70260472d1DB6Cf5825858CB0d);
-    address public constant VALIDATOR_4 = address(0x220230Eda8f50067Dd9e4729345dabCCe0C61542);
-    address public constant VALIDATOR_5 = address(0x93FdcAB283b0BcAc48157590af482E1CFd6af6aC);
-    address public constant VALIDATOR_6 = address(0xCd733E06B06083d52fC5867E8E3432aA5c103A38);
-    address public constant VALIDATOR_7 = address(0x42e210b110c6aa49CdfA7ceF1444Aa4719653111);
-    address public constant VALIDATOR_8 = address(0x501731c6a69803a53Ec6c3e12f293c247cE1092B);
-    address public constant VALIDATOR_9 = address(0x8bF9661F1b247522C75DD0FE84355aD2EfF27144);
-    address public constant VALIDATOR_10 = address(0x281754Ab58391A478B7aA4E7f39991CfB41118c4);
-    address public constant VALIDATOR_11 = address(0xB9C63a350A04d8BD245d18928a26EE036352dDd8);
-    address public constant VALIDATOR_12 = address(0x57A51D5BDcE188c2295fCA3b4687475a54E65A02);
-    address public constant VALIDATOR_13 = address(0x777FbA3666fa7747476a34577FcCC404b263E09F);
-    address public constant VALIDATOR_14 = address(0x2F85824B2B38F179E451988670935d315b5b9692);
-    address public constant VALIDATOR_15 = address(0xe868bE65C50b61E81A3fC5cB5A7916090B05eb2A);
-    address public constant VALIDATOR_16 = address(0xB12c5DFA8693a5890c4b5B9145E3CAE1502f17f0);
-    address public constant VALIDATOR_17 = address(0xe7129A4c7521452511249c26B018fEfbB10d108d);
+    address public constant VALIDATOR_2 = 0x57F404aD75e371c1A539589C1eFCA12e0C6980AD;
+    address public constant VALIDATOR_3 = 0xD56C6A4f64E0bD70260472d1DB6Cf5825858CB0d;
+    address public constant VALIDATOR_4 = 0x220230Eda8f50067Dd9e4729345dabCCe0C61542;
+    address public constant VALIDATOR_5 = 0x93FdcAB283b0BcAc48157590af482E1CFd6af6aC;
+    address public constant VALIDATOR_6 = 0xCd733E06B06083d52fC5867E8E3432aA5c103A38;
+    address public constant VALIDATOR_7 = 0x42e210b110c6aa49CdfA7ceF1444Aa4719653111;
+    address public constant VALIDATOR_8 = 0x501731c6a69803a53Ec6c3e12f293c247cE1092B;
+    address public constant VALIDATOR_9 = 0x8bF9661F1b247522C75DD0FE84355aD2EfF27144;
+    address public constant VALIDATOR_10 = 0x281754Ab58391A478B7aA4E7f39991CfB41118c4;
+    address public constant VALIDATOR_11 = 0xB9C63a350A04d8BD245d18928a26EE036352dDd8;
+    address public constant VALIDATOR_12 = 0x57A51D5BDcE188c2295fCA3b4687475a54E65A02;
+    address public constant VALIDATOR_13 = 0x777FbA3666fa7747476a34577FcCC404b263E09F;
+    address public constant VALIDATOR_14 = 0x2F85824B2B38F179E451988670935d315b5b9692;
+    address public constant VALIDATOR_15 = 0xe868bE65C50b61E81A3fC5cB5A7916090B05eb2A;
+    address public constant VALIDATOR_16 = 0xB12c5DFA8693a5890c4b5B9145E3CAE1502f17f0;
+    address public constant VALIDATOR_17 = 0xe7129A4c7521452511249c26B018fEfbB10d108d;
 
     constructor(uint256 _validatorsCount) StakingBankStatic(_validatorsCount) {}
 

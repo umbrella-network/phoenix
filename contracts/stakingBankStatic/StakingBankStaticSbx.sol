@@ -5,8 +5,8 @@ import "./StakingBankStatic.sol";
 
 
 contract StakingBankStaticSbx is StakingBankStatic {
-    address public constant VALIDATOR_0 = address(0xE3bDa0C6E1fBB111091Dfef6f22a673b20Ea5F50);
-    address public constant VALIDATOR_1 = address(0xc1773490F00963CBAb3841fc07C1a0796E658Ba2);
+    address public constant VALIDATOR_0 = 0xE3bDa0C6E1fBB111091Dfef6f22a673b20Ea5F50;
+    address public constant VALIDATOR_1 = 0xc1773490F00963CBAb3841fc07C1a0796E658Ba2;
 
     constructor(uint256 _validatorsCount) StakingBankStatic(_validatorsCount) {}
 

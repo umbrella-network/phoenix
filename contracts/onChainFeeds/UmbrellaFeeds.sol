@@ -47,6 +47,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     error InvalidSigner();
     error InvalidRequiredSignatures();
     error SignaturesOutOfOrder();
+    error ECDSAInvalidSignatureS();
+    error ECDSAInvalidSignatureV();
     error OldData();
     error DataReset();
 
@@ -72,8 +74,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         PriceData[] calldata _priceDatas,
         Signature[] calldata _signatures
     ) external {
-        // below check is only for pretty errors, so we can safe gas and allow for raw revert
-        // if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();
+        if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();
 
         bytes32 priceDataHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, _priceDatas));
         verifySignatures(priceDataHash, _signatures);
@@ -81,12 +82,14 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         uint256 i;
 
         while (i < _priceDatas.length) {
+            bytes32 priceKey = _priceKeys[i];
+
             // we do not allow for older prices
             // at the same time it prevents from reusing signatures
-            if (_prices[_priceKeys[i]].timestamp >= _priceDatas[i].timestamp) revert OldData();
-            if (_prices[_priceKeys[i]].data == DATA_RESET) revert DataReset();
+            if (_prices[priceKey].timestamp >= _priceDatas[i].timestamp) revert OldData();
+            if (_prices[priceKey].data == DATA_RESET) revert DataReset();
 
-            _prices[_priceKeys[i]] = _priceDatas[i];
+            _prices[priceKey] = _priceDatas[i];
 
             // atm there is no need for events, so in order to save gas, we do not emit any
             unchecked { i++; }
@@ -95,7 +98,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function reset(bytes32[] calldata _priceKeys, Signature[] calldata _signatures) external {
-        bytes32 resetHash = keccak256(abi.encodePacked(getChainId(), address(this), _priceKeys, "RESET"));
+        bytes32 resetHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, bytes32("RESET")));
         verifySignatures(resetHash, _signatures);
 
         for (uint256 i; i < _priceKeys.length;) {
@@ -230,7 +233,15 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         // to save gas we check only required number of signatures
         // case, where you can have part of signatures invalid but still enough valid in total is not supported
         for (uint256 i; i < REQUIRED_SIGNATURES;) {
-            address signer = recoverSigner(_hash, _signatures[i].v, _signatures[i].r, _signatures[i].s);
+            (uint8 v, bytes32 r, bytes32 s) = (_signatures[i].v, _signatures[i].r, _signatures[i].s);
+
+            if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+                revert ECDSAInvalidSignatureS();
+            }
+
+            if (uint8(v) != 27 && uint8(v) != 28) revert ECDSAInvalidSignatureV();
+
+            address signer = recoverSigner(_hash, v, r, s);
             if (prevSigner >= signer) revert SignaturesOutOfOrder();
 
             // because we check only required number of signatures, any invalid one will cause revert

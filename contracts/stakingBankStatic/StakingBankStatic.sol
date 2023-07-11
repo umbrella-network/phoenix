@@ -14,6 +14,8 @@ abstract contract StakingBankStatic is StakingBankStaticNotSupported {
     constructor(uint256 _validatorsCount) {
         NUMBER_OF_VALIDATORS = _validatorsCount;
         TOTAL_SUPPLY = _validatorsCount * ONE;
+
+        _assertValidSetup(_validatorsCount);
     }
 
     function balances(address _validator) external view returns (uint256) {
@@ -84,4 +86,15 @@ abstract contract StakingBankStatic is StakingBankStaticNotSupported {
     function _addresses() internal view virtual returns (address[] memory);
 
     function _isValidator(address _validator) internal view virtual returns (bool);
+
+    function _assertValidSetup(uint256 _validatorsCount) internal view virtual{
+        address[] memory list = _addresses();
+        require(list.length == _validatorsCount);
+
+        for (uint256 i; i < _validatorsCount;) {
+            require(_isValidator(list[i]));
+
+            unchecked { i ++; }
+        }
+    }
 }
