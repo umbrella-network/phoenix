@@ -47,6 +47,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     error InvalidSigner();
     error InvalidRequiredSignatures();
     error SignaturesOutOfOrder();
+    error ECDSAInvalidSignatureS();
+    error ECDSAInvalidSignatureV();
     error OldData();
     error DataReset();
 
@@ -231,7 +233,15 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         // to save gas we check only required number of signatures
         // case, where you can have part of signatures invalid but still enough valid in total is not supported
         for (uint256 i; i < REQUIRED_SIGNATURES;) {
-            address signer = recoverSigner(_hash, _signatures[i].v, _signatures[i].r, _signatures[i].s);
+            (uint8 v, bytes32 r, bytes32 s) = (_signatures[i].v, _signatures[i].r, _signatures[i].s);
+
+            if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+                revert ECDSAInvalidSignatureS();
+            }
+
+            if (uint8(v) != 27 && uint8(v) != 28) revert ECDSAInvalidSignatureV();
+
+            address signer = recoverSigner(_hash, v, r, s);
             if (prevSigner >= signer) revert SignaturesOutOfOrder();
 
             // because we check only required number of signatures, any invalid one will cause revert
