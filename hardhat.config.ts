@@ -23,7 +23,7 @@ import {
   AVALANCHE_STAGING,
   BNB, BNB_PRODUCTION, BNB_SANDBOX,
   BNB_STAGING, ETH, ETH_PRODUCTION, ETH_SANDBOX,
-  ETH_STAGING, LINEA_STAGING,
+  ETH_STAGING, LINEA_SANDBOX, LINEA_STAGING,
   LOCALHOST, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
@@ -192,6 +192,11 @@ const config: HardhatUserConfig = {
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(ARBITRUM_STAGING).chainId,
       gasPrice: 'auto'
+    },
+    linea_sandbox: {
+      url: getProviderData(LINEA_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(LINEA_SANDBOX).chainId,
     },
     arbitrum_sandbox: {
       url: getProviderData(ARBITRUM_SANDBOX).url,

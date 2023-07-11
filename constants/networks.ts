@@ -6,6 +6,7 @@ export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
 
 export const LINEA_STAGING = 'linea_staging';
+export const LINEA_SANDBOX = 'linea_sandbox';
 export const ARBITRUM_STAGING = 'arbitrum_staging';
 export const AVALANCHE_STAGING = 'avalanche_staging';
 export const BNB_STAGING = 'bnb_staging';

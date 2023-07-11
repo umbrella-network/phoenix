@@ -6,8 +6,20 @@ name: Contracts Quality Test
 on:
   push:
     branches: [ develop ]
+    paths:
+      - contracts/**/*.sol
+      - config/**/*.ts
+      - constants/**/*.ts
+      - deploy/**/*.ts
+      - test/**/*.ts
   pull_request:
-    branches: [ develop, master ]  
+    branches: [ develop, master ]
+    paths:
+      - contracts/**/*.sol
+      - config/**/*.ts
+      - constants/**/*.ts
+      - deploy/**/*.ts
+      - test/**/*.ts
   workflow_dispatch:
 
 jobs:
