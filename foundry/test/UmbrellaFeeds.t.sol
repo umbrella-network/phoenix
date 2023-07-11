@@ -137,6 +137,20 @@ contract UmbrellaFeedsTest is SignerHelper {
         assertEq(data.price, expectedData.price);
     }
 
+    /*
+    forge test -vv --match-test test_UmbrellaFeeds_getPrice_withFallbackAddress0
+    */
+    function test_UmbrellaFeeds_getPrice_withFallbackAddress0() public {
+        _executeUpdate(feeds1);
+
+        UmbrellaFeeds.PriceData memory expectedData = priceDatas[0];
+
+        cheats.mockCall(registry, abi.encodeCall(Registry.getAddressByString, (feeds.NAME())), abi.encode(address(0)));
+
+        cheats.expectRevert();
+        UmbrellaFeeds.PriceData memory data = feeds.getPriceData(priceKeys[0]);
+    }
+
     function test_UmbrellaFeeds_update_ignoringOtherSignatures() public {
         UmbrellaFeeds.Signature[] memory signatures = _signData(2, feeds, priceKeys, priceDatas);
         UmbrellaFeeds.Signature[] memory moreSignatures = new UmbrellaFeeds.Signature[](3);
