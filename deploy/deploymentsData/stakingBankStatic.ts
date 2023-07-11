@@ -4,7 +4,7 @@ import {
   STAKING_BANK_STATIC_PROD,
   STAKING_BANK_STATIC_DEV,
   STAKING_BANK_STATIC_LOCAL,
-  STAKING_BANK_STATIC_SBX
+  STAKING_BANK_STATIC_SBX,
 } from '../../constants';
 import { DeploymentData } from '../_helpers/types';
 
