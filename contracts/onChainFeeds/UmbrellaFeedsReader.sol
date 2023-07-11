@@ -18,7 +18,7 @@ contract UmbrellaFeedsReader {
 
     /// @dev string representation of feed key (feed name)
     string public DESCRIPTION;  // solhint-disable-line var-name-mixedcase
-    
+
     /// @param _umbrellaFeeds UmbrellaFeeds address
     /// @param _key price data key (before hashing)
     constructor(IUmbrellaFeeds _umbrellaFeeds, string memory _key) {
