@@ -13,18 +13,18 @@ contract UmbrellaFeedsReader {
     /// @dev key (hash of string key), under which feed is being stored
     bytes32 public immutable KEY;  // solhint-disable-line var-name-mixedcase
 
-    /// @dev decimals for feed
-    uint8 public immutable DECIMALS;  // solhint-disable-line var-name-mixedcase
-
     /// @dev string representation of feed key (feed name)
-    string public DESCRIPTION;  // solhint-disable-line var-name-mixedcase
+    string public description;
+
+    /// @dev decimals for feed
+    uint8 internal immutable _DECIMALS;  // solhint-disable-line var-name-mixedcase
 
     /// @param _umbrellaFeeds UmbrellaFeeds address
     /// @param _key price data key (before hashing)
     constructor(IUmbrellaFeeds _umbrellaFeeds, string memory _key) {
         UMBRELLA_FEEDS = _umbrellaFeeds;
-        DESCRIPTION = _key;
-        DECIMALS = _umbrellaFeeds.DECIMALS();
+        description = _key;
+        _DECIMALS = _umbrellaFeeds.DECIMALS();
 
         bytes32 hash = keccak256(abi.encodePacked(_key));
         KEY = hash;
@@ -35,12 +35,7 @@ contract UmbrellaFeedsReader {
 
     /// @dev decimals for feed
     function decimals() external view returns (uint8) {
-        return DECIMALS;
-    }
-
-    /// @dev string representation of feed key
-    function description() external view returns (string memory) {
-        return DESCRIPTION;
+        return _DECIMALS;
     }
 
     /// @dev this method follows chainlink interface for easy migration, NOTE: not all returned data are covered!
