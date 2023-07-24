@@ -43,6 +43,7 @@ const {
   POLYGONSCAN_API = '',
   AVASCAN_API = '',
   ARBISCAN_API = '',
+  LINEASCAN_API = '',
   FORKING_ENV,
   FORKING_BLOCK_NUMBER,
   CHAIN_ID
@@ -67,6 +68,8 @@ const apiKey = (): string | Record<string, string> => {
     // avalanche
     'avalanche': AVASCAN_API,
     'avalancheFujiTestnet': AVASCAN_API,
+    'lineatestnet': LINEASCAN_API,
+    'linea': LINEASCAN_API,
   };
 };
 
@@ -276,7 +279,25 @@ const config: HardhatUserConfig = {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://bscscan.com/
-    apiKey: apiKey()
+    apiKey: apiKey(),
+    customChains: [
+      {
+        network: 'lineatestnet',
+        chainId: 59140,
+        urls: {
+          apiURL: 'https://api-testnet.lineascan.build/api',
+          browserURL: 'https://goerli.lineascan.build'
+        }
+      },
+      {
+        network: 'linea',
+        chainId: 111,
+        urls: {
+          apiURL: 'https://lineascan.build/apis#contracts',
+          browserURL: 'https://lineascan.build/'
+        }
+      }
+    ]
   },
   gasReporter: {
     gasPrice: 1,
