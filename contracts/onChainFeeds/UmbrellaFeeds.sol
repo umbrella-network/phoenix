@@ -5,24 +5,21 @@ import "../interfaces/IUmbrellaFeeds.sol";
 import "../interfaces/IRegistry.sol";
 import "../interfaces/IStakingBankStatic.sol";
 
-/// @notice Main contract for all on-chain data.
-/// This contract has build in fallback feature in case, it will be replaced by newer contract.
-/// Fallback is transparent for the user, no additional setup is needed.
+/// @dev Main contract for all on-chain data.
+/// Check `UmbrellaFeedsReader` to see how to integrate.
 ///
-/// How fallback feature works? If data for provided key is empty, contract will execute following procedure:
-/// 1. When new contract is deployed, data from ols one are erased
-/// 2. if data is empty, contract will check if there is new contract with requested data
-/// 3. if data is found in new contract it will be returned
-/// 4. if there is no data or there is no new contract tx will revert.
-///
-/// After new deployment, it is recommended to update address to avoid fallback and reduce gas cost to minimum.
-/// In long run this is most efficient solution, better than any proxy.
+/// @notice This contract can be destroyed and replaced with new one (with new address).
+/// For best gas efficiency you should pick one of two ways of integration:
+/// 1. make `UmbrellaFeeds` immutable and use fallback in case of selfdestruct. After new deployment, it is recommended
+/// to update address to avoid fallback and reduce gas cost to minimum. In long run this is most efficient solution,
+/// better than any proxy.
+/// 2. always check newest `UmbrellaFeeds` via `Regostry` and fallback will not be needed.
 contract UmbrellaFeeds is IUmbrellaFeeds {
     bytes constant public ETH_PREFIX = "\x19Ethereum Signed Message:\n32";
     string constant public NAME = "UmbrellaFeeds";
 
-    /// @dev marker that will tell us, that price data was reset
-    uint8 constant public DATA_RESET = type(uint8).max;
+    /// @dev deployment time, used for protect for unintentional destroy
+    uint256 public immutable DEPLOYED_AT;  // solhint-disable-line var-name-mixedcase
 
     /// @dev Registry contract where list of all addresses is stored. Fallback feature uses this registry to
     /// resolve newest `UmbrellaFeeds` address
@@ -50,7 +47,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     error ECDSAInvalidSignatureS();
     error ECDSAInvalidSignatureV();
     error OldData();
-    error DataReset();
+    error ContractInUse();
+    error ContractNotInitialised();
 
     /// @param _contractRegistry Registry address
     /// @param _requiredSignatures number of required signatures for accepting consensus submission
@@ -66,6 +64,20 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         REQUIRED_SIGNATURES = _requiredSignatures;
         STAKING_BANK = IStakingBankStatic(_contractRegistry.requireAndGetAddress("StakingBank"));
         DECIMALS = _decimals;
+        DEPLOYED_AT = block.timestamp;
+    }
+
+    /// @dev destroys old contract
+    /// there is sanity check that prevents abuse of destroy method
+    /// @param _name string feed key to verify, that contract was initialised
+    function destroy(string calldata _name) external {
+        if (REGISTRY.getAddressByString(NAME) == address(this)) revert ContractInUse();
+
+        if (_prices[keccak256(abi.encodePacked(_name))].timestamp == 0 && DEPLOYED_AT + 3 days > block.timestamp) {
+            revert ContractNotInitialised();
+        }
+
+        selfdestruct(payable(msg.sender));
     }
 
     /// @inheritdoc IUmbrellaFeeds
@@ -87,22 +99,9 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
             // we do not allow for older prices
             // at the same time it prevents from reusing signatures
             if (_prices[priceKey].timestamp >= _priceDatas[i].timestamp) revert OldData();
-            if (_prices[priceKey].data == DATA_RESET) revert DataReset();
 
             _prices[priceKey] = _priceDatas[i];
 
-            // atm there is no need for events, so in order to save gas, we do not emit any
-            unchecked { i++; }
-        }
-    }
-
-    /// @inheritdoc IUmbrellaFeeds
-    function reset(bytes32[] calldata _priceKeys, Signature[] calldata _signatures) external {
-        bytes32 resetHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, bytes32("RESET")));
-        verifySignatures(resetHash, _signatures);
-
-        for (uint256 i; i < _priceKeys.length;) {
-            _prices[_priceKeys[i]] = PriceData(DATA_RESET, 0, 0, 0);
             // atm there is no need for events, so in order to save gas, we do not emit any
             unchecked { i++; }
         }
@@ -114,10 +113,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
         for (uint256 i; i < _keys.length;) {
             data[i] = _prices[_keys[i]];
-
-            if (data[i].timestamp == 0) {
-                data[i] = _fallbackCall(_keys[i]);
-            }
+            if (data[i].timestamp == 0) revert FeedNotExist();
 
             unchecked { i++; }
         }
@@ -129,55 +125,33 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
         for (uint256 i; i < _keys.length;) {
             data[i] = _prices[_keys[i]];
-
-            if (data[i].timestamp == 0) {
-                data[i] = _fallbackCallRaw(_keys[i]);
-            }
-
             unchecked { i++; }
         }
     }
 
     /// @inheritdoc IUmbrellaFeeds
     function prices(bytes32 _key) external view returns (PriceData memory data) {
-        return _prices[_key];
+        data = _prices[_key];
     }
 
     /// @inheritdoc IUmbrellaFeeds
     function getPriceData(bytes32 _key) external view returns (PriceData memory data) {
         data = _prices[_key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCall(_key);
-        }
-    }
-
-    /// @inheritdoc IUmbrellaFeeds
-    function getPriceDataRaw(bytes32 _key) external view returns (PriceData memory data) {
-        data = _prices[_key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCallRaw(_key);
-        }
+        if (data.timestamp == 0) revert FeedNotExist();
     }
 
     /// @inheritdoc IUmbrellaFeeds
     function getPrice(bytes32 _key) external view returns (uint128 price) {
         PriceData memory data = _prices[_key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCall(_key);
-        }
+        if (data.timestamp == 0) revert FeedNotExist();
 
         return data.price;
     }
 
+    /// @inheritdoc IUmbrellaFeeds
     function getPriceTimestamp(bytes32 _key) external view returns (uint128 price, uint32 timestamp) {
         PriceData memory data = _prices[_key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCall(_key);
-        }
+        if (data.timestamp == 0) revert FeedNotExist();
 
         return (data.price, data.timestamp);
     }
@@ -188,27 +162,15 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         returns (uint128 price, uint32 timestamp, uint24 heartbeat)
     {
         PriceData memory data = _prices[_key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCall(_key);
-        }
+        if (data.timestamp == 0) revert FeedNotExist();
 
         return (data.price, data.timestamp, data.heartbeat);
-    }
-
-    /// @dev this is helper method for UI
-    function priceData(string memory _key) external view returns (PriceData memory) {
-        return _prices[keccak256(abi.encodePacked(_key))];
     }
 
     /// @inheritdoc IUmbrellaFeeds
     function getPriceDataByName(string calldata _name) external view returns (PriceData memory data) {
         bytes32 key = keccak256(abi.encodePacked(_name));
         data = _prices[key];
-
-        if (data.timestamp == 0) {
-            data = _fallbackCallRaw(key);
-        }
     }
 
     /// @dev helper method for QA purposes
@@ -275,27 +237,5 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     /// @dev to follow Registrable interface
     function getName() public pure returns (bytes32) {
         return "UmbrellaFeeds";
-    }
-
-    function _fallbackCall(bytes32 _key) internal view returns (PriceData memory data) {
-        address umbrellaFeeds = REGISTRY.getAddressByString(NAME);
-
-        // if contract was NOT updated, fallback is not needed, data does not exist - revert
-        if (umbrellaFeeds == address(this)) revert FeedNotExist();
-
-        data = IUmbrellaFeeds(umbrellaFeeds).prices(_key);
-        // if contract WAS updated but there is no data - revert
-        if (data.timestamp == 0) revert FeedNotExist();
-    }
-
-    function _fallbackCallRaw(bytes32 _key) internal view returns (PriceData memory data) {
-        address umbrellaFeeds = REGISTRY.getAddress(getName());
-
-        // if contract was updated, we do a fallback call
-        if (umbrellaFeeds != address(this) && umbrellaFeeds != address(0)) {
-            data = IUmbrellaFeeds(umbrellaFeeds).prices(_key);
-        }
-
-        // else - we return empty data
     }
 }
