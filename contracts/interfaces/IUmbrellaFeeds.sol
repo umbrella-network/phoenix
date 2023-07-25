@@ -30,11 +30,6 @@ interface IUmbrellaFeeds {
         Signature[] calldata _signatures
     ) external;
 
-    /// @dev method for resetting data
-    /// @param _priceKeys array of keys for `_priceDatas`
-    /// @param _signatures validators signatures
-    function reset(bytes32[] calldata _priceKeys, Signature[] calldata _signatures) external;
-
     /// @dev it will return array of price datas for provided `_keys`
     /// In case ony of feed does not exist, fallback call will be executed for that feed.
     /// @notice If data for any key not exists, function will revert. Use `getManyPriceDataRaw` method if you don't
@@ -49,19 +44,13 @@ interface IUmbrellaFeeds {
     function getManyPriceDataRaw(bytes32[] calldata _keys) external view returns (PriceData[] memory data);
 
     /// @dev this is main endpoint for reading feeds.
-    /// In case timestamp is empty (that means there is no data), contract will execute fallback call.
-    /// Check main contract description for fallback details.
+    /// In case timestamp is empty (that means there is no data), contract will revert.
     /// If you do not need whole data from `PriceData` struct, you can save some gas by using other view methods that
     /// returns just what you need.
     /// @notice method will revert if data for `_key` not exists.
     /// @param _key hash of feed name
     /// @return data full PriceData struct
     function getPriceData(bytes32 _key) external view returns (PriceData memory data);
-
-    /// @notice same as `getPriceData` but does not revert when no data
-    /// @param _key hash of feed name
-    /// @return data full PriceData struct
-    function getPriceDataRaw(bytes32 _key) external view returns (PriceData memory data);
 
     /// @notice reader for mapping
     /// @param _key hash of feed name

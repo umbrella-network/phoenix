@@ -42,7 +42,7 @@ contract UmbrellaFeedsReaderFactory {
             return reader;
         }
 
-        reader = new UmbrellaFeedsReader(umbrellaFeeds, _feedName);
+        reader = new UmbrellaFeedsReader(REGISTRY, umbrellaFeeds, _feedName);
         readers[hash(_feedName)] = reader;
 
         emit NewUmbrellaFeedsReader(reader, _feedName);
