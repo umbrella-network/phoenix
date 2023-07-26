@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `StakingBankStatic` - for gas optimisation
 - On chain data contracts
 
+### Removed
+- remove old `StakingBank`
+
 ## [4.9.3] - 2023-05-29
 ### Changed
 - re-deploy Polygon with padding 3m
