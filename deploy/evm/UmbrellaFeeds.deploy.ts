@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
+import fs from 'fs';
 
 import { REGISTRY, STAKING_BANK_STATIC, UMBRELLA_FEEDS } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
@@ -8,7 +9,7 @@ import { checkStakingBankStaticUpdated } from '../_helpers/checkStakingBankStati
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
-  const { deploy } = deployments;
+  const { deploy, read } = deployments;
   const { deployer } = await getNamedAccounts();
 
   const { args, contractName } = await umbrellaFeedsDeploymentData(hre);
@@ -16,6 +17,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // check if we are using newest staking bank
   if (!(await checkStakingBankStaticUpdated(hre))) {
     return;
+  }
+
+  const [bankInFees, recentBank] = await Promise.all([
+    read(UMBRELLA_FEEDS, 'STAKING_BANK'),
+    deployments.get(STAKING_BANK_STATIC),
+  ]);
+
+  if (bankInFees.toLowerCase() == recentBank.address.toLowerCase()) {
+    console.log(`${UMBRELLA_FEEDS} has current bank ${recentBank.address} - OK`);
+  } else {
+    console.log('new bank detected - deploying...');
+    const f = `${__dirname}/../deployments/${hre.network.name}/${UMBRELLA_FEEDS}.json`;
+    console.log('new bank detected - deploying...', f);
+    fs.unlinkSync(f);
   }
 
   const feeds = await deploy(UMBRELLA_FEEDS, {

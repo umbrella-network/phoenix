@@ -167,15 +167,18 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 
 On blockchain where we do have L2 consensus:
 
-```shell
-npx hardhat deploy --network avalanche_staging
-npx hardhat registerStakingBankStatic --network avalanche_staging
-# just in case chain needs to be redeployed
-npx hardhat deploy --network avalanche_staging
+linea_staging | avalanche_staging | polygon_staging
+linea_sandbox | avalanche_sandbox | polygon_sandbox
 
-npx hardhat registerChain --network avalanche_staging
-npx hardhat registerUmbrellaFeeds --network avalanche_staging
-npx hardhat registerReaderFactory --network avalanche_staging
+```shell
+npx hardhat deploy --network linea_sandbox
+npx hardhat registerStakingBankStatic --network linea_sandbox
+# just in case chain needs to be redeployed
+npx hardhat deploy --network linea_sandbox
+
+npx hardhat registerChain --network linea_sandbox
+npx hardhat registerUmbrellaFeeds --network linea_sandbox
+npx hardhat registerReaderFactory --network linea_sandbox
 ```
 
 On blockchain with only on-chain data:
@@ -198,16 +201,14 @@ Here are steps that seems to be working always:
 # we need deploy to other network and verify code there
 
 # UmbrellaFeedsReader
-npx hardhat verify --network avalanche_staging 0x5A7De8db02e206f726804Ce96b65394996EFa89f --constructor-args ./arguments.js
-npx hardhat linea-verify --network avalanche_staging --address 0x5A7De8db02e206f726804Ce96b65394996EFa89f --name UmbrellaFeedsReader
+npx hardhat verify --network avalanche_staging 0x206953BAaEB74226D81059ffD67BC42f2cf8cF5f --constructor-args ./arguments.js
+npx hardhat linea-verify --network avalanche_staging --address 0x206953BAaEB74226D81059ffD67BC42f2cf8cF5f --name UmbrellaFeedsReader
 
 npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeeds  
 npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeedsReaderFactory  
 ```
 
 As result of `linea-verify`, stardard JSON file is created. Use it to verify contract on linea.
-
-
 
 ### Distributor
 

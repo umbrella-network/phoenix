@@ -1,0 +1,943 @@
+{
+  "address": "0x76c9741c1368008Cf2D1957359701E0C75a9224E",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IRegistry",
+          "name": "_contractRegistry",
+          "type": "address"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_requiredSignatures",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_decimals",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "ArraysDataDoNotMatch",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ContractInUse",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ContractNotInitialised",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ECDSAInvalidSignatureS",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ECDSAInvalidSignatureV",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "FeedNotExist",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidRequiredSignatures",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidSigner",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotEnoughSignatures",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OldData",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SignaturesOutOfOrder",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "DECIMALS",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "DEPLOYED_AT",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ETH_PREFIX",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "NAME",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "REGISTRY",
+      "outputs": [
+        {
+          "internalType": "contract IRegistry",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "REQUIRED_SIGNATURES",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "STAKING_BANK",
+      "outputs": [
+        {
+          "internalType": "contract IStakingBankStatic",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "destroy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getChainId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "_keys",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "getManyPriceData",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "data",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint24",
+              "name": "heartbeat",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.PriceData[]",
+          "name": "data",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "_keys",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "getManyPriceDataRaw",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "data",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint24",
+              "name": "heartbeat",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.PriceData[]",
+          "name": "data",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getName",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_key",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getPrice",
+      "outputs": [
+        {
+          "internalType": "uint128",
+          "name": "price",
+          "type": "uint128"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_key",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getPriceData",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "data",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint24",
+              "name": "heartbeat",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.PriceData",
+          "name": "data",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "getPriceDataByName",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "data",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint24",
+              "name": "heartbeat",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.PriceData",
+          "name": "data",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_key",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getPriceTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint128",
+          "name": "price",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint32",
+          "name": "timestamp",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_key",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getPriceTimestampHeartbeat",
+      "outputs": [
+        {
+          "internalType": "uint128",
+          "name": "price",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint32",
+          "name": "timestamp",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint24",
+          "name": "heartbeat",
+          "type": "uint24"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "_priceKeys",
+          "type": "bytes32[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "data",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint24",
+              "name": "heartbeat",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.PriceData[]",
+          "name": "_priceDatas",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "hashData",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_key",
+          "type": "bytes32"
+        }
+      ],
+      "name": "prices",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "data",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint24",
+              "name": "heartbeat",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.PriceData",
+          "name": "data",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_hash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "recoverSigner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "_priceKeys",
+          "type": "bytes32[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "data",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint24",
+              "name": "heartbeat",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.PriceData[]",
+          "name": "_priceDatas",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.Signature[]",
+          "name": "_signatures",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "update",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_hash",
+          "type": "bytes32"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct IUmbrellaFeeds.Signature[]",
+          "name": "_signatures",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "verifySignatures",
+      "outputs": [],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x739e59b36254d469adf6dbf3ebf90a38f150f66ee3a41b157c2ef2c3eebb09ed",
+  "receipt": {
+    "to": null,
+    "from": "0x66f13FDceed822E74b6a1e08e082Fa699fF36454",
+    "contractAddress": "0x76c9741c1368008Cf2D1957359701E0C75a9224E",
+    "transactionIndex": 4,
+    "gasUsed": "2533763",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xb98e8eeb30ce30d35f5a99250f0ca80a546e865a3a92e1a75da3651f49d37648",
+    "transactionHash": "0x739e59b36254d469adf6dbf3ebf90a38f150f66ee3a41b157c2ef2c3eebb09ed",
+    "logs": [],
+    "blockNumber": 1216710,
+    "cumulativeGasUsed": "3487090",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0xbcF125D0fA975a63aCd750DD59116706554d5B3C",
+    2,
+    8
+  ],
+  "numDeployments": 2,
+  "solcInputHash": "65b481d0d93e5efa93599cd0de466855",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IRegistry\",\"name\":\"_contractRegistry\",\"type\":\"address\"},{\"internalType\":\"uint16\",\"name\":\"_requiredSignatures\",\"type\":\"uint16\"},{\"internalType\":\"uint8\",\"name\":\"_decimals\",\"type\":\"uint8\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"ArraysDataDoNotMatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ContractInUse\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ContractNotInitialised\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ECDSAInvalidSignatureS\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ECDSAInvalidSignatureV\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FeedNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRequiredSignatures\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidSigner\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotEnoughSignatures\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OldData\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SignaturesOutOfOrder\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"DECIMALS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"DEPLOYED_AT\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ETH_PREFIX\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"NAME\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"REGISTRY\",\"outputs\":[{\"internalType\":\"contract IRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"REQUIRED_SIGNATURES\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"STAKING_BANK\",\"outputs\":[{\"internalType\":\"contract IStakingBankStatic\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"destroy\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getChainId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"_keys\",\"type\":\"bytes32[]\"}],\"name\":\"getManyPriceData\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"data\",\"type\":\"uint8\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"internalType\":\"struct IUmbrellaFeeds.PriceData[]\",\"name\":\"data\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"_keys\",\"type\":\"bytes32[]\"}],\"name\":\"getManyPriceDataRaw\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"data\",\"type\":\"uint8\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"internalType\":\"struct IUmbrellaFeeds.PriceData[]\",\"name\":\"data\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getName\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_key\",\"type\":\"bytes32\"}],\"name\":\"getPrice\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_key\",\"type\":\"bytes32\"}],\"name\":\"getPriceData\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"data\",\"type\":\"uint8\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"internalType\":\"struct IUmbrellaFeeds.PriceData\",\"name\":\"data\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"getPriceDataByName\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"data\",\"type\":\"uint8\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"internalType\":\"struct IUmbrellaFeeds.PriceData\",\"name\":\"data\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_key\",\"type\":\"bytes32\"}],\"name\":\"getPriceTimestamp\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_key\",\"type\":\"bytes32\"}],\"name\":\"getPriceTimestampHeartbeat\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"_priceKeys\",\"type\":\"bytes32[]\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"data\",\"type\":\"uint8\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"internalType\":\"struct IUmbrellaFeeds.PriceData[]\",\"name\":\"_priceDatas\",\"type\":\"tuple[]\"}],\"name\":\"hashData\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_key\",\"type\":\"bytes32\"}],\"name\":\"prices\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"data\",\"type\":\"uint8\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"internalType\":\"struct IUmbrellaFeeds.PriceData\",\"name\":\"data\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_hash\",\"type\":\"bytes32\"},{\"internalType\":\"uint8\",\"name\":\"_v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"_r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_s\",\"type\":\"bytes32\"}],\"name\":\"recoverSigner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"_priceKeys\",\"type\":\"bytes32[]\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"data\",\"type\":\"uint8\"},{\"internalType\":\"uint24\",\"name\":\"heartbeat\",\"type\":\"uint24\"},{\"internalType\":\"uint32\",\"name\":\"timestamp\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"price\",\"type\":\"uint128\"}],\"internalType\":\"struct IUmbrellaFeeds.PriceData[]\",\"name\":\"_priceDatas\",\"type\":\"tuple[]\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"internalType\":\"struct IUmbrellaFeeds.Signature[]\",\"name\":\"_signatures\",\"type\":\"tuple[]\"}],\"name\":\"update\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_hash\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"internalType\":\"struct IUmbrellaFeeds.Signature[]\",\"name\":\"_signatures\",\"type\":\"tuple[]\"}],\"name\":\"verifySignatures\",\"outputs\":[],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Main contract for all on-chain data. Check `UmbrellaFeedsReader` to see how to integrate.\",\"kind\":\"dev\",\"methods\":{\"constructor\":{\"params\":{\"_contractRegistry\":\"Registry address\",\"_decimals\":\"decimals for prices stored in this contract\",\"_requiredSignatures\":\"number of required signatures for accepting consensus submission\"}},\"destroy(string)\":{\"details\":\"destroys old contract there is sanity check that prevents abuse of destroy method\",\"params\":{\"_name\":\"string feed key to verify, that contract was initialised\"}},\"getManyPriceData(bytes32[])\":{\"details\":\"it will return array of price datas for provided `_keys` In case ony of feed does not exist, fallback call will be executed for that feed.\",\"params\":{\"_keys\":\"array of feed keys\"},\"returns\":{\"data\":\"PriceData array\"}},\"getManyPriceDataRaw(bytes32[])\":{\"details\":\"same as getManyPriceData() but does not revert on empty data.\"},\"getName()\":{\"details\":\"to follow Registrable interface\"},\"getPrice(bytes32)\":{\"params\":{\"_key\":\"hash of feed name\"},\"returns\":{\"price\":\"price\"}},\"getPriceData(bytes32)\":{\"details\":\"this is main endpoint for reading feeds. In case timestamp is empty (that means there is no data), contract will revert. If you do not need whole data from `PriceData` struct, you can save some gas by using other view methods that returns just what you need.\",\"params\":{\"_key\":\"hash of feed name\"},\"returns\":{\"data\":\"full PriceData struct\"}},\"getPriceDataByName(string)\":{\"details\":\"This method should be used only for Layer2 as it is more gas consuming than others views.\",\"params\":{\"_name\":\"string feed name\"},\"returns\":{\"data\":\"PriceData\"}},\"getPriceTimestamp(bytes32)\":{\"params\":{\"_key\":\"hash of feed name\"},\"returns\":{\"price\":\"price\",\"timestamp\":\"timestamp\"}},\"getPriceTimestampHeartbeat(bytes32)\":{\"params\":{\"_key\":\"hash of feed name\"},\"returns\":{\"heartbeat\":\"heartbeat\",\"price\":\"price\",\"timestamp\":\"timestamp\"}},\"hashData(bytes32[],(uint8,uint24,uint32,uint128)[])\":{\"details\":\"helper method for QA purposes\",\"returns\":{\"_0\":\"hash of data that are signed by validators (keys and priced data)\"}},\"prices(bytes32)\":{\"params\":{\"_key\":\"hash of feed name\"},\"returns\":{\"data\":\"full PriceData struct\"}},\"recoverSigner(bytes32,uint8,bytes32,bytes32)\":{\"params\":{\"_hash\":\"hashed of data\",\"_r\":\"part of signature\",\"_s\":\"part of signature\",\"_v\":\"part of signature\"},\"returns\":{\"_0\":\"signer address\"}},\"update(bytes32[],(uint8,uint24,uint32,uint128)[],(uint8,bytes32,bytes32)[])\":{\"details\":\"method for submitting consensus data\",\"params\":{\"_priceDatas\":\"PriceData signed by validators\",\"_priceKeys\":\"array of keys for `_priceDatas`\",\"_signatures\":\"validators signatures\"}},\"verifySignatures(bytes32,(uint8,bytes32,bytes32)[])\":{\"params\":{\"_hash\":\"hash of signed data\",\"_signatures\":\"array of validators signatures\"}}},\"stateVariables\":{\"DECIMALS\":{\"details\":\"decimals for prices stored in this contract\"},\"DEPLOYED_AT\":{\"details\":\"deployment time, used for protect for unintentional destroy\"},\"REGISTRY\":{\"details\":\"Registry contract where list of all addresses is stored. Fallback feature uses this registry to resolve newest `UmbrellaFeeds` address\"},\"REQUIRED_SIGNATURES\":{\"details\":\"minimal number of signatures required for accepting price submission (PoA)\"},\"STAKING_BANK\":{\"details\":\"StakingBank contract where list of validators is stored\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getManyPriceData(bytes32[])\":{\"notice\":\"If data for any key not exists, function will revert. Use `getManyPriceDataRaw` method if you don't want revert.\"},\"getManyPriceDataRaw(bytes32[])\":{\"notice\":\"This method does no revert if some data does not exists. Check `data.timestamp` to see if price exist, if it is 0, then it does not exist.\"},\"getPrice(bytes32)\":{\"notice\":\"method will revert if data for `_key` not exists.\"},\"getPriceData(bytes32)\":{\"notice\":\"method will revert if data for `_key` not exists.\"},\"getPriceDataByName(string)\":{\"notice\":\"It does not revert on empty data.\"},\"getPriceTimestamp(bytes32)\":{\"notice\":\"method will revert if data for `_key` not exists.\"},\"getPriceTimestampHeartbeat(bytes32)\":{\"notice\":\"method will revert if data for `_key` not exists.\"},\"prices(bytes32)\":{\"notice\":\"reader for mapping\"}},\"notice\":\"This contract can be destroyed and replaced with new one (with new address). For best gas efficiency you should pick one of two ways of integration: 1. make `UmbrellaFeeds` immutable and use fallback in case of selfdestruct. After new deployment, it is recommended to update address to avoid fallback and reduce gas cost to minimum. In long run this is most efficient solution, better than any proxy. 2. always check newest `UmbrellaFeeds` via `Regostry` and fallback will not be needed.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/onChainFeeds/UmbrellaFeeds.sol\":\"UmbrellaFeeds\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":false,\"runs\":0},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `to`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address to, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `from` to `to` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 amount\\n    ) external returns (bool);\\n}\\n\",\"keccak256\":\"0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b\",\"license\":\"MIT\"},\"contracts/interfaces/IRegistry.sol\":{\"content\":\"//SPDX-License-Identifier: MIT\\npragma solidity 0.8.13;\\n\\n\\ninterface IRegistry {\\n    event LogRegistered(address indexed destination, bytes32 name);\\n\\n    /// @dev imports new contract addresses and override old addresses, if they exist under provided name\\n    /// This method can be used for contracts that for some reason do not have `getName` method\\n    /// @param  _names array of contract names that we want to register\\n    /// @param  _destinations array of contract addresses\\n    function importAddresses(bytes32[] calldata _names, address[] calldata _destinations) external;\\n\\n    /// @dev imports new contracts and override old addresses, if they exist.\\n    /// Names of contracts are fetched directly from each contract by calling `getName`\\n    /// @param  _destinations array of contract addresses\\n    function importContracts(address[] calldata _destinations) external;\\n\\n    /// @dev this method ensure, that old and new contract is aware of it state in registry\\n    /// Note: BSC registry does not have this method. This method was introduced in later stage.\\n    /// @param _newContract address of contract that will replace old one\\n    function atomicUpdate(address _newContract) external;\\n\\n    /// @dev similar to `getAddress` but throws when contract name not exists\\n    /// @param name contract name\\n    /// @return contract address registered under provided name or throws, if does not exists\\n    function requireAndGetAddress(bytes32 name) external view returns (address);\\n\\n    /// @param name contract name in a form of bytes32\\n    /// @return contract address registered under provided name\\n    function getAddress(bytes32 name) external view returns (address);\\n\\n    /// @param _name contract name\\n    /// @return contract address assigned to the name or address(0) if not exists\\n    function getAddressByString(string memory _name) external view returns (address);\\n\\n    /// @dev helper method that converts string to bytes32,\\n    /// you can use to to generate contract name\\n    function stringToBytes32(string memory _string) external pure returns (bytes32 result);\\n}\\n\",\"keccak256\":\"0xa0099ecf4182138fda7a0733407784461410c245de67c1e7ba7cd7c9595e054f\",\"license\":\"MIT\"},\"contracts/interfaces/IStakingBank.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity 0.8.13;\\n\\nimport \\\"@openzeppelin/contracts/token/ERC20/IERC20.sol\\\";\\n\\ninterface IStakingBank is IERC20 {\\n    /// @param id address of validator wallet\\n    /// @param location URL of the validator API\\n    struct Validator {\\n        address id;\\n        string location;\\n    }\\n\\n    event LogValidatorRegistered(address indexed id);\\n    event LogValidatorUpdated(address indexed id);\\n    event LogValidatorRemoved(address indexed id);\\n    event LogMinAmountForStake(uint256 minAmountForStake);\\n\\n    /// @dev setter for `minAmountForStake`\\n    function setMinAmountForStake(uint256 _minAmountForStake) external;\\n\\n    /// @dev allows to stake `token` by validators\\n    /// Validator needs to approve StakingBank beforehand\\n    /// @param _value amount of tokens to stake\\n    function stake(uint256 _value) external;\\n\\n    /// @dev notification about approval from `_from` address on UMB token\\n    /// Staking bank will stake max approved amount from `_from` address\\n    /// @param _from address which approved token spend for IStakingBank\\n    function receiveApproval(address _from) external returns (bool success);\\n\\n    /// @dev withdraws stake tokens\\n    /// it throws, when balance will be less than required minimum for stake\\n    /// to withdraw all use `exit`\\n    function withdraw(uint256 _value) external returns (bool success);\\n\\n    /// @dev unstake and withdraw all tokens\\n    function exit() external returns (bool success);\\n\\n    /// @dev creates (register) new validator\\n    /// @param _id validator address\\n    /// @param _location location URL of the validator API\\n    function create(address _id, string calldata _location) external;\\n\\n    /// @dev removes validator\\n    /// @param _id validator wallet\\n    function remove(address _id) external;\\n\\n    /// @dev updates validator location\\n    /// @param _id validator wallet\\n    /// @param _location new validator URL\\n    function update(address _id, string calldata _location) external;\\n\\n    /// @return total number of registered validators (with and without balance)\\n    function getNumberOfValidators() external view returns (uint256);\\n\\n    /// @dev gets validator address for provided index\\n    /// @param _ix index in array of list of all validators wallets\\n    function addresses(uint256 _ix) external view returns (address);\\n\\n    /// @param _id address of validator\\n    /// @return id address of validator\\n    /// @return location URL of validator\\n    function validators(address _id) external view returns (address id, string memory location);\\n}\\n\",\"keccak256\":\"0x2c518aeab8b0b3a364fafaec559d3ff0dc6a119f8d203fa31ef7ad667ca0f7b9\",\"license\":\"MIT\"},\"contracts/interfaces/IStakingBankStatic.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity 0.8.13;\\n\\nimport \\\"./IStakingBank.sol\\\";\\n\\n\\ninterface IStakingBankStatic is IStakingBank {\\n    /// @param _validators array of validators addresses to verify\\n    /// @return TRUE when all validators are valid, FALSE otherwise\\n    function verifyValidators(address[] calldata _validators) external view returns (bool);\\n}\\n\",\"keccak256\":\"0xb7829f090205357ae8c7b86490504897060650c149309362b95eacbeef88d8ba\",\"license\":\"MIT\"},\"contracts/interfaces/IUmbrellaFeeds.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\ninterface IUmbrellaFeeds {\\n    struct PriceData {\\n        /// @dev this is placeholder, that can be used for some additional data\\n        /// atm of creating this smart contract, it is only used as marker for removed data (when == type(uint8).max)\\n        uint8 data;\\n        /// @dev heartbeat: how often price data will be refreshed in case price stay flat\\n        uint24 heartbeat;\\n        /// @dev timestamp: price time, at this time validators run consensus\\n        uint32 timestamp;\\n        /// @dev price\\n        uint128 price;\\n    }\\n\\n    struct Signature {\\n        uint8 v;\\n        bytes32 r;\\n        bytes32 s;\\n    }\\n\\n    /// @dev method for submitting consensus data\\n    /// @param _priceKeys array of keys for `_priceDatas`\\n    /// @param _priceDatas PriceData signed by validators\\n    /// @param _signatures validators signatures\\n    function update(\\n        bytes32[] calldata _priceKeys,\\n        PriceData[] calldata _priceDatas,\\n        Signature[] calldata _signatures\\n    ) external;\\n\\n    /// @dev it will return array of price datas for provided `_keys`\\n    /// In case ony of feed does not exist, fallback call will be executed for that feed.\\n    /// @notice If data for any key not exists, function will revert. Use `getManyPriceDataRaw` method if you don't\\n    /// want revert.\\n    /// @param _keys array of feed keys\\n    /// @return data PriceData array\\n    function getManyPriceData(bytes32[] calldata _keys) external view returns (PriceData[] memory data);\\n\\n    /// @dev same as getManyPriceData() but does not revert on empty data.\\n    /// @notice This method does no revert if some data does not exists.\\n    /// Check `data.timestamp` to see if price exist, if it is 0, then it does not exist.\\n    function getManyPriceDataRaw(bytes32[] calldata _keys) external view returns (PriceData[] memory data);\\n\\n    /// @dev this is main endpoint for reading feeds.\\n    /// In case timestamp is empty (that means there is no data), contract will revert.\\n    /// If you do not need whole data from `PriceData` struct, you can save some gas by using other view methods that\\n    /// returns just what you need.\\n    /// @notice method will revert if data for `_key` not exists.\\n    /// @param _key hash of feed name\\n    /// @return data full PriceData struct\\n    function getPriceData(bytes32 _key) external view returns (PriceData memory data);\\n\\n    /// @notice reader for mapping\\n    /// @param _key hash of feed name\\n    /// @return data full PriceData struct\\n    function prices(bytes32 _key) external view returns (PriceData memory data);\\n\\n    /// @notice method will revert if data for `_key` not exists.\\n    /// @param _key hash of feed name\\n    /// @return price\\n    function getPrice(bytes32 _key) external view returns (uint128 price);\\n\\n    /// @notice method will revert if data for `_key` not exists.\\n    /// @param _key hash of feed name\\n    /// @return price\\n    /// @return timestamp\\n    function getPriceTimestamp(bytes32 _key) external view returns (uint128 price, uint32 timestamp);\\n\\n    /// @notice method will revert if data for `_key` not exists.\\n    /// @param _key hash of feed name\\n    /// @return price\\n    /// @return timestamp\\n    /// @return heartbeat\\n    function getPriceTimestampHeartbeat(bytes32 _key)\\n        external\\n        view\\n        returns (uint128 price, uint32 timestamp, uint24 heartbeat);\\n\\n    /// @dev This method should be used only for Layer2 as it is more gas consuming than others views.\\n    /// @notice It does not revert on empty data.\\n    /// @param _name string feed name\\n    /// @return data PriceData\\n    function getPriceDataByName(string calldata _name) external view returns (PriceData memory data);\\n\\n    /// @dev decimals for prices stored in this contract\\n    function DECIMALS() external view returns (uint8); // solhint-disable-line func-name-mixedcase\\n}\\n\",\"keccak256\":\"0x3b89742a9ab465f00aa9cf8635a5dfdc02d7ecf9bad8f564bee7c15d8aea46cb\",\"license\":\"MIT\"},\"contracts/onChainFeeds/UmbrellaFeeds.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity 0.8.13;\\n\\nimport \\\"../interfaces/IUmbrellaFeeds.sol\\\";\\nimport \\\"../interfaces/IRegistry.sol\\\";\\nimport \\\"../interfaces/IStakingBankStatic.sol\\\";\\n\\n/// @dev Main contract for all on-chain data.\\n/// Check `UmbrellaFeedsReader` to see how to integrate.\\n///\\n/// @notice This contract can be destroyed and replaced with new one (with new address).\\n/// For best gas efficiency you should pick one of two ways of integration:\\n/// 1. make `UmbrellaFeeds` immutable and use fallback in case of selfdestruct. After new deployment, it is recommended\\n/// to update address to avoid fallback and reduce gas cost to minimum. In long run this is most efficient solution,\\n/// better than any proxy.\\n/// 2. always check newest `UmbrellaFeeds` via `Regostry` and fallback will not be needed.\\ncontract UmbrellaFeeds is IUmbrellaFeeds {\\n    bytes constant public ETH_PREFIX = \\\"\\\\x19Ethereum Signed Message:\\\\n32\\\";\\n    string constant public NAME = \\\"UmbrellaFeeds\\\";\\n\\n    /// @dev deployment time, used for protect for unintentional destroy\\n    uint256 public immutable DEPLOYED_AT;  // solhint-disable-line var-name-mixedcase\\n\\n    /// @dev Registry contract where list of all addresses is stored. Fallback feature uses this registry to\\n    /// resolve newest `UmbrellaFeeds` address\\n    IRegistry public immutable REGISTRY;  // solhint-disable-line var-name-mixedcase\\n\\n    /// @dev StakingBank contract where list of validators is stored\\n    IStakingBankStatic public immutable STAKING_BANK;  // solhint-disable-line var-name-mixedcase\\n\\n    /// @dev minimal number of signatures required for accepting price submission (PoA)\\n    uint16 public immutable REQUIRED_SIGNATURES; // solhint-disable-line var-name-mixedcase\\n\\n    /// @dev decimals for prices stored in this contract\\n    uint8 public immutable DECIMALS;  // solhint-disable-line var-name-mixedcase\\n\\n    /// @notice map of all prices stored in this contract, key for map is hash of feed name\\n    /// eg for \\\"ETH-USD\\\" feed, key will be hash(\\\"ETH-USD\\\")\\n    mapping (bytes32 => PriceData) private _prices;\\n\\n    error ArraysDataDoNotMatch();\\n    error FeedNotExist();\\n    error NotEnoughSignatures();\\n    error InvalidSigner();\\n    error InvalidRequiredSignatures();\\n    error SignaturesOutOfOrder();\\n    error ECDSAInvalidSignatureS();\\n    error ECDSAInvalidSignatureV();\\n    error OldData();\\n    error ContractInUse();\\n    error ContractNotInitialised();\\n\\n    /// @param _contractRegistry Registry address\\n    /// @param _requiredSignatures number of required signatures for accepting consensus submission\\n    /// @param _decimals decimals for prices stored in this contract\\n    constructor(\\n        IRegistry _contractRegistry,\\n        uint16 _requiredSignatures,\\n        uint8 _decimals\\n    ) {\\n        if (_requiredSignatures == 0) revert InvalidRequiredSignatures();\\n\\n        REGISTRY = _contractRegistry;\\n        REQUIRED_SIGNATURES = _requiredSignatures;\\n        STAKING_BANK = IStakingBankStatic(_contractRegistry.requireAndGetAddress(\\\"StakingBank\\\"));\\n        DECIMALS = _decimals;\\n        DEPLOYED_AT = block.timestamp;\\n    }\\n\\n    /// @dev destroys old contract\\n    /// there is sanity check that prevents abuse of destroy method\\n    /// @param _name string feed key to verify, that contract was initialised\\n    function destroy(string calldata _name) external {\\n        if (REGISTRY.getAddressByString(NAME) == address(this)) revert ContractInUse();\\n\\n        if (_prices[keccak256(abi.encodePacked(_name))].timestamp == 0 && DEPLOYED_AT + 3 days > block.timestamp) {\\n            revert ContractNotInitialised();\\n        }\\n\\n        selfdestruct(payable(msg.sender));\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function update(\\n        bytes32[] calldata _priceKeys,\\n        PriceData[] calldata _priceDatas,\\n        Signature[] calldata _signatures\\n    ) external {\\n        if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();\\n\\n        bytes32 priceDataHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, _priceDatas));\\n        verifySignatures(priceDataHash, _signatures);\\n\\n        uint256 i;\\n\\n        while (i < _priceDatas.length) {\\n            bytes32 priceKey = _priceKeys[i];\\n\\n            // we do not allow for older prices\\n            // at the same time it prevents from reusing signatures\\n            if (_prices[priceKey].timestamp >= _priceDatas[i].timestamp) revert OldData();\\n\\n            _prices[priceKey] = _priceDatas[i];\\n\\n            // atm there is no need for events, so in order to save gas, we do not emit any\\n            unchecked { i++; }\\n        }\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function getManyPriceData(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {\\n        data = new PriceData[](_keys.length);\\n\\n        for (uint256 i; i < _keys.length;) {\\n            data[i] = _prices[_keys[i]];\\n            if (data[i].timestamp == 0) revert FeedNotExist();\\n\\n            unchecked { i++; }\\n        }\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function getManyPriceDataRaw(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {\\n        data = new PriceData[](_keys.length);\\n\\n        for (uint256 i; i < _keys.length;) {\\n            data[i] = _prices[_keys[i]];\\n            unchecked { i++; }\\n        }\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function prices(bytes32 _key) external view returns (PriceData memory data) {\\n        data = _prices[_key];\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function getPriceData(bytes32 _key) external view returns (PriceData memory data) {\\n        data = _prices[_key];\\n        if (data.timestamp == 0) revert FeedNotExist();\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function getPrice(bytes32 _key) external view returns (uint128 price) {\\n        PriceData memory data = _prices[_key];\\n        if (data.timestamp == 0) revert FeedNotExist();\\n\\n        return data.price;\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function getPriceTimestamp(bytes32 _key) external view returns (uint128 price, uint32 timestamp) {\\n        PriceData memory data = _prices[_key];\\n        if (data.timestamp == 0) revert FeedNotExist();\\n\\n        return (data.price, data.timestamp);\\n    }\\n\\n    function getPriceTimestampHeartbeat(bytes32 _key)\\n        external\\n        view\\n        returns (uint128 price, uint32 timestamp, uint24 heartbeat)\\n    {\\n        PriceData memory data = _prices[_key];\\n        if (data.timestamp == 0) revert FeedNotExist();\\n\\n        return (data.price, data.timestamp, data.heartbeat);\\n    }\\n\\n    /// @inheritdoc IUmbrellaFeeds\\n    function getPriceDataByName(string calldata _name) external view returns (PriceData memory data) {\\n        bytes32 key = keccak256(abi.encodePacked(_name));\\n        data = _prices[key];\\n    }\\n\\n    /// @dev helper method for QA purposes\\n    /// @return hash of data that are signed by validators (keys and priced data)\\n    function hashData(bytes32[] calldata _priceKeys, PriceData[] calldata _priceDatas)\\n        external\\n        view\\n        returns (bytes32)\\n    {\\n        return keccak256(abi.encode(getChainId(), address(this), _priceKeys, _priceDatas));\\n    }\\n\\n    /// @param _hash hash of signed data\\n    /// @param _signatures array of validators signatures\\n    function verifySignatures(bytes32 _hash, Signature[] calldata _signatures) public view {\\n        address prevSigner = address(0x0);\\n\\n        if (_signatures.length < REQUIRED_SIGNATURES) revert NotEnoughSignatures();\\n\\n        address[] memory validators = new address[](REQUIRED_SIGNATURES);\\n\\n        // to save gas we check only required number of signatures\\n        // case, where you can have part of signatures invalid but still enough valid in total is not supported\\n        for (uint256 i; i < REQUIRED_SIGNATURES;) {\\n            (uint8 v, bytes32 r, bytes32 s) = (_signatures[i].v, _signatures[i].r, _signatures[i].s);\\n\\n            if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {\\n                revert ECDSAInvalidSignatureS();\\n            }\\n\\n            if (uint8(v) != 27 && uint8(v) != 28) revert ECDSAInvalidSignatureV();\\n\\n            address signer = recoverSigner(_hash, v, r, s);\\n            if (prevSigner >= signer) revert SignaturesOutOfOrder();\\n\\n            // because we check only required number of signatures, any invalid one will cause revert\\n            prevSigner = signer;\\n            validators[i] = signer;\\n\\n            unchecked { i++; }\\n        }\\n\\n        // bulk verification can optimise gas when we have 5 or more validators\\n        if (!STAKING_BANK.verifyValidators(validators)) revert InvalidSigner();\\n    }\\n\\n    function getChainId() public view returns (uint256 id) {\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            id := chainid()\\n        }\\n    }\\n\\n    /// @param _hash hashed of data\\n    /// @param _v part of signature\\n    /// @param _r part of signature\\n    /// @param _s part of signature\\n    /// @return signer address\\n    function recoverSigner(bytes32 _hash, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {\\n        bytes32 hash = keccak256(abi.encodePacked(ETH_PREFIX, _hash));\\n        return ecrecover(hash, _v, _r, _s);\\n    }\\n\\n    /// @dev to follow Registrable interface\\n    function getName() public pure returns (bytes32) {\\n        return \\\"UmbrellaFeeds\\\";\\n    }\\n}\\n\",\"keccak256\":\"0xf5dcfbbdfe5a5ed6e7579246363b10cdc0aa30580fec74025e0704c2b042d369\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x6101206040523480156200001257600080fd5b50604051620030a4380380620030a4833981810160405281019062000038919062000286565b60008261ffff160362000077576040517f458bb42100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8273ffffffffffffffffffffffffffffffffffffffff1660a08173ffffffffffffffffffffffffffffffffffffffff16815250508161ffff1660e08161ffff16815250508273ffffffffffffffffffffffffffffffffffffffff166346bcb49d6040518163ffffffff1660e01b8152600401620000f49062000308565b602060405180830381865afa15801562000112573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019062000138919062000354565b73ffffffffffffffffffffffffffffffffffffffff1660c08173ffffffffffffffffffffffffffffffffffffffff16815250508060ff166101008160ff1681525050426080818152505050505062000386565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000620001bd8262000190565b9050919050565b6000620001d182620001b0565b9050919050565b620001e381620001c4565b8114620001ef57600080fd5b50565b6000815190506200020381620001d8565b92915050565b600061ffff82169050919050565b620002228162000209565b81146200022e57600080fd5b50565b600081519050620002428162000217565b92915050565b600060ff82169050919050565b620002608162000248565b81146200026c57600080fd5b50565b600081519050620002808162000255565b92915050565b600080600060608486031215620002a257620002a16200018b565b5b6000620002b286828701620001f2565b9350506020620002c58682870162000231565b9250506040620002d8868287016200026f565b9150509250925092565b7f5374616b696e6742616e6b000000000000000000000000000000000000000000815250565b60006020820190506200031e60008301620002e2565b919050565b6200032e81620001b0565b81146200033a57600080fd5b50565b6000815190506200034e8162000323565b92915050565b6000602082840312156200036d576200036c6200018b565b5b60006200037d848285016200033d565b91505092915050565b60805160a05160c05160e05161010051612caf620003f560003960006108b10152600081816104e501528181610548015281816105ba01526116980152600081816107da01526116f501526000818161045e015261107e0152600081816111fd015261127a0152612caf6000f3fe608060405234801561001057600080fd5b50600436106101125760003560e01c806306433b1b1461011757806317d7de7c1461013557806324c89a491461015357806326559877146101715780632e0f26251461018d5780632e550693146101ab57806331d98b3f146101db5780633408e4701461020b578063385e05da1461022957806343fa6211146102595780635b38adc71461028957806360846bc6146102b95780636b9c3c7c146102e95780636ebb8cd2146103055780638a1194d31461032357806395f1cf301461035457806396594f66146103705780639ac18b19146103a2578063a3f4df7e146103c0578063c65a53ad146103de578063ccc6fd69146103fc578063d45167d01461042c575b600080fd5b61011f61045c565b60405161012c91906118df565b60405180910390f35b61013d610480565b60405161014a9190611913565b60405180910390f35b61015b6104a8565b60405161016891906119c7565b60405180910390f35b61018b60048036038101906101869190611a84565b6104e1565b005b6101956108af565b6040516101a29190611b00565b60405180910390f35b6101c560048036038101906101c09190611b71565b6108d3565b6040516101d29190611d39565b60405180910390f35b6101f560048036038101906101f09190611d5b565b610a54565b6040516102029190611d97565b60405180910390f35b610213610b77565b6040516102209190611dcb565b60405180910390f35b610243600480360381019061023e9190611b71565b610b7f565b6040516102509190611d39565b60405180910390f35b610273600480360381019061026e9190611d5b565b610d5e565b6040516102809190611e3b565b60405180910390f35b6102a3600480360381019061029e9190611eac565b610e7e565b6040516102b09190611e3b565b60405180910390f35b6102d360048036038101906102ce9190611d5b565b610f89565b6040516102e09190611e3b565b60405180910390f35b61030360048036038101906102fe9190611eac565b611065565b005b61030d611278565b60405161031a9190611dcb565b60405180910390f35b61033d60048036038101906103389190611d5b565b61129c565b60405161034b929190611f08565b60405180910390f35b61036e60048036038101906103699190611f87565b6113c8565b005b61038a60048036038101906103859190611d5b565b611560565b6040516103999392919061204a565b60405180910390f35b6103aa611696565b6040516103b7919061209e565b60405180910390f35b6103c86116ba565b6040516103d5919061210e565b60405180910390f35b6103e66116f3565b6040516103f39190612151565b60405180910390f35b6104166004803603810190610411919061216c565b611717565b6040516104239190611913565b60405180910390f35b61044660048036038101906104419190612219565b61175b565b60405161045391906122a1565b60405180910390f35b7f000000000000000000000000000000000000000000000000000000000000000081565b60007f556d6272656c6c61466565647300000000000000000000000000000000000000905090565b6040518060400160405280601c81526020017f19457468657265756d205369676e6564204d6573736167653a0a33320000000081525081565b60007f000000000000000000000000000000000000000000000000000000000000000061ffff16838390501015610544576040517fe246dc6300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60007f000000000000000000000000000000000000000000000000000000000000000061ffff1667ffffffffffffffff811115610584576105836122bc565b5b6040519080825280602002602001820160405280156105b25781602001602082028036833780820191505090505b50905060005b7f000000000000000000000000000000000000000000000000000000000000000061ffff168110156107d75760008060008787858181106105fc576105fb6122eb565b5b9050606002016000016020810190610614919061231a565b888886818110610627576106266122eb565b5b90506060020160200135898987818110610644576106436122eb565b5b905060600201604001359250925092507f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a08160001c11156106b1576040517f454ffaa700000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b601b8360ff16141580156106c95750601c8360ff1614155b15610700576040517f1afa741400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600061070e8a85858561175b565b90508073ffffffffffffffffffffffffffffffffffffffff168773ffffffffffffffffffffffffffffffffffffffff1610610775576040517f9079f69b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8096508086868151811061078c5761078b6122eb565b5b602002602001019073ffffffffffffffffffffffffffffffffffffffff16908173ffffffffffffffffffffffffffffffffffffffff16815250508480600101955050505050506105b8565b507f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16631d4f9ce0826040518263ffffffff1660e01b81526004016108319190612405565b602060405180830381865afa15801561084e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610872919061245f565b6108a8576040517f815e1d6400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5050505050565b7f000000000000000000000000000000000000000000000000000000000000000081565b60608282905067ffffffffffffffff8111156108f2576108f16122bc565b5b60405190808252806020026020018201604052801561092b57816020015b610918611818565b8152602001906001900390816109105790505b50905060005b83839050811015610a4d57600080858584818110610952576109516122eb565b5b9050602002013581526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681525050828281518110610a3557610a346122eb565b5b60200260200101819052508080600101915050610931565b5092915050565b6000806000808481526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff1603610b6a576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8060600151915050919050565b600046905090565b60608282905067ffffffffffffffff811115610b9e57610b9d6122bc565b5b604051908082528060200260200182016040528015610bd757816020015b610bc4611818565b815260200190600190039081610bbc5790505b50905060005b83839050811015610d5757600080858584818110610bfe57610bfd6122eb565b5b9050602002013581526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681525050828281518110610ce157610ce06122eb565b5b60200260200101819052506000828281518110610d0157610d006122eb565b5b60200260200101516040015163ffffffff1603610d4a576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8080600101915050610bdd565b5092915050565b610d66611818565b6000808381526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff1603610e79576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b919050565b610e86611818565b60008383604051602001610e9b9291906124cb565b6040516020818303038152906040528051906020012090506000808281526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505091505092915050565b610f91611818565b6000808381526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff16815250509050919050565b3073ffffffffffffffffffffffffffffffffffffffff167f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1663e8f98f886040518060400160405280600d81526020017f556d6272656c6c614665656473000000000000000000000000000000000000008152506040518263ffffffff1660e01b815260040161110a919061210e565b602060405180830381865afa158015611127573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061114b9190612510565b73ffffffffffffffffffffffffffffffffffffffff1603611198576040517f8c3e700900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600080600084846040516020016111b09291906124cb565b60405160208183030381529060405280519060200120815260200190815260200160002060000160049054906101000a900463ffffffff1663ffffffff161480156112285750426203f4807f0000000000000000000000000000000000000000000000000000000000000000611226919061256c565b115b1561125f576040517fcf51b43b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b3373ffffffffffffffffffffffffffffffffffffffff16ff5b7f000000000000000000000000000000000000000000000000000000000000000081565b60008060008060008581526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff16036113b4576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b806060015181604001519250925050915091565b838390508686905014611407576040517f0cf7902300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6000611411610b77565b308888888860405160200161142b96959493929190612820565b60405160208183030381529060405280519060200120905061144e8184846104e1565b60005b85859050811015611556576000888883818110611471576114706122eb565b5b90506020020135905086868381811061148d5761148c6122eb565b5b90506080020160400160208101906114a59190612877565b63ffffffff1660008083815260200190815260200160002060000160049054906101000a900463ffffffff1663ffffffff161061150e576040517f1251b2f300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b868683818110611521576115206122eb565b5b90506080020160008083815260200190815260200160002081816115459190612ba1565b905050818060010192505050611451565b5050505050505050565b6000806000806000808681526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff1603611679576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b806060015181604001518260200151935093509350509193909250565b7f000000000000000000000000000000000000000000000000000000000000000081565b6040518060400160405280600d81526020017f556d6272656c6c6146656564730000000000000000000000000000000000000081525081565b7f000000000000000000000000000000000000000000000000000000000000000081565b6000611721610b77565b308686868660405160200161173b96959493929190612820565b604051602081830303815290604052805190602001209050949350505050565b6000806040518060400160405280601c81526020017f19457468657265756d205369676e6564204d6573736167653a0a333200000000815250866040516020016117a6929190612c0c565b604051602081830303815290604052805190602001209050600181868686604051600081526020016040526040516117e19493929190612c34565b6020604051602081039080840390855afa158015611803573d6000803e3d6000fd5b50505060206040510351915050949350505050565b6040518060800160405280600060ff168152602001600062ffffff168152602001600063ffffffff16815260200160006fffffffffffffffffffffffffffffffff1681525090565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000819050919050565b60006118a56118a061189b84611860565b611880565b611860565b9050919050565b60006118b78261188a565b9050919050565b60006118c9826118ac565b9050919050565b6118d9816118be565b82525050565b60006020820190506118f460008301846118d0565b92915050565b6000819050919050565b61190d816118fa565b82525050565b60006020820190506119286000830184611904565b92915050565b600081519050919050565b600082825260208201905092915050565b60005b8381101561196857808201518184015260208101905061194d565b83811115611977576000848401525b50505050565b6000601f19601f8301169050919050565b60006119998261192e565b6119a38185611939565b93506119b381856020860161194a565b6119bc8161197d565b840191505092915050565b600060208201905081810360008301526119e1818461198e565b905092915050565b600080fd5b600080fd5b6119fc816118fa565b8114611a0757600080fd5b50565b600081359050611a19816119f3565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f840112611a4457611a43611a1f565b5b8235905067ffffffffffffffff811115611a6157611a60611a24565b5b602083019150836060820283011115611a7d57611a7c611a29565b5b9250929050565b600080600060408486031215611a9d57611a9c6119e9565b5b6000611aab86828701611a0a565b935050602084013567ffffffffffffffff811115611acc57611acb6119ee565b5b611ad886828701611a2e565b92509250509250925092565b600060ff82169050919050565b611afa81611ae4565b82525050565b6000602082019050611b156000830184611af1565b92915050565b60008083601f840112611b3157611b30611a1f565b5b8235905067ffffffffffffffff811115611b4e57611b4d611a24565b5b602083019150836020820283011115611b6a57611b69611a29565b5b9250929050565b60008060208385031215611b8857611b876119e9565b5b600083013567ffffffffffffffff811115611ba657611ba56119ee565b5b611bb285828601611b1b565b92509250509250929050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b611bf381611ae4565b82525050565b600062ffffff82169050919050565b611c1181611bf9565b82525050565b600063ffffffff82169050919050565b611c3081611c17565b82525050565b60006fffffffffffffffffffffffffffffffff82169050919050565b611c5b81611c36565b82525050565b608082016000820151611c776000850182611bea565b506020820151611c8a6020850182611c08565b506040820151611c9d6040850182611c27565b506060820151611cb06060850182611c52565b50505050565b6000611cc28383611c61565b60808301905092915050565b6000602082019050919050565b6000611ce682611bbe565b611cf08185611bc9565b9350611cfb83611bda565b8060005b83811015611d2c578151611d138882611cb6565b9750611d1e83611cce565b925050600181019050611cff565b5085935050505092915050565b60006020820190508181036000830152611d538184611cdb565b905092915050565b600060208284031215611d7157611d706119e9565b5b6000611d7f84828501611a0a565b91505092915050565b611d9181611c36565b82525050565b6000602082019050611dac6000830184611d88565b92915050565b6000819050919050565b611dc581611db2565b82525050565b6000602082019050611de06000830184611dbc565b92915050565b608082016000820151611dfc6000850182611bea565b506020820151611e0f6020850182611c08565b506040820151611e226040850182611c27565b506060820151611e356060850182611c52565b50505050565b6000608082019050611e506000830184611de6565b92915050565b60008083601f840112611e6c57611e6b611a1f565b5b8235905067ffffffffffffffff811115611e8957611e88611a24565b5b602083019150836001820283011115611ea557611ea4611a29565b5b9250929050565b60008060208385031215611ec357611ec26119e9565b5b600083013567ffffffffffffffff811115611ee157611ee06119ee565b5b611eed85828601611e56565b92509250509250929050565b611f0281611c17565b82525050565b6000604082019050611f1d6000830185611d88565b611f2a6020830184611ef9565b9392505050565b60008083601f840112611f4757611f46611a1f565b5b8235905067ffffffffffffffff811115611f6457611f63611a24565b5b602083019150836080820283011115611f8057611f7f611a29565b5b9250929050565b60008060008060008060608789031215611fa457611fa36119e9565b5b600087013567ffffffffffffffff811115611fc257611fc16119ee565b5b611fce89828a01611b1b565b9650965050602087013567ffffffffffffffff811115611ff157611ff06119ee565b5b611ffd89828a01611f31565b9450945050604087013567ffffffffffffffff8111156120205761201f6119ee565b5b61202c89828a01611a2e565b92509250509295509295509295565b61204481611bf9565b82525050565b600060608201905061205f6000830186611d88565b61206c6020830185611ef9565b612079604083018461203b565b949350505050565b600061ffff82169050919050565b61209881612081565b82525050565b60006020820190506120b3600083018461208f565b92915050565b600081519050919050565b600082825260208201905092915050565b60006120e0826120b9565b6120ea81856120c4565b93506120fa81856020860161194a565b6121038161197d565b840191505092915050565b6000602082019050818103600083015261212881846120d5565b905092915050565b600061213b826118ac565b9050919050565b61214b81612130565b82525050565b60006020820190506121666000830184612142565b92915050565b60008060008060408587031215612186576121856119e9565b5b600085013567ffffffffffffffff8111156121a4576121a36119ee565b5b6121b087828801611b1b565b9450945050602085013567ffffffffffffffff8111156121d3576121d26119ee565b5b6121df87828801611f31565b925092505092959194509250565b6121f681611ae4565b811461220157600080fd5b50565b600081359050612213816121ed565b92915050565b60008060008060808587031215612233576122326119e9565b5b600061224187828801611a0a565b945050602061225287828801612204565b935050604061226387828801611a0a565b925050606061227487828801611a0a565b91505092959194509250565b600061228b82611860565b9050919050565b61229b81612280565b82525050565b60006020820190506122b66000830184612292565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b6000602082840312156123305761232f6119e9565b5b600061233e84828501612204565b91505092915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b61237c81612280565b82525050565b600061238e8383612373565b60208301905092915050565b6000602082019050919050565b60006123b282612347565b6123bc8185612352565b93506123c783612363565b8060005b838110156123f85781516123df8882612382565b97506123ea8361239a565b9250506001810190506123cb565b5085935050505092915050565b6000602082019050818103600083015261241f81846123a7565b905092915050565b60008115159050919050565b61243c81612427565b811461244757600080fd5b50565b60008151905061245981612433565b92915050565b600060208284031215612475576124746119e9565b5b60006124838482850161244a565b91505092915050565b600081905092915050565b82818337600083830152505050565b60006124b2838561248c565b93506124bf838584612497565b82840190509392505050565b60006124d88284866124a6565b91508190509392505050565b6124ed81612280565b81146124f857600080fd5b50565b60008151905061250a816124e4565b92915050565b600060208284031215612526576125256119e9565b5b6000612534848285016124fb565b91505092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600061257782611db2565b915061258283611db2565b9250827fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff038211156125b7576125b661253d565b5b828201905092915050565b600082825260208201905092915050565b600080fd5b60006125e483856125c2565b93507f07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff831115612617576126166125d3565b5b602083029250612628838584612497565b82840190509392505050565b6000819050919050565b600061264d6020840184612204565b905092915050565b61265e81611bf9565b811461266957600080fd5b50565b60008135905061267b81612655565b92915050565b6000612690602084018461266c565b905092915050565b6126a181611c17565b81146126ac57600080fd5b50565b6000813590506126be81612698565b92915050565b60006126d360208401846126af565b905092915050565b6126e481611c36565b81146126ef57600080fd5b50565b600081359050612701816126db565b92915050565b600061271660208401846126f2565b905092915050565b6080820161272f600083018361263e565b61273c6000850182611bea565b5061274a6020830183612681565b6127576020850182611c08565b5061276560408301836126c4565b6127726040850182611c27565b506127806060830183612707565b61278d6060850182611c52565b50505050565b600061279f838361271e565b60808301905092915050565b600082905092915050565b6000608082019050919050565b60006127cf8385611bc9565b93506127da82612634565b8060005b85811015612813576127f082846127ab565b6127fa8882612793565b9750612805836127b6565b9250506001810190506127de565b5085925050509392505050565b60006080820190506128356000830189611dbc565b6128426020830188612292565b81810360408301526128558186886125d8565b9050818103606083015261286a8184866127c3565b9050979650505050505050565b60006020828403121561288d5761288c6119e9565b5b600061289b848285016126af565b91505092915050565b600081356128b1816121ed565b80915050919050565b60008160001b9050919050565b600060ff6128d4846128ba565b9350801983169250808416831791505092915050565b60006129056129006128fb84611ae4565b611880565b611ae4565b9050919050565b6000819050919050565b61291f826128ea565b61293261292b8261290c565b83546128c7565b8255505050565b6000813561294681612655565b80915050919050565b60008160081b9050919050565b600063ffffff0061296c8461294f565b9350801983169250808416831791505092915050565b600061299d61299861299384611bf9565b611880565b611bf9565b9050919050565b6000819050919050565b6129b782612982565b6129ca6129c3826129a4565b835461295c565b8255505050565b600081356129de81612698565b80915050919050565b60008160201b9050919050565b600067ffffffff00000000612a08846129e7565b9350801983169250808416831791505092915050565b6000612a39612a34612a2f84611c17565b611880565b611c17565b9050919050565b6000819050919050565b612a5382612a1e565b612a66612a5f82612a40565b83546129f4565b8255505050565b60008135612a7a816126db565b80915050919050565b60008160401b9050919050565b600077ffffffffffffffffffffffffffffffff0000000000000000612ab484612a83565b9350801983169250808416831791505092915050565b6000612ae5612ae0612adb84611c36565b611880565b611c36565b9050919050565b6000819050919050565b612aff82612aca565b612b12612b0b82612aec565b8354612a90565b8255505050565b600081016000830180612b2b816128a4565b9050612b378184612916565b505050600081016020830180612b4c81612939565b9050612b5881846129ae565b505050600081016040830180612b6d816129d1565b9050612b798184612a4a565b505050600081016060830180612b8e81612a6d565b9050612b9a8184612af6565b5050505050565b612bab8282612b19565b5050565b600081905092915050565b6000612bc58261192e565b612bcf8185612baf565b9350612bdf81856020860161194a565b80840191505092915050565b6000819050919050565b612c06612c01826118fa565b612beb565b82525050565b6000612c188285612bba565b9150612c248284612bf5565b6020820191508190509392505050565b6000608082019050612c496000830187611904565b612c566020830186611af1565b612c636040830185611904565b612c706060830184611904565b9594505050505056fea26469706673582212204e20478e2e3070a20aa83127753a448e1b78b26fd4b44673d2f1b4027a2cf6be64736f6c634300080d0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106101125760003560e01c806306433b1b1461011757806317d7de7c1461013557806324c89a491461015357806326559877146101715780632e0f26251461018d5780632e550693146101ab57806331d98b3f146101db5780633408e4701461020b578063385e05da1461022957806343fa6211146102595780635b38adc71461028957806360846bc6146102b95780636b9c3c7c146102e95780636ebb8cd2146103055780638a1194d31461032357806395f1cf301461035457806396594f66146103705780639ac18b19146103a2578063a3f4df7e146103c0578063c65a53ad146103de578063ccc6fd69146103fc578063d45167d01461042c575b600080fd5b61011f61045c565b60405161012c91906118df565b60405180910390f35b61013d610480565b60405161014a9190611913565b60405180910390f35b61015b6104a8565b60405161016891906119c7565b60405180910390f35b61018b60048036038101906101869190611a84565b6104e1565b005b6101956108af565b6040516101a29190611b00565b60405180910390f35b6101c560048036038101906101c09190611b71565b6108d3565b6040516101d29190611d39565b60405180910390f35b6101f560048036038101906101f09190611d5b565b610a54565b6040516102029190611d97565b60405180910390f35b610213610b77565b6040516102209190611dcb565b60405180910390f35b610243600480360381019061023e9190611b71565b610b7f565b6040516102509190611d39565b60405180910390f35b610273600480360381019061026e9190611d5b565b610d5e565b6040516102809190611e3b565b60405180910390f35b6102a3600480360381019061029e9190611eac565b610e7e565b6040516102b09190611e3b565b60405180910390f35b6102d360048036038101906102ce9190611d5b565b610f89565b6040516102e09190611e3b565b60405180910390f35b61030360048036038101906102fe9190611eac565b611065565b005b61030d611278565b60405161031a9190611dcb565b60405180910390f35b61033d60048036038101906103389190611d5b565b61129c565b60405161034b929190611f08565b60405180910390f35b61036e60048036038101906103699190611f87565b6113c8565b005b61038a60048036038101906103859190611d5b565b611560565b6040516103999392919061204a565b60405180910390f35b6103aa611696565b6040516103b7919061209e565b60405180910390f35b6103c86116ba565b6040516103d5919061210e565b60405180910390f35b6103e66116f3565b6040516103f39190612151565b60405180910390f35b6104166004803603810190610411919061216c565b611717565b6040516104239190611913565b60405180910390f35b61044660048036038101906104419190612219565b61175b565b60405161045391906122a1565b60405180910390f35b7f000000000000000000000000000000000000000000000000000000000000000081565b60007f556d6272656c6c61466565647300000000000000000000000000000000000000905090565b6040518060400160405280601c81526020017f19457468657265756d205369676e6564204d6573736167653a0a33320000000081525081565b60007f000000000000000000000000000000000000000000000000000000000000000061ffff16838390501015610544576040517fe246dc6300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60007f000000000000000000000000000000000000000000000000000000000000000061ffff1667ffffffffffffffff811115610584576105836122bc565b5b6040519080825280602002602001820160405280156105b25781602001602082028036833780820191505090505b50905060005b7f000000000000000000000000000000000000000000000000000000000000000061ffff168110156107d75760008060008787858181106105fc576105fb6122eb565b5b9050606002016000016020810190610614919061231a565b888886818110610627576106266122eb565b5b90506060020160200135898987818110610644576106436122eb565b5b905060600201604001359250925092507f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a08160001c11156106b1576040517f454ffaa700000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b601b8360ff16141580156106c95750601c8360ff1614155b15610700576040517f1afa741400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600061070e8a85858561175b565b90508073ffffffffffffffffffffffffffffffffffffffff168773ffffffffffffffffffffffffffffffffffffffff1610610775576040517f9079f69b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8096508086868151811061078c5761078b6122eb565b5b602002602001019073ffffffffffffffffffffffffffffffffffffffff16908173ffffffffffffffffffffffffffffffffffffffff16815250508480600101955050505050506105b8565b507f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16631d4f9ce0826040518263ffffffff1660e01b81526004016108319190612405565b602060405180830381865afa15801561084e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610872919061245f565b6108a8576040517f815e1d6400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5050505050565b7f000000000000000000000000000000000000000000000000000000000000000081565b60608282905067ffffffffffffffff8111156108f2576108f16122bc565b5b60405190808252806020026020018201604052801561092b57816020015b610918611818565b8152602001906001900390816109105790505b50905060005b83839050811015610a4d57600080858584818110610952576109516122eb565b5b9050602002013581526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681525050828281518110610a3557610a346122eb565b5b60200260200101819052508080600101915050610931565b5092915050565b6000806000808481526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff1603610b6a576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8060600151915050919050565b600046905090565b60608282905067ffffffffffffffff811115610b9e57610b9d6122bc565b5b604051908082528060200260200182016040528015610bd757816020015b610bc4611818565b815260200190600190039081610bbc5790505b50905060005b83839050811015610d5757600080858584818110610bfe57610bfd6122eb565b5b9050602002013581526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681525050828281518110610ce157610ce06122eb565b5b60200260200101819052506000828281518110610d0157610d006122eb565b5b60200260200101516040015163ffffffff1603610d4a576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8080600101915050610bdd565b5092915050565b610d66611818565b6000808381526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff1603610e79576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b919050565b610e86611818565b60008383604051602001610e9b9291906124cb565b6040516020818303038152906040528051906020012090506000808281526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505091505092915050565b610f91611818565b6000808381526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff16815250509050919050565b3073ffffffffffffffffffffffffffffffffffffffff167f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1663e8f98f886040518060400160405280600d81526020017f556d6272656c6c614665656473000000000000000000000000000000000000008152506040518263ffffffff1660e01b815260040161110a919061210e565b602060405180830381865afa158015611127573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061114b9190612510565b73ffffffffffffffffffffffffffffffffffffffff1603611198576040517f8c3e700900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600080600084846040516020016111b09291906124cb565b60405160208183030381529060405280519060200120815260200190815260200160002060000160049054906101000a900463ffffffff1663ffffffff161480156112285750426203f4807f0000000000000000000000000000000000000000000000000000000000000000611226919061256c565b115b1561125f576040517fcf51b43b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b3373ffffffffffffffffffffffffffffffffffffffff16ff5b7f000000000000000000000000000000000000000000000000000000000000000081565b60008060008060008581526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff16036113b4576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b806060015181604001519250925050915091565b838390508686905014611407576040517f0cf7902300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6000611411610b77565b308888888860405160200161142b96959493929190612820565b60405160208183030381529060405280519060200120905061144e8184846104e1565b60005b85859050811015611556576000888883818110611471576114706122eb565b5b90506020020135905086868381811061148d5761148c6122eb565b5b90506080020160400160208101906114a59190612877565b63ffffffff1660008083815260200190815260200160002060000160049054906101000a900463ffffffff1663ffffffff161061150e576040517f1251b2f300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b868683818110611521576115206122eb565b5b90506080020160008083815260200190815260200160002081816115459190612ba1565b905050818060010192505050611451565b5050505050505050565b6000806000806000808681526020019081526020016000206040518060800160405290816000820160009054906101000a900460ff1660ff1660ff1681526020016000820160019054906101000a900462ffffff1662ffffff1662ffffff1681526020016000820160049054906101000a900463ffffffff1663ffffffff1663ffffffff1681526020016000820160089054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff168152505090506000816040015163ffffffff1603611679576040517f15647ae900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b806060015181604001518260200151935093509350509193909250565b7f000000000000000000000000000000000000000000000000000000000000000081565b6040518060400160405280600d81526020017f556d6272656c6c6146656564730000000000000000000000000000000000000081525081565b7f000000000000000000000000000000000000000000000000000000000000000081565b6000611721610b77565b308686868660405160200161173b96959493929190612820565b604051602081830303815290604052805190602001209050949350505050565b6000806040518060400160405280601c81526020017f19457468657265756d205369676e6564204d6573736167653a0a333200000000815250866040516020016117a6929190612c0c565b604051602081830303815290604052805190602001209050600181868686604051600081526020016040526040516117e19493929190612c34565b6020604051602081039080840390855afa158015611803573d6000803e3d6000fd5b50505060206040510351915050949350505050565b6040518060800160405280600060ff168152602001600062ffffff168152602001600063ffffffff16815260200160006fffffffffffffffffffffffffffffffff1681525090565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000819050919050565b60006118a56118a061189b84611860565b611880565b611860565b9050919050565b60006118b78261188a565b9050919050565b60006118c9826118ac565b9050919050565b6118d9816118be565b82525050565b60006020820190506118f460008301846118d0565b92915050565b6000819050919050565b61190d816118fa565b82525050565b60006020820190506119286000830184611904565b92915050565b600081519050919050565b600082825260208201905092915050565b60005b8381101561196857808201518184015260208101905061194d565b83811115611977576000848401525b50505050565b6000601f19601f8301169050919050565b60006119998261192e565b6119a38185611939565b93506119b381856020860161194a565b6119bc8161197d565b840191505092915050565b600060208201905081810360008301526119e1818461198e565b905092915050565b600080fd5b600080fd5b6119fc816118fa565b8114611a0757600080fd5b50565b600081359050611a19816119f3565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f840112611a4457611a43611a1f565b5b8235905067ffffffffffffffff811115611a6157611a60611a24565b5b602083019150836060820283011115611a7d57611a7c611a29565b5b9250929050565b600080600060408486031215611a9d57611a9c6119e9565b5b6000611aab86828701611a0a565b935050602084013567ffffffffffffffff811115611acc57611acb6119ee565b5b611ad886828701611a2e565b92509250509250925092565b600060ff82169050919050565b611afa81611ae4565b82525050565b6000602082019050611b156000830184611af1565b92915050565b60008083601f840112611b3157611b30611a1f565b5b8235905067ffffffffffffffff811115611b4e57611b4d611a24565b5b602083019150836020820283011115611b6a57611b69611a29565b5b9250929050565b60008060208385031215611b8857611b876119e9565b5b600083013567ffffffffffffffff811115611ba657611ba56119ee565b5b611bb285828601611b1b565b92509250509250929050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b611bf381611ae4565b82525050565b600062ffffff82169050919050565b611c1181611bf9565b82525050565b600063ffffffff82169050919050565b611c3081611c17565b82525050565b60006fffffffffffffffffffffffffffffffff82169050919050565b611c5b81611c36565b82525050565b608082016000820151611c776000850182611bea565b506020820151611c8a6020850182611c08565b506040820151611c9d6040850182611c27565b506060820151611cb06060850182611c52565b50505050565b6000611cc28383611c61565b60808301905092915050565b6000602082019050919050565b6000611ce682611bbe565b611cf08185611bc9565b9350611cfb83611bda565b8060005b83811015611d2c578151611d138882611cb6565b9750611d1e83611cce565b925050600181019050611cff565b5085935050505092915050565b60006020820190508181036000830152611d538184611cdb565b905092915050565b600060208284031215611d7157611d706119e9565b5b6000611d7f84828501611a0a565b91505092915050565b611d9181611c36565b82525050565b6000602082019050611dac6000830184611d88565b92915050565b6000819050919050565b611dc581611db2565b82525050565b6000602082019050611de06000830184611dbc565b92915050565b608082016000820151611dfc6000850182611bea565b506020820151611e0f6020850182611c08565b506040820151611e226040850182611c27565b506060820151611e356060850182611c52565b50505050565b6000608082019050611e506000830184611de6565b92915050565b60008083601f840112611e6c57611e6b611a1f565b5b8235905067ffffffffffffffff811115611e8957611e88611a24565b5b602083019150836001820283011115611ea557611ea4611a29565b5b9250929050565b60008060208385031215611ec357611ec26119e9565b5b600083013567ffffffffffffffff811115611ee157611ee06119ee565b5b611eed85828601611e56565b92509250509250929050565b611f0281611c17565b82525050565b6000604082019050611f1d6000830185611d88565b611f2a6020830184611ef9565b9392505050565b60008083601f840112611f4757611f46611a1f565b5b8235905067ffffffffffffffff811115611f6457611f63611a24565b5b602083019150836080820283011115611f8057611f7f611a29565b5b9250929050565b60008060008060008060608789031215611fa457611fa36119e9565b5b600087013567ffffffffffffffff811115611fc257611fc16119ee565b5b611fce89828a01611b1b565b9650965050602087013567ffffffffffffffff811115611ff157611ff06119ee565b5b611ffd89828a01611f31565b9450945050604087013567ffffffffffffffff8111156120205761201f6119ee565b5b61202c89828a01611a2e565b92509250509295509295509295565b61204481611bf9565b82525050565b600060608201905061205f6000830186611d88565b61206c6020830185611ef9565b612079604083018461203b565b949350505050565b600061ffff82169050919050565b61209881612081565b82525050565b60006020820190506120b3600083018461208f565b92915050565b600081519050919050565b600082825260208201905092915050565b60006120e0826120b9565b6120ea81856120c4565b93506120fa81856020860161194a565b6121038161197d565b840191505092915050565b6000602082019050818103600083015261212881846120d5565b905092915050565b600061213b826118ac565b9050919050565b61214b81612130565b82525050565b60006020820190506121666000830184612142565b92915050565b60008060008060408587031215612186576121856119e9565b5b600085013567ffffffffffffffff8111156121a4576121a36119ee565b5b6121b087828801611b1b565b9450945050602085013567ffffffffffffffff8111156121d3576121d26119ee565b5b6121df87828801611f31565b925092505092959194509250565b6121f681611ae4565b811461220157600080fd5b50565b600081359050612213816121ed565b92915050565b60008060008060808587031215612233576122326119e9565b5b600061224187828801611a0a565b945050602061225287828801612204565b935050604061226387828801611a0a565b925050606061227487828801611a0a565b91505092959194509250565b600061228b82611860565b9050919050565b61229b81612280565b82525050565b60006020820190506122b66000830184612292565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b6000602082840312156123305761232f6119e9565b5b600061233e84828501612204565b91505092915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b61237c81612280565b82525050565b600061238e8383612373565b60208301905092915050565b6000602082019050919050565b60006123b282612347565b6123bc8185612352565b93506123c783612363565b8060005b838110156123f85781516123df8882612382565b97506123ea8361239a565b9250506001810190506123cb565b5085935050505092915050565b6000602082019050818103600083015261241f81846123a7565b905092915050565b60008115159050919050565b61243c81612427565b811461244757600080fd5b50565b60008151905061245981612433565b92915050565b600060208284031215612475576124746119e9565b5b60006124838482850161244a565b91505092915050565b600081905092915050565b82818337600083830152505050565b60006124b2838561248c565b93506124bf838584612497565b82840190509392505050565b60006124d88284866124a6565b91508190509392505050565b6124ed81612280565b81146124f857600080fd5b50565b60008151905061250a816124e4565b92915050565b600060208284031215612526576125256119e9565b5b6000612534848285016124fb565b91505092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600061257782611db2565b915061258283611db2565b9250827fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff038211156125b7576125b661253d565b5b828201905092915050565b600082825260208201905092915050565b600080fd5b60006125e483856125c2565b93507f07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff831115612617576126166125d3565b5b602083029250612628838584612497565b82840190509392505050565b6000819050919050565b600061264d6020840184612204565b905092915050565b61265e81611bf9565b811461266957600080fd5b50565b60008135905061267b81612655565b92915050565b6000612690602084018461266c565b905092915050565b6126a181611c17565b81146126ac57600080fd5b50565b6000813590506126be81612698565b92915050565b60006126d360208401846126af565b905092915050565b6126e481611c36565b81146126ef57600080fd5b50565b600081359050612701816126db565b92915050565b600061271660208401846126f2565b905092915050565b6080820161272f600083018361263e565b61273c6000850182611bea565b5061274a6020830183612681565b6127576020850182611c08565b5061276560408301836126c4565b6127726040850182611c27565b506127806060830183612707565b61278d6060850182611c52565b50505050565b600061279f838361271e565b60808301905092915050565b600082905092915050565b6000608082019050919050565b60006127cf8385611bc9565b93506127da82612634565b8060005b85811015612813576127f082846127ab565b6127fa8882612793565b9750612805836127b6565b9250506001810190506127de565b5085925050509392505050565b60006080820190506128356000830189611dbc565b6128426020830188612292565b81810360408301526128558186886125d8565b9050818103606083015261286a8184866127c3565b9050979650505050505050565b60006020828403121561288d5761288c6119e9565b5b600061289b848285016126af565b91505092915050565b600081356128b1816121ed565b80915050919050565b60008160001b9050919050565b600060ff6128d4846128ba565b9350801983169250808416831791505092915050565b60006129056129006128fb84611ae4565b611880565b611ae4565b9050919050565b6000819050919050565b61291f826128ea565b61293261292b8261290c565b83546128c7565b8255505050565b6000813561294681612655565b80915050919050565b60008160081b9050919050565b600063ffffff0061296c8461294f565b9350801983169250808416831791505092915050565b600061299d61299861299384611bf9565b611880565b611bf9565b9050919050565b6000819050919050565b6129b782612982565b6129ca6129c3826129a4565b835461295c565b8255505050565b600081356129de81612698565b80915050919050565b60008160201b9050919050565b600067ffffffff00000000612a08846129e7565b9350801983169250808416831791505092915050565b6000612a39612a34612a2f84611c17565b611880565b611c17565b9050919050565b6000819050919050565b612a5382612a1e565b612a66612a5f82612a40565b83546129f4565b8255505050565b60008135612a7a816126db565b80915050919050565b60008160401b9050919050565b600077ffffffffffffffffffffffffffffffff0000000000000000612ab484612a83565b9350801983169250808416831791505092915050565b6000612ae5612ae0612adb84611c36565b611880565b611c36565b9050919050565b6000819050919050565b612aff82612aca565b612b12612b0b82612aec565b8354612a90565b8255505050565b600081016000830180612b2b816128a4565b9050612b378184612916565b505050600081016020830180612b4c81612939565b9050612b5881846129ae565b505050600081016040830180612b6d816129d1565b9050612b798184612a4a565b505050600081016060830180612b8e81612a6d565b9050612b9a8184612af6565b5050505050565b612bab8282612b19565b5050565b600081905092915050565b6000612bc58261192e565b612bcf8185612baf565b9350612bdf81856020860161194a565b80840191505092915050565b6000819050919050565b612c06612c01826118fa565b612beb565b82525050565b6000612c188285612bba565b9150612c248284612bf5565b6020820191508190509392505050565b6000608082019050612c496000830187611904565b612c566020830186611af1565b612c636040830185611904565b612c706060830184611904565b9594505050505056fea26469706673582212204e20478e2e3070a20aa83127753a448e1b78b26fd4b44673d2f1b4027a2cf6be64736f6c634300080d0033",
+  "devdoc": {
+    "details": "Main contract for all on-chain data. Check `UmbrellaFeedsReader` to see how to integrate.",
+    "kind": "dev",
+    "methods": {
+      "constructor": {
+        "params": {
+          "_contractRegistry": "Registry address",
+          "_decimals": "decimals for prices stored in this contract",
+          "_requiredSignatures": "number of required signatures for accepting consensus submission"
+        }
+      },
+      "destroy(string)": {
+        "details": "destroys old contract there is sanity check that prevents abuse of destroy method",
+        "params": {
+          "_name": "string feed key to verify, that contract was initialised"
+        }
+      },
+      "getManyPriceData(bytes32[])": {
+        "details": "it will return array of price datas for provided `_keys` In case ony of feed does not exist, fallback call will be executed for that feed.",
+        "params": {
+          "_keys": "array of feed keys"
+        },
+        "returns": {
+          "data": "PriceData array"
+        }
+      },
+      "getManyPriceDataRaw(bytes32[])": {
+        "details": "same as getManyPriceData() but does not revert on empty data."
+      },
+      "getName()": {
+        "details": "to follow Registrable interface"
+      },
+      "getPrice(bytes32)": {
+        "params": {
+          "_key": "hash of feed name"
+        },
+        "returns": {
+          "price": "price"
+        }
+      },
+      "getPriceData(bytes32)": {
+        "details": "this is main endpoint for reading feeds. In case timestamp is empty (that means there is no data), contract will revert. If you do not need whole data from `PriceData` struct, you can save some gas by using other view methods that returns just what you need.",
+        "params": {
+          "_key": "hash of feed name"
+        },
+        "returns": {
+          "data": "full PriceData struct"
+        }
+      },
+      "getPriceDataByName(string)": {
+        "details": "This method should be used only for Layer2 as it is more gas consuming than others views.",
+        "params": {
+          "_name": "string feed name"
+        },
+        "returns": {
+          "data": "PriceData"
+        }
+      },
+      "getPriceTimestamp(bytes32)": {
+        "params": {
+          "_key": "hash of feed name"
+        },
+        "returns": {
+          "price": "price",
+          "timestamp": "timestamp"
+        }
+      },
+      "getPriceTimestampHeartbeat(bytes32)": {
+        "params": {
+          "_key": "hash of feed name"
+        },
+        "returns": {
+          "heartbeat": "heartbeat",
+          "price": "price",
+          "timestamp": "timestamp"
+        }
+      },
+      "hashData(bytes32[],(uint8,uint24,uint32,uint128)[])": {
+        "details": "helper method for QA purposes",
+        "returns": {
+          "_0": "hash of data that are signed by validators (keys and priced data)"
+        }
+      },
+      "prices(bytes32)": {
+        "params": {
+          "_key": "hash of feed name"
+        },
+        "returns": {
+          "data": "full PriceData struct"
+        }
+      },
+      "recoverSigner(bytes32,uint8,bytes32,bytes32)": {
+        "params": {
+          "_hash": "hashed of data",
+          "_r": "part of signature",
+          "_s": "part of signature",
+          "_v": "part of signature"
+        },
+        "returns": {
+          "_0": "signer address"
+        }
+      },
+      "update(bytes32[],(uint8,uint24,uint32,uint128)[],(uint8,bytes32,bytes32)[])": {
+        "details": "method for submitting consensus data",
+        "params": {
+          "_priceDatas": "PriceData signed by validators",
+          "_priceKeys": "array of keys for `_priceDatas`",
+          "_signatures": "validators signatures"
+        }
+      },
+      "verifySignatures(bytes32,(uint8,bytes32,bytes32)[])": {
+        "params": {
+          "_hash": "hash of signed data",
+          "_signatures": "array of validators signatures"
+        }
+      }
+    },
+    "stateVariables": {
+      "DECIMALS": {
+        "details": "decimals for prices stored in this contract"
+      },
+      "DEPLOYED_AT": {
+        "details": "deployment time, used for protect for unintentional destroy"
+      },
+      "REGISTRY": {
+        "details": "Registry contract where list of all addresses is stored. Fallback feature uses this registry to resolve newest `UmbrellaFeeds` address"
+      },
+      "REQUIRED_SIGNATURES": {
+        "details": "minimal number of signatures required for accepting price submission (PoA)"
+      },
+      "STAKING_BANK": {
+        "details": "StakingBank contract where list of validators is stored"
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getManyPriceData(bytes32[])": {
+        "notice": "If data for any key not exists, function will revert. Use `getManyPriceDataRaw` method if you don't want revert."
+      },
+      "getManyPriceDataRaw(bytes32[])": {
+        "notice": "This method does no revert if some data does not exists. Check `data.timestamp` to see if price exist, if it is 0, then it does not exist."
+      },
+      "getPrice(bytes32)": {
+        "notice": "method will revert if data for `_key` not exists."
+      },
+      "getPriceData(bytes32)": {
+        "notice": "method will revert if data for `_key` not exists."
+      },
+      "getPriceDataByName(string)": {
+        "notice": "It does not revert on empty data."
+      },
+      "getPriceTimestamp(bytes32)": {
+        "notice": "method will revert if data for `_key` not exists."
+      },
+      "getPriceTimestampHeartbeat(bytes32)": {
+        "notice": "method will revert if data for `_key` not exists."
+      },
+      "prices(bytes32)": {
+        "notice": "reader for mapping"
+      }
+    },
+    "notice": "This contract can be destroyed and replaced with new one (with new address). For best gas efficiency you should pick one of two ways of integration: 1. make `UmbrellaFeeds` immutable and use fallback in case of selfdestruct. After new deployment, it is recommended to update address to avoid fallback and reduce gas cost to minimum. In long run this is most efficient solution, better than any proxy. 2. always check newest `UmbrellaFeeds` via `Regostry` and fallback will not be needed.",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 4270,
+        "contract": "contracts/onChainFeeds/UmbrellaFeeds.sol:UmbrellaFeeds",
+        "label": "_prices",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_bytes32,t_struct(PriceData)3396_storage)"
+      }
+    ],
+    "types": {
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_bytes32,t_struct(PriceData)3396_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => struct IUmbrellaFeeds.PriceData)",
+        "numberOfBytes": "32",
+        "value": "t_struct(PriceData)3396_storage"
+      },
+      "t_struct(PriceData)3396_storage": {
+        "encoding": "inplace",
+        "label": "struct IUmbrellaFeeds.PriceData",
+        "members": [
+          {
+            "astId": 3386,
+            "contract": "contracts/onChainFeeds/UmbrellaFeeds.sol:UmbrellaFeeds",
+            "label": "data",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8"
+          },
+          {
+            "astId": 3389,
+            "contract": "contracts/onChainFeeds/UmbrellaFeeds.sol:UmbrellaFeeds",
+            "label": "heartbeat",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_uint24"
+          },
+          {
+            "astId": 3392,
+            "contract": "contracts/onChainFeeds/UmbrellaFeeds.sol:UmbrellaFeeds",
+            "label": "timestamp",
+            "offset": 4,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 3395,
+            "contract": "contracts/onChainFeeds/UmbrellaFeeds.sol:UmbrellaFeeds",
+            "label": "price",
+            "offset": 8,
+            "slot": "0",
+            "type": "t_uint128"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_uint128": {
+        "encoding": "inplace",
+        "label": "uint128",
+        "numberOfBytes": "16"
+      },
+      "t_uint24": {
+        "encoding": "inplace",
+        "label": "uint24",
+        "numberOfBytes": "3"
+      },
+      "t_uint32": {
+        "encoding": "inplace",
+        "label": "uint32",
+        "numberOfBytes": "4"
+      },
+      "t_uint8": {
+        "encoding": "inplace",
+        "label": "uint8",
+        "numberOfBytes": "1"
+      }
+    }
+  }
+}

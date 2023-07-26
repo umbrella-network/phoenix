@@ -56,7 +56,6 @@ contract OnchainDataCompareGasTest is DSTest {
         // _umbrellaFeeds_gasCost(FEEDS, abi.encodeWithSignature("getPriceData(bytes32)", KEY));
     }
 
-
     /*
     forge test -vvv --match-test test_gas_UmbrellaFeedsReader --fork-url https://api.avax-test.network/ext/bc/C/rpc
     */

@@ -35,9 +35,15 @@ task('registerStakingBankStatic', 'chain contract registration')
         return;
       }
 
-      const tx = await registry.importContracts([stakingBankStatic.address]);
-      console.log(`${STAKING_BANK_STATIC} (${stakingBankStatic.address}) registered, waiting for confirmation...`);
+      const nonce = await deployer.getTransactionCount('latest');
+      console.log({ nonce, from: deployer.address });
+
+      const tx = await registry.importContracts([stakingBankStatic.address], { nonce });
+      console.log(`${STAKING_BANK_STATIC} (${stakingBankStatic.address}) registered`);
+      console.log(`tx #${tx.nonce} ${tx.hash}, waiting for confirmation...`);
       await tx.wait(1);
+    } else {
+      console.log(`${STAKING_BANK_STATIC} up to date - OK`);
     }
 
     console.log('next steps:');

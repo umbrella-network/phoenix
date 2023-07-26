@@ -43,7 +43,7 @@ const localProviderData: ProviderData = {
 };
 
 const lineaTestnetProviderData: ProviderData = {
-  url: 'https://rpc.goerli.linea.build',
+  url: `https://linea-goerli.infura.io/v3/${INFURA_ID}`,
   chainId: chainId(59140)
 };
 

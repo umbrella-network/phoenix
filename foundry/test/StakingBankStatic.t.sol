@@ -15,16 +15,13 @@ contract StaticBankStaticTest is DSTest {
     mapping (address => string) locations;
 
     constructor() {
-        bank = new StakingBankStaticProd(18);
+        bank = new StakingBankStaticProd(15);
 
         locations[address(0x977Ba523420110e230643B772Fe9cF955e11dA7B)] = "https://validator.umb.network";
         locations[address(0xe2422b23e52bc13ebA04d7FbB9F332Deb43360fB)] = "https://validator2.umb.network";
         locations[address(0x220230Eda8f50067Dd9e4729345dabCCe0C61542)] = "https://umb.stakers.world";
-        locations[address(0xe868bE65C50b61E81A3fC5cB5A7916090B05eb2A)] = "https://razumv-umb.razumv.tech";
         locations[address(0x42e210b110c6aa49CdfA7ceF1444Aa4719653111)] = "https://umb.anorak.technology";
-        locations[address(0xB12c5DFA8693a5890c4b5B9145E3CAE1502f17f0)] = "https://markusrichard-umb.markusrichard.tech";
-        locations[address(0xe7129A4c7521452511249c26B018fEfbB10d108d)] = "https://santanika-umb.santanika.tech";
-        locations[address(0x57A51D5BDcE188c2295fCA3b4687475a54E65A02)] = "http://umbrella.klever.finance:3000";
+        locations[address(0x57A51D5BDcE188c2295fCA3b4687475a54E65A02)] = "http://5.161.78.230:3000";
         locations[address(0x8bF9661F1b247522C75DD0FE84355aD2EfF27144)] = "https://umb.hashquark.io";
         locations[address(0x501731c6a69803a53Ec6c3e12f293c247cE1092B)] = "https://umbrella.infstones.io";
         locations[address(0x281754Ab58391A478B7aA4E7f39991CfB41118c4)] = "http://umbrella.staking4all.org:3000";

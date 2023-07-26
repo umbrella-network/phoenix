@@ -6,7 +6,6 @@ import "../lib/CheatCodes.sol";
 import "../lib/Mock.sol";
 
 import "../../contracts/onChainFeeds/UmbrellaFeeds.sol";
-import "../../contracts/StakingBankState.sol";
 import "../../contracts/stakingBankStatic/StakingBankStatic.sol";
 import "../../contracts/stakingBankStatic/StakingBankStaticCI.sol";
 
@@ -68,21 +67,6 @@ contract SignerHelper is DSTest {
         for (uint256 i; i < _numSigs; i++) {
             (signatures[i].v, signatures[i].r, signatures[i].s) =
                 i == 0 ? cheats.sign(_pk(999), hash) : cheats.sign(_pk(i), hash);
-        }
-    }
-
-    function _signReset(
-        uint256 _numSigs,
-        UmbrellaFeeds _feeds,
-        bytes32[] memory _priceKeys
-    ) internal returns (IUmbrellaFeeds.Signature[] memory signatures) {
-        bytes32 resetHash = keccak256(abi.encode(_feeds.getChainId(), address(_feeds), _priceKeys, bytes32("RESET")));
-        bytes32 hash = keccak256(abi.encodePacked(_feeds.ETH_PREFIX(), resetHash));
-
-        signatures = new UmbrellaFeeds.Signature[](_numSigs);
-
-        for (uint256 i; i < _numSigs; i++) {
-            (signatures[i].v, signatures[i].r, signatures[i].s) = cheats.sign(_pk(i), hash);
         }
     }
 }

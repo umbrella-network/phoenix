@@ -35,8 +35,12 @@ task('registerUmbrellaFeeds', 'UmbrellaFeeds registration')
         return;
       }
 
-      const tx = await registry.importContracts([umbrellaFeeds.address]);
-      console.log(`${UMBRELLA_FEEDS} (${umbrellaFeeds.address}) registered, waiting for confirmation...`);
+      const nonce = await deployer.getTransactionCount('latest');
+      console.log({ nonce, from: deployer.address });
+
+      const tx = await registry.importContracts([umbrellaFeeds.address], { nonce });
+      console.log(`${UMBRELLA_FEEDS} (${umbrellaFeeds.address}) registered`);
+      console.log(`tx #${tx.nonce} ${tx.hash}, waiting for confirmation...`);
       await tx.wait(1);
     }
   });

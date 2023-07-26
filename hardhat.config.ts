@@ -200,6 +200,7 @@ const config: HardhatUserConfig = {
       url: getProviderData(LINEA_SANDBOX).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(LINEA_SANDBOX).chainId,
+      gasPrice: 'auto'
     },
     arbitrum_sandbox: {
       url: getProviderData(ARBITRUM_SANDBOX).url,
