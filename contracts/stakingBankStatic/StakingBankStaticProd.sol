@@ -21,9 +21,6 @@ contract StakingBankStaticProd is StakingBankStatic {
     address public constant VALIDATOR_12 = 0x57A51D5BDcE188c2295fCA3b4687475a54E65A02;
     address public constant VALIDATOR_13 = 0x777FbA3666fa7747476a34577FcCC404b263E09F;
     address public constant VALIDATOR_14 = 0x2F85824B2B38F179E451988670935d315b5b9692;
-    address public constant VALIDATOR_15 = 0xe868bE65C50b61E81A3fC5cB5A7916090B05eb2A;
-    address public constant VALIDATOR_16 = 0xB12c5DFA8693a5890c4b5B9145E3CAE1502f17f0;
-    address public constant VALIDATOR_17 = 0xe7129A4c7521452511249c26B018fEfbB10d108d;
 
     constructor(uint256 _validatorsCount) StakingBankStatic(_validatorsCount) {}
 
@@ -41,12 +38,9 @@ contract StakingBankStaticProd is StakingBankStatic {
         if (_id == VALIDATOR_9) return (_id, "https://umb.hashquark.io");
         if (_id == VALIDATOR_10) return (_id, "http://umbrella.staking4all.org:3000");
         if (_id == VALIDATOR_11) return (_id, "https://umbrella-api.validatrium.club");
-        if (_id == VALIDATOR_12) return (_id, "http://umbrella.klever.finance:3000");
+        if (_id == VALIDATOR_12) return (_id, "http://5.161.78.230:3000");
         if (_id == VALIDATOR_13) return (_id, "https://umbnode.blockchainliverpool.com");
         if (_id == VALIDATOR_14) return (_id, "https://umb-api.staking.rocks");
-        if (_id == VALIDATOR_15) return (_id, "https://razumv-umb.razumv.tech");
-        if (_id == VALIDATOR_16) return (_id, "https://markusrichard-umb.markusrichard.tech");
-        if (_id == VALIDATOR_17) return (_id, "https://santanika-umb.santanika.tech");
 
         return (address(0), "");
     }
@@ -69,9 +63,6 @@ contract StakingBankStaticProd is StakingBankStatic {
         list[12] = VALIDATOR_12;
         list[13] = VALIDATOR_13;
         list[14] = VALIDATOR_14;
-        list[15] = VALIDATOR_15;
-        list[16] = VALIDATOR_16;
-        list[17] = VALIDATOR_17;
 
         return list;
     }
@@ -93,9 +84,6 @@ contract StakingBankStaticProd is StakingBankStatic {
             || _validator == VALIDATOR_12
             || _validator == VALIDATOR_13
             || _validator == VALIDATOR_14
-            || _validator == VALIDATOR_15
-            || _validator == VALIDATOR_16
-            || _validator == VALIDATOR_17
         );
     }
 }
