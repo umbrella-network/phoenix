@@ -11,7 +11,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { toBytes32 } from '../scripts/utils/helpers';
 import { IUmbrellaFeeds, UmbrellaFeeds, UmbrellaFeeds__factory } from '../typechain';
 
-import { REGISTRY, STAKING_BANK, UMBRELLA_FEEDS } from '../constants';
+import { REGISTRY, ISTAKING_BANK, UMBRELLA_FEEDS } from '../constants';
 
 type PriceDataStruct = IUmbrellaFeeds.PriceDataStruct;
 
@@ -61,7 +61,7 @@ const setupForFeedsWithMocks = async (props: {
 
   const Registry = artifacts.readArtifactSync(REGISTRY);
   const UmbrellaFeed = artifacts.readArtifactSync(UMBRELLA_FEEDS);
-  const StakingBank = artifacts.readArtifactSync(STAKING_BANK);
+  const StakingBank = artifacts.readArtifactSync(ISTAKING_BANK);
 
   const requiredSignatures = props.requiredSignatures || 1;
 
