@@ -6,7 +6,7 @@ Prices are stored under a `key`. `key` is constant, and it is hash of feed name 
 
 ### Direct access
 
-It is recommended option, most gas effective.
+It is recommended option, most gas effective (check fallback section please).
 
 There is main contract called `UmbrellaFeeds` where all prices are submitted.
 Use `getPriceData(key)` method to get price data about specified `key`. Price data contains:
@@ -37,26 +37,30 @@ There is option to create dedicated contract reader that also provides chainlink
 
 ### Fallback
 
-Fallback is emergency feature. Its' job, is to make sure, that even when contract address will be updated you will be
-able to read data in transparent way.
+Fallback is emergency feature. Its' job, is to make sure, that even when contract will be updated and old one destroyed
+you will be able to read data in transparent way.
 It is almost as a proxy but cheaper in a long run.
 
-With proxy contract is forced to read `implementation` address all the time. With fallback, read for new address is
-done ONLY when it is needed and only int this case additional cost is added to the tx.
+With proxy, contract is forced to read `implementation` address all the time. With fallback, read for new address is
+done ONLY when it is needed and only then additional cost is added to the tx.
 
-Redeployments of contracts are very rare, so it is more effective to simply update contract address when it happens than
-paying additional fee all the time.
+`UmbrellaFeedsReader` came with fallback feature by default. If you are using `UmbrellaFeeds` directly, please follow
+`UmbrellaFeedsReader` as implementation example and create best way for reading data for your case.
 
-If data is not present in destination contract, fallback will resolve current contract (1 additional storage read) and
-will do a call to new contract for the data (second additional storage read).
+Redeployments of contracts are very rare, so it is more effective to simply set update contract address when it happens 
+than paying additional fee all the time.
+
+If data is not present in destination contract (contract destroyed), fallback will resolve current contract 
+(1 additional storage read) and will do a call to new contract for the data (second storage read).
 
 #### Used case 1 - with constant/immutable
 
 - use current `UmbrellaFeeds` (or `UmbrellaFeedsReader` if you are using reader, flow is exactly the same) address
   as immutable in your contract
 - your users benefit from lowest gas cost of reading data
-- in case `UmbrellaFeeds` changed, fallback will be used as emmergency solution
-- redeploy your contract with newest `UmbrellaFeeds` address to go back to cheapest way of reading data
+- in case `UmbrellaFeeds` changed, fallback will be used as emergency solution
+- redeploy your contract with newest `UmbrellaFeeds` address (or deploy new reader using factory to get up to date 
+  reader) to go back to the cheapest way of reading data
 
 #### Used case 2 - with registry
 
@@ -64,7 +68,7 @@ will do a call to new contract for the data (second additional storage read).
 - read current `UmbrellaFeeds` address from registry
 - do a call to `UmbrellaFeeds`
 
-No fallback
+No fallback is needed here, because you will always get newest contract address.
 
 How to resolve newest `UmbrellaFeeds` contract address:
 

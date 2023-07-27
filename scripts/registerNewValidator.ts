@@ -1,22 +1,8 @@
-import { artifacts } from 'hardhat';
 import { ethers, Contract } from 'ethers';
-import { formatEther } from 'ethers/lib/utils';
 import superagent from 'superagent';
 import { deployedContract } from './utils/deployedContracts';
-import { getProvider, pressToContinue, waitForTx } from './utils/helpers';
-import configuration from '../config';
-
-const provider = getProvider();
-const config = configuration();
 
 const { PEGASUS_VERSION } = process.env;
-
-const ERC20 = artifacts.readArtifactSync('ERC20');
-
-interface Validator {
-  id: string;
-  location: string;
-}
 
 interface ValidatorInfo {
   validator: string;
@@ -29,12 +15,12 @@ interface ValidatorInfo {
 
 let stakingBank: Contract;
 
-const resolveValidatorInfo = async (location: string): Promise<ValidatorInfo> => {
+export const resolveValidatorInfo = async (location: string): Promise<ValidatorInfo> => {
   const res = await superagent.get(`${location}/info`);
   return res.body;
 };
 
-const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
+export const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
   if (!ethers.utils.isAddress(info.validator)) {
     throw Error(`${info.validator} is not valid address`);
   }
@@ -55,27 +41,6 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
   console.log(`Chain ${info.chainContractAddress} OK`);
 
-  const balance = await provider.getBalance(info.validator);
-
-  if (balance.lt(`3${'0'.repeat(17)}`)) {
-    throw Error(`validator balance is too low: ${formatEther(balance)}`);
-  }
-
-  console.log(`validator balance: ${formatEther(balance)} OK`);
-
-  if (!config.token.address) {
-    throw Error('UMB token address empty');
-  }
-
-  const umb = new Contract(config.token.address, ERC20.abi, provider);
-  const umbBalance = await umb.balanceOf(info.validator);
-
-  if (umbBalance.lt(`100${'0'.repeat(18)}`)) {
-    throw Error(`validator UMB balance is too low: ${formatEther(umbBalance)}`);
-  }
-
-  console.log(`validator UMB balance: ${formatEther(umbBalance)} OK`);
-
   const registeredValidator = await stakingBank.validators(info.validator);
 
   if (registeredValidator.id !== ethers.constants.AddressZero) {
@@ -84,63 +49,3 @@ const checkValidator = async (info: ValidatorInfo): Promise<boolean> => {
 
   return true;
 };
-
-const registerNewValidator = async () => {
-  const location = process.env.NEW_VALIDATOR_LOCATION as string;
-  const stake = BigInt(process.env.NEW_VALIDATOR_STAKE as string) * BigInt(1e18);
-
-  if (!stake) {
-    throw Error(`stake value invalid: ${stake} UMB`);
-  }
-
-  console.log(`Adding new validator based on location: ${location} with stake of ${stake} UMB`);
-
-  stakingBank = await deployedContract('StakingBank');
-  const token = await deployedContract('UMB');
-
-  const info = await resolveValidatorInfo(location);
-  await checkValidator(info);
-
-  const validator: Validator = {
-    id: info.validator,
-    location,
-  };
-
-  if (!validator.id || !validator.location) {
-    throw Error('New validator has empty data, please setup env: NEW_VALIDATOR_LOCATION');
-  }
-
-  console.log('new validator:', validator);
-  console.log('stakingBank:', stakingBank.address);
-  console.log('token:', token.address);
-
-  const registeredValidator = await stakingBank.validators(validator.id);
-
-  if (registeredValidator.id !== ethers.constants.AddressZero) {
-    throw Error(`validator ${validator.id} already registered`);
-  }
-
-  let tx = await stakingBank.create(validator.id, validator.location);
-  await waitForTx(hre, tx.hash);
-  console.log('new validator created');
-
-  console.log('staking tokens');
-
-  try {
-    tx = await token.mintApproveAndStake(stakingBank.address, validator.id, stake.toString(10));
-    await waitForTx(hre, tx.hash);
-    console.log('mintApproveAndStake DONE');
-  } catch (e) {
-    console.log(e);
-    console.log('mintApproveAndStake not available, please stake manually');
-  }
-};
-
-pressToContinue('y', () => {
-  registerNewValidator()
-    .then(() => process.exit(0))
-    .catch((error) => {
-      console.error(error);
-      process.exit(1);
-    });
-});

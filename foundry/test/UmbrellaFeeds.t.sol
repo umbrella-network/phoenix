@@ -2,6 +2,7 @@ pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
 
+import "../../contracts/interfaces/IRegistry.sol";
 import "./SignerHelper.sol";
 
 /*
@@ -19,7 +20,7 @@ contract UmbrellaFeedsTest is SignerHelper {
     constructor() {
         registry = Mock.create("Registry");
 
-        cheats.mockCall(registry, abi.encodeCall(Registry.requireAndGetAddress, ("StakingBank")), abi.encode(bank));
+        cheats.mockCall(registry, abi.encodeCall(IRegistry.requireAndGetAddress, ("StakingBank")), abi.encode(bank));
         feeds = new UmbrellaFeeds(IRegistry(registry), 2, 8);
         feeds1 = new UmbrellaFeeds(IRegistry(registry), 1, 8);
         feeds6 = new UmbrellaFeeds(IRegistry(registry), 6, 8);
@@ -29,20 +30,6 @@ contract UmbrellaFeedsTest is SignerHelper {
 
         priceDatas.push(IUmbrellaFeeds.PriceData(0, 86400, 1683410179, 1409031));
         priceDatas.push(IUmbrellaFeeds.PriceData(0, 86400, 1683410179, 124760000));
-    }
-
-    function test_UmbrellaFeeds_getPrice_failWhenNoPriceAndNoFallback() public {
-        cheats.mockCall(registry, abi.encodeCall(Registry.getAddressByString, (feeds.NAME())), abi.encode(address(feeds)));
-
-        cheats.expectRevert(UmbrellaFeeds.FeedNotExist.selector);
-        feeds.getPriceData(bytes32(0));
-    }
-
-    function test_UmbrellaFeeds_getPrice_failWhenNoPriceWithFallback() public {
-        cheats.mockCall(registry, abi.encodeCall(Registry.getAddressByString, (feeds.NAME())), abi.encode(address(feeds1)));
-
-        cheats.expectRevert(UmbrellaFeeds.FeedNotExist.selector);
-        feeds.getPriceData(bytes32(0));
     }
 
     /*
@@ -65,7 +52,7 @@ contract UmbrellaFeedsTest is SignerHelper {
         uint256 gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 2 signatures (initial):", gasUsed);
-        assertEq(gasUsed, 41595);
+        assertEq(gasUsed, 41286);
 
         datas2[0] = IUmbrellaFeeds.PriceData(0, datas[0].heartbeat, datas[0].timestamp + 2, datas[0].price + 10e8);
         sigs = _signData(2, feeds, keys, datas2);
@@ -75,21 +62,21 @@ contract UmbrellaFeedsTest is SignerHelper {
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 2 signatures (#2):", gasUsed);
-        assertEq(gasUsed, 17175);
+        assertEq(gasUsed, 16866);
 
         gasStart = gasleft();
         feeds1.update(keys, datas, sigs1);
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 1 signature (initial):", gasUsed);
-        assertEq(gasUsed, 33805);
+        assertEq(gasUsed, 33496);
 
         gasStart = gasleft();
         feeds6.update(keys, datas, sigs6);
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 6 signature (initial):", gasUsed);
-        assertEq(gasUsed, 60164);
+        assertEq(gasUsed, 59855);
 
         sigs6 = _signData(6, feeds6, keys, datas2);
 
@@ -98,7 +85,7 @@ contract UmbrellaFeedsTest is SignerHelper {
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 6 signature (#2):", gasUsed);
-        assertEq(gasUsed, 38295);
+        assertEq(gasUsed, 37986);
 
         gasStart = gasleft();
         IUmbrellaFeeds.PriceData memory result = feeds.getPriceData(keys[0]);
@@ -106,7 +93,7 @@ contract UmbrellaFeedsTest is SignerHelper {
 
         emit log_named_uint("gas used to read price directly:", gasUsed);
         emit log_named_uint("result:", result.price);
-        assertEq(gasUsed, 1951);
+        assertEq(gasUsed, 1902);
     }
 
     /*
@@ -115,7 +102,7 @@ contract UmbrellaFeedsTest is SignerHelper {
     function test_UmbrellaFeeds_getManyPriceDataRaw_whenNoData() public {
         emit log_address(address(feeds));
 
-        cheats.mockCall(registry, abi.encodeCall(Registry.getAddress, ("UmbrellaFeeds")), abi.encode(address(feeds)));
+        cheats.mockCall(registry, abi.encodeCall(IRegistry.getAddress, ("UmbrellaFeeds")), abi.encode(address(feeds)));
         UmbrellaFeeds.PriceData[] memory data = feeds.getManyPriceDataRaw(priceKeys);
 
         for (uint256 i; i < data.length; i++) {
@@ -124,17 +111,22 @@ contract UmbrellaFeedsTest is SignerHelper {
     }
 
     /*
-    forge test -vvv --match-test test_UmbrellaFeeds_getPrice_withFallback
+    forge test -vvv --match-test test_UmbrellaFeeds_destroy_failWhenNoData
     */
-    function test_UmbrellaFeeds_getPrice_withFallback() public {
-        _executeUpdate(feeds1);
+    function test_UmbrellaFeeds_destroy_failWhenNoData() public {
+        cheats.mockCall(registry, abi.encodeCall(IRegistry.getAddressByString, (feeds.NAME())), abi.encode(address(1)));
+        cheats.expectRevert(UmbrellaFeeds.ContractNotInitialised.selector);
+        feeds.destroy("no-data");
+    }
 
-        UmbrellaFeeds.PriceData memory expectedData = priceDatas[0];
+    /*
+    forge test -vvv --match-test test_UmbrellaFeeds_destroy_failWhenContractInUse
+    */
+    function test_UmbrellaFeeds_destroy_failWhenContractInUse() public {
+        cheats.mockCall(registry, abi.encodeCall(IRegistry.getAddressByString, (feeds.NAME())), abi.encode(address(feeds)));
 
-        cheats.mockCall(registry, abi.encodeCall(Registry.getAddressByString, (feeds.NAME())), abi.encode(address(feeds1)));
-        UmbrellaFeeds.PriceData memory data = feeds.getPriceData(priceKeys[0]);
-
-        assertEq(data.price, expectedData.price);
+        cheats.expectRevert(UmbrellaFeeds.ContractInUse.selector);
+        feeds.destroy("UMB-USD");
     }
 
     /*
@@ -143,7 +135,7 @@ contract UmbrellaFeedsTest is SignerHelper {
     function test_UmbrellaFeeds_getPrice_withFallbackAddress0() public {
         _executeUpdate(feeds1);
 
-        cheats.mockCall(registry, abi.encodeCall(Registry.getAddressByString, (feeds.NAME())), abi.encode(address(0)));
+        cheats.mockCall(registry, abi.encodeCall(IRegistry.getAddressByString, (feeds.NAME())), abi.encode(address(0)));
 
         cheats.expectRevert();
         UmbrellaFeeds.PriceData memory data = feeds.getPriceData(priceKeys[0]);
@@ -211,38 +203,6 @@ contract UmbrellaFeedsTest is SignerHelper {
 
         cheats.expectRevert(UmbrellaFeeds.NotEnoughSignatures.selector);
         feeds.update(priceKeys, priceDatas, onesignature);
-    }
-
-    /*
-    forge test -vvv --match-test test_UmbrellaFeeds_reset
-    */
-    function test_UmbrellaFeeds_reset() public {
-        feeds.update(priceKeys, priceDatas, _signData(2, feeds, priceKeys, priceDatas));
-
-        assert(feeds.prices(priceKeys[0]).price != 0);
-        assert(feeds.prices(priceKeys[1]).price != 0);
-
-        bytes32[] memory toRemove = new bytes32[](1);
-        toRemove[0] = priceKeys[1];
-
-        UmbrellaFeeds.Signature[] memory signatures = _signReset(2, feeds, toRemove);
-
-        feeds.reset(toRemove, signatures);
-
-        assert(feeds.prices(priceKeys[0]).price != 0);
-        assert(feeds.prices(priceKeys[1]).price == 0);
-    }
-
-    function test_UmbrellaFeeds_failWhenWantToUpdateResetedData() public {
-        UmbrellaFeeds.Signature[] memory oldSignatures = _signData(2, feeds, priceKeys, priceDatas);
-        feeds.update(priceKeys, priceDatas, oldSignatures);
-
-        UmbrellaFeeds.Signature[] memory signatures = _signReset(2, feeds, priceKeys);
-
-        feeds.reset(priceKeys, signatures);
-
-        cheats.expectRevert(UmbrellaFeeds.DataReset.selector);
-        feeds.update(priceKeys, priceDatas, oldSignatures);
     }
 
     function _executeUpdate(UmbrellaFeeds _feeds) internal {
