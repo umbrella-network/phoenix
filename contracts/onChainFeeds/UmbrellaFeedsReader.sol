@@ -82,6 +82,11 @@ contract UmbrellaFeedsReader {
         )
     {
         IUmbrellaFeeds.PriceData memory priceData = _getPriceDataRaw();
+
+        if (priceData.timestamp == 0) {
+            priceData = _fallbackCall();
+        }
+
         return (0, int256(uint256(priceData.price)), 0, priceData.timestamp, 0);
     }
 
