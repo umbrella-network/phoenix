@@ -4,4 +4,6 @@ export * from './registerStakingBankStatic';
 export * from './registerUmbrellaFeeds';
 export * from './registerUmbrellaFeedsReaderFactory';
 export * from './lineaVerifyCode';
+export * from './staticBankDeploymentVerification';
+export * from './staticBankDeploymentVerificationAfter';
 export * from './debug';

@@ -6,6 +6,8 @@ import { verifyCode } from '../../scripts/utils/verifyContract';
 import { checkStakingBankStaticUpdated } from '../_helpers/checkStakingBankStaticUpdated';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  return;
+
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();

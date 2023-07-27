@@ -23,7 +23,7 @@ import {
   AVALANCHE_STAGING,
   BNB, BNB_PRODUCTION, BNB_SANDBOX,
   BNB_STAGING, ETH, ETH_PRODUCTION, ETH_SANDBOX,
-  ETH_STAGING, LINEA_SANDBOX, LINEA_STAGING,
+  ETH_STAGING, LINEA_PRODUCTION, LINEA_SANDBOX, LINEA_STAGING,
   LOCALHOST, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
@@ -266,7 +266,13 @@ const config: HardhatUserConfig = {
       chainId: getProviderData(POLYGON_PRODUCTION).chainId,
       live: true,
       gasMultiplier: 2,
-      blockGasLimit: 40_000_000,
+      blockGasLimit: 40_000_000
+    },
+    linea_production: {
+      url: getProviderData(LINEA_PRODUCTION).url,
+      accounts: getPrivteKeys(PROD_PK),
+      chainId: getProviderData(LINEA_PRODUCTION).chainId,
+      live: true
     },
     docker: {
       url: 'http://eth:8545',
@@ -292,9 +298,9 @@ const config: HardhatUserConfig = {
       },
       {
         network: 'linea',
-        chainId: 111,
+        chainId: 59144,
         urls: {
-          apiURL: 'https://lineascan.build/apis#contracts',
+          apiURL: 'https://api.lineascan.build/api',
           browserURL: 'https://lineascan.build/'
         }
       }
