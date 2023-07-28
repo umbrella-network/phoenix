@@ -35,7 +35,10 @@ task('registerReaderFactory', 'UmbrellaFeedsReaderFactory registration')
         return;
       }
 
-      const tx = await registry.importContracts([factory.address]);
+      const nonce = await deployer.getTransactionCount('latest');
+      console.log({ nonce, from: deployer.address });
+
+      const tx = await registry.importContracts([factory.address], { nonce });
       console.log(`${UMBRELLA_FEEDS_READER_FACTORY} (${factory.address}) registered, waiting for confirmation...`);
       await tx.wait(1);
     }

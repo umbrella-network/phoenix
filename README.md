@@ -167,9 +167,6 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 
 On blockchain where we do have L2 consensus:
 
-linea_staging | avalanche_staging | polygon_staging
-linea_sandbox | avalanche_sandbox | polygon_sandbox
-
 ```shell
 npx hardhat deploy --network linea_sandbox
 npx hardhat registerStakingBankStatic --network linea_sandbox
@@ -177,7 +174,7 @@ npx hardhat registerStakingBankStatic --network linea_sandbox
 npx hardhat deploy --network linea_sandbox
 
 npx hardhat registerChain --network linea_sandbox
-npx hardhat registerUmbrellaFeeds --network linea_sandbox
+npx hardhat registerUmbrellaFeeds --destroy x --network linea_sandbox 
 npx hardhat registerReaderFactory --network linea_sandbox
 ```
 

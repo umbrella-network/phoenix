@@ -2,7 +2,7 @@ import {
   ARBITRUM_PRODUCTION,
   AVALANCHE_PRODUCTION,
   BNB_PRODUCTION,
-  ETH_PRODUCTION,
+  ETH_PRODUCTION, LINEA_PRODUCTION,
   LOCALHOST,
   POLYGON_PRODUCTION
 } from './networks';
@@ -39,6 +39,7 @@ export function getPrivteKeys(network = ''): string[] {
     case BNB_PRODUCTION:
     case POLYGON_PRODUCTION:
     case ETH_PRODUCTION:
+    case LINEA_PRODUCTION:
       return prodAccounts;
 
     default: return localAccounts;
