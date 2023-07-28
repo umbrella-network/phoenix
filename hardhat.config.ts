@@ -266,7 +266,7 @@ const config: HardhatUserConfig = {
       chainId: getProviderData(POLYGON_PRODUCTION).chainId,
       live: true,
       gasMultiplier: 2,
-      blockGasLimit: 40_000_000
+      blockGasLimit: 40_000_000,
     },
     linea_production: {
       url: getProviderData(LINEA_PRODUCTION).url,

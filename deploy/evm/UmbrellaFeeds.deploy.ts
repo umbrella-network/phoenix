@@ -8,7 +8,12 @@ import { umbrellaFeedsDeploymentData } from '../deploymentsData/umbrellaFeeds';
 import { checkStakingBankStaticUpdated } from '../_helpers/checkStakingBankStaticUpdated';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  return;
+  if (!hre.network.name.includes('linea') && !hre.network.name.includes('polygon')) {
+    console.log('-'.repeat(80));
+    console.log(`${UMBRELLA_FEEDS} is not supported on ${hre.network.name}`);
+    console.log('-'.repeat(80));
+    return;
+  }
 
   const { deployments, getNamedAccounts } = hre;
   const { deploy, read } = deployments;
