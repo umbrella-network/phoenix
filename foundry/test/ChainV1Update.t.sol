@@ -4,10 +4,14 @@ import "ds-test/test.sol";
 
 import "../../contracts/Registry.sol";
 import "../../contracts/Chain.sol";
-import "../../contracts/StakingBank.sol";
+import "../../contracts/interfaces/IStakingBank.sol";
 import "../lib/CheatCodes.sol";
 import "../lib/Mock.sol";
 import "./mocks/BaseChainV1.sol";
+
+interface IRegistrable {
+    function getName() external view returns (string memory);
+}
 
 // I wasn't able to mock this call:
 // IBaseChainV1(address(oldChain)).getBlockTimestamp(latestId);
@@ -75,7 +79,7 @@ contract ChainV1UpdateTest is DSTest {
 
         stakingBank = Mock.create("IStakingBank");
         addresses[0] = stakingBank;
-        cheats.mockCall(stakingBank, abi.encodeCall(StakingBank.getName, ()), abi.encode(bytes32("StakingBank")));
+        cheats.mockCall(stakingBank, abi.encodeCall(IRegistrable.getName, ()), abi.encode(bytes32("StakingBank")));
         registry.importContracts(addresses);
 
         chainV1 = new BaseChainV1(1);

@@ -13,7 +13,7 @@ use(waffleChai);
 
 const Chain = artifacts.readArtifactSync('Chain');
 const Registry = artifacts.readArtifactSync('Registry');
-const StakingBank = artifacts.readArtifactSync('StakingBank');
+const StakingBank = artifacts.readArtifactSync('IStakingBank');
 
 describe('Tree', () => {
   let contract: Contract;

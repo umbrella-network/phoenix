@@ -23,7 +23,7 @@ import {
   AVALANCHE_STAGING,
   BNB, BNB_PRODUCTION, BNB_SANDBOX,
   BNB_STAGING, ETH, ETH_PRODUCTION, ETH_SANDBOX,
-  ETH_STAGING,
+  ETH_STAGING, LINEA_PRODUCTION, LINEA_SANDBOX, LINEA_STAGING,
   LOCALHOST, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
@@ -43,6 +43,7 @@ const {
   POLYGONSCAN_API = '',
   AVASCAN_API = '',
   ARBISCAN_API = '',
+  LINEASCAN_API = '',
   FORKING_ENV,
   FORKING_BLOCK_NUMBER,
   CHAIN_ID
@@ -67,6 +68,8 @@ const apiKey = (): string | Record<string, string> => {
     // avalanche
     'avalanche': AVASCAN_API,
     'avalancheFujiTestnet': AVASCAN_API,
+    'lineatestnet': LINEASCAN_API,
+    'linea': LINEASCAN_API,
   };
 };
 
@@ -158,6 +161,11 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
       deploy: ['deploy/evm'],
     },
+    linea_staging: {
+      url: getProviderData(LINEA_STAGING).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(LINEA_STAGING).chainId,
+    },
     avalanche_staging: {
       url: getProviderData(AVALANCHE_STAGING).url,
       accounts: getPrivteKeys(LOCALHOST),
@@ -186,6 +194,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(ARBITRUM_STAGING).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(ARBITRUM_STAGING).chainId,
+      gasPrice: 'auto'
+    },
+    linea_sandbox: {
+      url: getProviderData(LINEA_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(LINEA_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     arbitrum_sandbox: {
@@ -254,6 +268,12 @@ const config: HardhatUserConfig = {
       gasMultiplier: 2,
       blockGasLimit: 40_000_000,
     },
+    linea_production: {
+      url: getProviderData(LINEA_PRODUCTION).url,
+      accounts: getPrivteKeys(PROD_PK),
+      chainId: getProviderData(LINEA_PRODUCTION).chainId,
+      live: true
+    },
     docker: {
       url: 'http://eth:8545',
     },
@@ -266,7 +286,25 @@ const config: HardhatUserConfig = {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://bscscan.com/
-    apiKey: apiKey()
+    apiKey: apiKey(),
+    customChains: [
+      {
+        network: 'lineatestnet',
+        chainId: 59140,
+        urls: {
+          apiURL: 'https://api-testnet.lineascan.build/api',
+          browserURL: 'https://goerli.lineascan.build'
+        }
+      },
+      {
+        network: 'linea',
+        chainId: 59144,
+        urls: {
+          apiURL: 'https://api.lineascan.build/api',
+          browserURL: 'https://lineascan.build/'
+        }
+      }
+    ]
   },
   gasReporter: {
     gasPrice: 1,
@@ -286,8 +324,14 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.8.13'
-      },
+        version: '0.8.13',
+        settings: {
+          optimizer: {
+            enabled: false,
+            runs: 0,
+          },
+        },
+      }
     ]
   },
   namedAccounts: {

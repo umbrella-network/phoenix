@@ -7,7 +7,7 @@ const config = configuration();
 const provider = hre.ethers.provider;
 
 const Registry = artifacts.readArtifactSync('Registry');
-const StakingBank = artifacts.readArtifactSync('StakingBank');
+const StakingBank = artifacts.readArtifactSync('IStakingBank');
 const Chain = artifacts.readArtifactSync('Chain');
 const Token = artifacts.readArtifactSync('Token');
 
@@ -17,7 +17,7 @@ export const deployedRegistry = async (): Promise<Contract> => {
   );
 };
 
-export const deployedContract = async (name: 'StakingBank' | 'UMB' | 'Chain'): Promise<Contract> => {
+export const deployedContract = async (name: 'IStakingBank' | 'UMB' | 'Chain'): Promise<Contract> => {
   const address = await (await deployedRegistry()).getAddressByString(name);
   let abi;
 

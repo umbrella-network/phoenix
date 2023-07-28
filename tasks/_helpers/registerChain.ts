@@ -104,12 +104,16 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment, gasPrice?: n
 
     const registryIface = new ethers.utils.Interface(registryDeployments.abi);
 
+    const nonce = await deployer.getTransactionCount('latest');
+    console.log({ nonce, from: deployer.address });
+
     try {
       await deployer.sendTransaction({
         to: registry.address,
         value: 0,
         data: registryIface.encodeFunctionData(method, [args]),
         gasPrice,
+        nonce,
       });
     } catch (e) {
       if (atomicUpdate != method) {

@@ -4,6 +4,7 @@ out = 'foundry/out'
 libs = ['lib']
 test = 'foundry/test'
 cache = true
+gas_reports = ["*"]
 
 [hardhat]
 src = "contracts"

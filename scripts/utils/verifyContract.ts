@@ -20,6 +20,7 @@ export const verifyCode = async (
     } catch (e: unknown) {
       console.log((<Error>e).message);
       if ((<Error>e).message.toLowerCase().includes('already verified')) break;
+      if ((<Error>e).message.toLowerCase().includes("doesn't recognize it as a supported chain")) break;
       console.log('retrying in 5 sec...');
       await sleep(5000);
     }

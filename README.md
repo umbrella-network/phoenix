@@ -1,9 +1,12 @@
 # phoenix
-A delegated proof-of-stake contract for minting sidechain blocks.
+A delegated proof-of-authority contract for minting sidechain blocks.
 
 ## Overview
 Each block is signed by a set of validators.
 A minimum stake quorum must be achieved in order for a sidechain block to be mined.
+
+- [Multichain docs](./MASTERCHAIN.md)
+- [On-chain docs](./ON-CHAIN.md)
 
 ## Prerequisites
 
@@ -158,6 +161,52 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 ```
 
 
+### On-Chain data
+
+#### Deployments
+
+On blockchain where we do have L2 consensus:
+
+```shell
+npx hardhat deploy --network linea_sandbox
+npx hardhat registerStakingBankStatic --network linea_sandbox
+# just in case chain needs to be redeployed
+npx hardhat deploy --network linea_sandbox
+
+npx hardhat registerChain --network linea_sandbox
+npx hardhat registerUmbrellaFeeds --destroy x --network linea_sandbox 
+npx hardhat registerReaderFactory --network linea_sandbox
+```
+
+On blockchain with only on-chain data:
+
+```
+npx hardhat deploy --network linea_staging
+
+npx hardhat registerStakingBankStatic --network linea_staging
+npx hardhat registerUmbrellaFeeds --network linea_staging
+npx hardhat registerReaderFactory --network linea_staging
+```
+
+#### Code verification on Linea
+
+At the moment of developing hardhat verification not supporting linea, hardhat flattener was not working all the time.
+
+Here are steps that seems to be working always:
+
+```
+# we need deploy to other network and verify code there
+
+# UmbrellaFeedsReader
+npx hardhat verify --network avalanche_staging 0x206953BAaEB74226D81059ffD67BC42f2cf8cF5f --constructor-args ./arguments.js
+npx hardhat linea-verify --network avalanche_staging --address 0x206953BAaEB74226D81059ffD67BC42f2cf8cF5f --name UmbrellaFeedsReader
+
+npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeeds  
+npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeedsReaderFactory  
+```
+
+As result of `linea-verify`, stardard JSON file is created. Use it to verify contract on linea.
+
 ### Distributor
 
 Only for testnets
@@ -180,26 +229,6 @@ cd ../pegasus
 # start hardhat network with contracts
 echo 'BLOCKCHAIN_PROVIDER_URL=http://eth:8545' >> .env
 docker-compose up
-```
-
-## Troubleshoot for avalanche
-
-In order to make hardhat work with avalanche, please edit this file:
-
-`node_modules/@nomiclabs/hardhat-etherscan/dist/src/network/prober.js`
-
-```aidl
-    NetworkID[NetworkID["AVALANCHE"] = 43114] = "AVALANCHE";
-    NetworkID[NetworkID["AVALANCHE_FUJI_TESTNET"] = 43113] = "AVALANCHE_FUJI_TESTNET";
-
-    [NetworkID.AVALANCHE]: {
-        apiURL: "https://api.snowtrace.io/api",
-        browserURL: "https://snowtrace.io/",
-    },
-    [NetworkID.AVALANCHE_FUJI_TESTNET]: {
-        apiURL: "https://api-testnet.snowtrace.io/api",
-        browserURL: "https://testnet.snowtrace.io/",
-    },
 ```
 
 ## Licensed under MIT.

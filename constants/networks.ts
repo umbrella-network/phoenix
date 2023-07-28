@@ -5,6 +5,8 @@ export const BNB_SANDBOX = 'bnb_sandbox';
 export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
 
+export const LINEA_STAGING = 'linea_staging';
+export const LINEA_SANDBOX = 'linea_sandbox';
 export const ARBITRUM_STAGING = 'arbitrum_staging';
 export const AVALANCHE_STAGING = 'avalanche_staging';
 export const BNB_STAGING = 'bnb_staging';
@@ -21,6 +23,7 @@ export const AVALANCHE_PRODUCTION = 'avalanche_production';
 export const ETH_PRODUCTION = 'eth_production';
 export const POLYGON_PRODUCTION = 'polygon_production';
 export const BNB_PRODUCTION = 'bnb_production';
+export const LINEA_PRODUCTION = 'linea_production';
 
 
 export const MASTER_CHAIN_NAME = BNB;

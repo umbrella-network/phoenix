@@ -519,11 +519,11 @@ describe('Chain', () => {
               expect(blockIds.length).gt(1);
 
               await expect(contract.verifyProofs([blockIds[0]], proofs, proofItemsCounter, leaves)).to.revertedWith(
-                'out-of-bounds or negative index'
+                'panic code 50'
               );
 
               await expect(contract.verifyProofs(blockIds, proofs, [proofItemsCounter[0]], leaves)).to.revertedWith(
-                'out-of-bounds or negative index'
+                'panic code 50'
               );
 
               const verified = await contract.verifyProofs(blockIds, proofs, proofItemsCounter, [leaves[0]]);

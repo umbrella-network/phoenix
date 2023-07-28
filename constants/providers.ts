@@ -1,12 +1,24 @@
 import {
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
-  ARBITRUM_STAGING, AVALANCHE_PRODUCTION, AVALANCHE_SANDBOX,
-  AVALANCHE_STAGING, BNB,
+  ARBITRUM_STAGING,
+  AVALANCHE_PRODUCTION,
+  AVALANCHE_SANDBOX,
+  AVALANCHE_STAGING,
+  BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING, ETH_PRODUCTION, ETH_SANDBOX, ETH_STAGING, FORKED_BNB_ID, FORKED_ETH_ID,
-  POLYGON_PRODUCTION, POLYGON_SANDBOX,
+  BNB_STAGING,
+  ETH_PRODUCTION,
+  ETH_SANDBOX,
+  ETH_STAGING,
+  FORKED_BNB_ID,
+  FORKED_ETH_ID,
+  LINEA_PRODUCTION,
+  LINEA_SANDBOX,
+  LINEA_STAGING,
+  POLYGON_PRODUCTION,
+  POLYGON_SANDBOX,
   POLYGON_STAGING
 } from './networks';
 
@@ -40,6 +52,11 @@ export const forkingChainId = (): number => {
 const localProviderData: ProviderData = {
   url: 'http://localhost:8545',
   chainId: forkingChainId()
+};
+
+const lineaTestnetProviderData: ProviderData = {
+  url: `https://linea-goerli.infura.io/v3/${INFURA_ID}`,
+  chainId: chainId(59140)
 };
 
 const arbitrumTestnetProviderData: ProviderData = {
@@ -93,8 +110,17 @@ const ethMainnetProviderData: ProviderData = {
   chainId: chainId(1)
 };
 
+const lineaMainnetProviderData: ProviderData = {
+  url: `https://linea-mainnet.infura.io/v3/${INFURA_ID}`,
+  chainId: chainId(59144)
+};
+
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
+    case LINEA_STAGING:
+    case LINEA_SANDBOX:
+      return lineaTestnetProviderData;
+
     case ARBITRUM_STAGING:
     case ARBITRUM_SANDBOX:
       return arbitrumTestnetProviderData;
@@ -129,6 +155,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
 
     case ETH_PRODUCTION:
       return ethMainnetProviderData;
+
+    case LINEA_PRODUCTION:
+      return lineaMainnetProviderData;
   }
 
   throw new Error(`${networkName} not supported`);
