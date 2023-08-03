@@ -20,7 +20,7 @@ import {
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
   ARBITRUM_STAGING, AVALANCHE_PRODUCTION, AVALANCHE_SANDBOX,
-  AVALANCHE_STAGING,
+  AVALANCHE_STAGING, BASE_STAGING,
   BNB, BNB_PRODUCTION, BNB_SANDBOX,
   BNB_STAGING, ETH, ETH_PRODUCTION, ETH_SANDBOX,
   ETH_STAGING, LINEA_PRODUCTION, LINEA_SANDBOX, LINEA_STAGING,
@@ -70,6 +70,7 @@ const apiKey = (): string | Record<string, string> => {
     'avalancheFujiTestnet': AVASCAN_API,
     'lineatestnet': LINEASCAN_API,
     'linea': LINEASCAN_API,
+    'base-goerli': 'PLACEHOLDER_STRING'
   };
 };
 
@@ -165,6 +166,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(LINEA_STAGING).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(LINEA_STAGING).chainId,
+    },
+    base_staging: {
+      url: getProviderData(BASE_STAGING).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(BASE_STAGING).chainId,
+      gasMultiplier: 1.5
     },
     avalanche_staging: {
       url: getProviderData(AVALANCHE_STAGING).url,
@@ -302,6 +309,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.lineascan.build/api',
           browserURL: 'https://lineascan.build/'
+        }
+      },
+      {
+        network: 'base-goerli',
+        chainId: 84531,
+        urls: {
+          apiURL: 'https://api-goerli.basescan.org/api',
+          browserURL: 'https://goerli.basescan.org'
         }
       }
     ]
