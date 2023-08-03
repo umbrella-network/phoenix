@@ -6,6 +6,9 @@ export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
 
 export const LINEA_STAGING = 'linea_staging';
+export const BASE_STAGING = 'base_staging';
+export const BASE_SANDBOX = 'base_sandbox';
+export const BASE_PRODUCTION = 'base_production';
 export const LINEA_SANDBOX = 'linea_sandbox';
 export const ARBITRUM_STAGING = 'arbitrum_staging';
 export const AVALANCHE_STAGING = 'avalanche_staging';

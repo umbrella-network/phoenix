@@ -4,9 +4,10 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import { REGISTRY, UMBRELLA_FEEDS, UMBRELLA_FEEDS_READER_FACTORY } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { checkStakingBankStaticUpdated } from '../_helpers/checkStakingBankStaticUpdated';
+import { onChainSupportedBlockchains } from '../_helpers/onChainSupportedBlockchains';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  if (!hre.network.name.includes('linea') && !hre.network.name.includes('polygon')) {
+  if (!onChainSupportedBlockchains(hre)) {
     console.log('-'.repeat(80));
     console.log(`${UMBRELLA_FEEDS_READER_FACTORY} is not supported on ${hre.network.name}`);
     console.log('-'.repeat(80));

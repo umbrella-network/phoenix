@@ -4,7 +4,7 @@ import {
   ARBITRUM_STAGING,
   AVALANCHE_PRODUCTION,
   AVALANCHE_SANDBOX,
-  AVALANCHE_STAGING,
+  AVALANCHE_STAGING, BASE_PRODUCTION, BASE_SANDBOX, BASE_STAGING,
   BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
@@ -57,6 +57,11 @@ const localProviderData: ProviderData = {
 const lineaTestnetProviderData: ProviderData = {
   url: `https://linea-goerli.infura.io/v3/${INFURA_ID}`,
   chainId: chainId(59140)
+};
+
+const baseTestnetProviderData: ProviderData = {
+  url: 'https://base-goerli.public.blastapi.io',
+  chainId: chainId(84531)
 };
 
 const arbitrumTestnetProviderData: ProviderData = {
@@ -115,11 +120,20 @@ const lineaMainnetProviderData: ProviderData = {
   chainId: chainId(59144)
 };
 
+const baseMainnetProviderData: ProviderData = {
+  url: 'https://base-mainnet.public.blastapi.io',
+  chainId: chainId(8453)
+};
+
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
     case LINEA_STAGING:
     case LINEA_SANDBOX:
       return lineaTestnetProviderData;
+
+    case BASE_STAGING:
+    case BASE_SANDBOX:
+      return baseTestnetProviderData;
 
     case ARBITRUM_STAGING:
     case ARBITRUM_SANDBOX:
@@ -158,6 +172,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
 
     case LINEA_PRODUCTION:
       return lineaMainnetProviderData;
+
+    case BASE_PRODUCTION:
+      return baseMainnetProviderData;
   }
 
   throw new Error(`${networkName} not supported`);
