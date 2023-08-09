@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.11.0] - 2023-08-03
+### Added
+- on-chain setup and deployment for `base` blockchain
+
 ## [4.10.0] - 2023-07-28
 ### Added
 - `StakingBankStatic` - for gas optimisation

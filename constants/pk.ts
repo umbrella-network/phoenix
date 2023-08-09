@@ -1,6 +1,6 @@
 import {
   ARBITRUM_PRODUCTION,
-  AVALANCHE_PRODUCTION,
+  AVALANCHE_PRODUCTION, BASE_PRODUCTION,
   BNB_PRODUCTION,
   ETH_PRODUCTION, LINEA_PRODUCTION,
   LOCALHOST,
@@ -40,6 +40,7 @@ export function getPrivteKeys(network = ''): string[] {
     case POLYGON_PRODUCTION:
     case ETH_PRODUCTION:
     case LINEA_PRODUCTION:
+    case BASE_PRODUCTION:
       return prodAccounts;
 
     default: return localAccounts;
