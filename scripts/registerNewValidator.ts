@@ -4,7 +4,7 @@ import { deployedContract } from './utils/deployedContracts';
 
 const { PEGASUS_VERSION } = process.env;
 
-interface ValidatorInfo {
+export interface ValidatorInfo {
   validator: string;
   contractRegistryAddress: string;
   chainContractAddress: string;
@@ -13,10 +13,23 @@ interface ValidatorInfo {
   name: string;
 }
 
+export interface ValidatorInfoV2 {
+  chains: {
+    [chain: string]: {
+      walletAddress: string;
+      contractRegistryAddress: string;
+      chainContractAddress: string;
+    };
+  };
+  version: string;
+  environment: string;
+  name: string;
+}
+
 let stakingBank: Contract;
 
-export const resolveValidatorInfo = async (location: string): Promise<ValidatorInfo> => {
-  const res = await superagent.get(`${location}/info`);
+export const resolveValidatorInfo = async (location: string): Promise<ValidatorInfo | ValidatorInfoV2> => {
+  const res = await superagent.get(`${location}/info?details=avax`);
   return res.body;
 };
 
