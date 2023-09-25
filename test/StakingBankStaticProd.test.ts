@@ -23,7 +23,7 @@ async function fixture([owner]: Wallet[]): Promise<{
   };
 }
 
-describe.only('StakingBankStaticProd', () => {
+describe('StakingBankStaticProd', () => {
   let contract: Contract;
 
   before(async () => {
