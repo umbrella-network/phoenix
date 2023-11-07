@@ -50,8 +50,8 @@ task('registerUmbrellaFeeds', 'UmbrellaFeeds registration')
 
         const price = await oldUmbrellaFeeds.getPriceDataByName(taskArgs.destroy);
 
-        if (price.timestamp == 0) {
-          throw new Error(`provided key ${taskArgs.destroy} is empty in ${inRegistry}`);
+        if (oldExists && price.timestamp == 0) {
+          if (taskArgs.destroy != 'any') throw new Error(`provided key ${taskArgs.destroy} is empty in ${inRegistry}`);
         } else {
           console.log(`key ${taskArgs.destroy} exists so old contract ${inRegistry} will be destroyed`);
         }

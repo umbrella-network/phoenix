@@ -15,7 +15,7 @@ contract StaticBankStaticTest is DSTest {
     mapping (address => string) locations;
 
     constructor() {
-        bank = new StakingBankStaticProd(17);
+        bank = new StakingBankStaticProd(19);
 
         locations[address(0x977Ba523420110e230643B772Fe9cF955e11dA7B)] = "https://validator.umb.network";
         locations[address(0xe2422b23e52bc13ebA04d7FbB9F332Deb43360fB)] = "https://validator2.umb.network";
@@ -34,6 +34,8 @@ contract StaticBankStaticTest is DSTest {
         locations[address(0x57F404aD75e371c1A539589C1eFCA12e0C6980AD)] = "https://umbrella.artemahr.tech";
         locations[address(0xA7241994267682de4dE7Ef62f52dc2C783d1784B)] = "https://rpc.urbanhq.net";
         locations[address(0x6eEd457C20603EDAE50C3A112CAA1a9425321bD0)] = "https://umbrella-node.ankastake.com";
+        locations[address(0xC5a7650c2725a7B6A39f15cb9FbffC7af357AFeb)] = "https://umbrella.tchambrella.com";
+        locations[address(0xFEd95453678920c1b7b3A81F033Ca02a27225556)] = "https://umbrella-node.cmt13.eu";
     }
 
     function test_constructor() public {

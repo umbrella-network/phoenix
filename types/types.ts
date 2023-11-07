@@ -13,3 +13,8 @@ export type SubmitPreparedData = {
   hashForSolidity: string;
   dataTimestamp: number;
 }
+
+export type Validator = {
+  id: string;
+  location: string;
+}
