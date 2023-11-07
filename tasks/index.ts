@@ -7,3 +7,4 @@ export * from './lineaVerifyCode';
 export * from './staticBankDeploymentVerification';
 export * from './staticBankDeploymentVerificationAfter';
 export * from './debug';
+export * from './getStandardJson';

@@ -23,6 +23,8 @@ contract StakingBankStaticProd is StakingBankStatic {
     address public constant VALIDATOR_14 = 0x2F85824B2B38F179E451988670935d315b5b9692;
     address public constant VALIDATOR_15 = 0xA7241994267682de4dE7Ef62f52dc2C783d1784B;
     address public constant VALIDATOR_16 = 0x6eEd457C20603EDAE50C3A112CAA1a9425321bD0;
+    address public constant VALIDATOR_17 = 0xC5a7650c2725a7B6A39f15cb9FbffC7af357AFeb;
+    address public constant VALIDATOR_18 = 0xFEd95453678920c1b7b3A81F033Ca02a27225556;
 
     constructor(uint256 _validatorsCount) StakingBankStatic(_validatorsCount) {}
 
@@ -45,6 +47,8 @@ contract StakingBankStaticProd is StakingBankStatic {
         if (_id == VALIDATOR_14) return (_id, "https://umb-api.staking.rocks");
         if (_id == VALIDATOR_15) return (_id, "https://rpc.urbanhq.net");
         if (_id == VALIDATOR_16) return (_id, "https://umbrella-node.ankastake.com");
+        if (_id == VALIDATOR_17) return (_id, "https://umbrella.tchambrella.com");
+        if (_id == VALIDATOR_18) return (_id, "https://umbrella-node.cmt13.eu");
 
         return (address(0), "");
     }
@@ -69,6 +73,8 @@ contract StakingBankStaticProd is StakingBankStatic {
         list[14] = VALIDATOR_14;
         list[15] = VALIDATOR_15;
         list[16] = VALIDATOR_16;
+        list[17] = VALIDATOR_17;
+        list[18] = VALIDATOR_18;
 
         return list;
     }
@@ -92,6 +98,8 @@ contract StakingBankStaticProd is StakingBankStatic {
             || _validator == VALIDATOR_14
             || _validator == VALIDATOR_15
             || _validator == VALIDATOR_16
+            || _validator == VALIDATOR_17
+            || _validator == VALIDATOR_18
         );
     }
 }

@@ -13,7 +13,7 @@ export const stakingBankStaticDeploymentData = async (hre: HardhatRuntimeEnviron
   let contractName = STAKING_BANK_STATIC_LOCAL;
 
   if (hre.network.name.includes('_production')) {
-    validatorsCount = 17;
+    validatorsCount = 19;
     contractName = STAKING_BANK_STATIC_PROD;
   } else if (hre.network.name.includes('_staging')) {
     validatorsCount = 2;
