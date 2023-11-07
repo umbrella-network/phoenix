@@ -168,24 +168,29 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 On blockchain where we do have L2 consensus:
 
 ```shell
-npx hardhat deploy --network linea_sandbox
-npx hardhat registerStakingBankStatic --network linea_sandbox
+npx hardhat deploy --network polygon_sandbox
+npx hardhat registerStakingBankStatic --network polygon_sandbox
 # just in case chain needs to be redeployed
-npx hardhat deploy --network linea_sandbox
+# if staking bank changed, there might be need to force redeployment by removing deployment files for chain and feeds
+npx hardhat deploy --network polygon_sandbox
 
-npx hardhat registerChain --network linea_sandbox
-npx hardhat registerUmbrellaFeeds --destroy x --network linea_sandbox 
-npx hardhat registerReaderFactory --network linea_sandbox
+npx hardhat registerChain --network polygon_sandbox
+
+npx hardhat registerUmbrellaFeeds --destroy UMB-USD --network polygon_sandbox
+npx hardhat registerReaderFactory --network polygon_sandbox
 ```
 
 On blockchain with only on-chain data:
 
-```
-npx hardhat deploy --network linea_staging
+```shell
+npx hardhat deploy --network linea_sandbox
 
-npx hardhat registerStakingBankStatic --network linea_staging
-npx hardhat registerUmbrellaFeeds --network linea_staging
-npx hardhat registerReaderFactory --network linea_staging
+npx hardhat registerStakingBankStatic --network linea_sandbox
+# remove feed json
+npx hardhat deploy --network linea_sandbox
+
+npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network linea_sandbox
+npx hardhat registerReaderFactory --network linea_sandbox
 ```
 
 #### Code verification on Linea

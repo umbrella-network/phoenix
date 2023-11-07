@@ -38,7 +38,11 @@ task('registerStakingBankStatic', 'chain contract registration')
       const nonce = await deployer.getTransactionCount('latest');
       console.log({ nonce, from: deployer.address });
 
-      const tx = await registry.importContracts([stakingBankStatic.address], { nonce });
+      const tx = await registry.importContracts([stakingBankStatic.address], {
+        nonce,
+        gasPrice: hre.network.config.gasPrice == 'auto' ? undefined : hre.network.config.gasPrice,
+      });
+
       console.log(`${STAKING_BANK_STATIC} (${stakingBankStatic.address}) registered`);
       console.log(`tx #${tx.nonce} ${tx.hash}, waiting for confirmation...`);
       await tx.wait(1);

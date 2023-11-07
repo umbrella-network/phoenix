@@ -57,12 +57,21 @@ task('registerUmbrellaFeeds', 'UmbrellaFeeds registration')
         }
       }
 
-      const tx = await registry.importContracts([newUmbrellaFeeds.address], { nonce });
+      const tx = await registry.importContracts([newUmbrellaFeeds.address], {
+        nonce,
+        gasPrice: hre.network.config.gasPrice == 'auto' ? undefined : hre.network.config.gasPrice,
+      });
+
       console.log(`importContracts tx #${tx.nonce} ${tx.hash}`);
 
       if (oldExists) {
         const oldUmbrellaFeeds = UmbrellaFeeds__factory.connect(inRegistry, deployer);
-        const tx2 = await oldUmbrellaFeeds.destroy(taskArgs.destroy, { nonce: nonce + 1 });
+
+        const tx2 = await oldUmbrellaFeeds.destroy(taskArgs.destroy, {
+          nonce: nonce + 1,
+          gasPrice: hre.network.config.gasPrice == 'auto' ? undefined : hre.network.config.gasPrice,
+        });
+
         console.log(`destroy tx #${tx2.nonce} ${tx2.hash}`);
         console.log('waiting for confirmations...');
         await tx2.wait(1);
