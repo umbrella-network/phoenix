@@ -121,6 +121,21 @@ FORKING_ENV=bsc npx hardhat node --no-deploy --no-reset
 npx hardhat redeploy-homechain
 ```
 
+### Adding new validator
+
+1. update staking bank static contract
+   1. update `stakingBankStaticDeploymentData` 
+   2. update `validatorsCount` in test case
+   3. update list of validators in test `StaticBankStaticTest`
+   4. `yarn test`
+   5. `forge test -vvv`
+2. run `./scripts/update-validators-prod.sh [step]`
+   1. in case if verification errors, try with standard json
+   `npx hardhat  standard-json --network avalanche_production --contract StakingBankStatic`
+   and run script again
+   2. steps: 1, 2, 3 (warning - removing files), 1 (again), 4, 5
+   3. each step can fail because of various reasons, so repeat (or execute via Metamask)
+
 ### Old scripts
 
 ```shell
