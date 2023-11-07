@@ -1,16 +1,17 @@
 import { artifacts } from 'hardhat';
 import { expect, use } from 'chai';
 
-import { ContractFactory, Contract, Wallet } from 'ethers';
+import { ContractFactory, Contract, Wallet, ethers } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { loadFixture } from 'ethereum-waffle';
 
 import { resolveValidatorInfo, ValidatorInfo, ValidatorInfoV2 } from '../scripts/registerNewValidator';
+import { Validator } from '../types/types';
 
 use(waffleChai);
 
 const StakingBankStaticProd = artifacts.readArtifactSync('StakingBankStaticProd');
-const validatorsCount = 17;
+const validatorsCount = 19;
 
 async function fixture([owner]: Wallet[]): Promise<{
   contract: Contract;
@@ -23,10 +24,10 @@ async function fixture([owner]: Wallet[]): Promise<{
   };
 }
 
-describe.only('StakingBankStaticProd', () => {
+describe('StakingBankStaticProd', () => {
   let contract: Contract;
 
-  before(async () => {
+  beforeEach(async () => {
     ({ contract } = await loadFixture(fixture));
   });
 
@@ -34,7 +35,18 @@ describe.only('StakingBankStaticProd', () => {
     expect(await contract.getNumberOfValidators()).to.eq(validatorsCount);
   });
 
-  describe.only('cross check all validators', () => {
+  it('invalid address check', async () => {
+    expect(() => contract.addresses(validatorsCount)).throw;
+  });
+
+  it('invalid validators check', async () => {
+    const validator: Validator = await contract.validators(contract.address);
+
+    expect(validator.id).eq(ethers.constants.AddressZero);
+    expect(validator.location).eq('');
+  });
+
+  describe('cross check all validators', () => {
     const arr = new Array(validatorsCount).fill(0);
 
     console.log(arr);
