@@ -21,6 +21,8 @@ contract StakingBankStaticProd is StakingBankStatic {
     address public constant VALIDATOR_12 = 0x57A51D5BDcE188c2295fCA3b4687475a54E65A02;
     address public constant VALIDATOR_13 = 0x777FbA3666fa7747476a34577FcCC404b263E09F;
     address public constant VALIDATOR_14 = 0x2F85824B2B38F179E451988670935d315b5b9692;
+    address public constant VALIDATOR_15 = 0xA7241994267682de4dE7Ef62f52dc2C783d1784B;
+    address public constant VALIDATOR_16 = 0x6eEd457C20603EDAE50C3A112CAA1a9425321bD0;
 
     constructor(uint256 _validatorsCount) StakingBankStatic(_validatorsCount) {}
 
@@ -34,13 +36,15 @@ contract StakingBankStaticProd is StakingBankStatic {
         if (_id == VALIDATOR_5) return (_id, "https://umbrella.crazywhale.es");
         if (_id == VALIDATOR_6) return (_id, "https://umbrella-node.gateomega.com");
         if (_id == VALIDATOR_7) return (_id, "https://umb.anorak.technology");
-        if (_id == VALIDATOR_8) return (_id, "https://umbrella.infstones.io");
+        if (_id == VALIDATOR_8) return (_id, "https://umbrella.validator.infstones.io");
         if (_id == VALIDATOR_9) return (_id, "https://umb.hashquark.io");
         if (_id == VALIDATOR_10) return (_id, "http://umbrella.staking4all.org:3000");
         if (_id == VALIDATOR_11) return (_id, "https://umbrella-api.validatrium.club");
         if (_id == VALIDATOR_12) return (_id, "http://5.161.78.230:3000");
         if (_id == VALIDATOR_13) return (_id, "https://umbnode.blockchainliverpool.com");
         if (_id == VALIDATOR_14) return (_id, "https://umb-api.staking.rocks");
+        if (_id == VALIDATOR_15) return (_id, "https://rpc.urbanhq.net");
+        if (_id == VALIDATOR_16) return (_id, "https://umbrella-node.ankastake.com");
 
         return (address(0), "");
     }
@@ -63,6 +67,8 @@ contract StakingBankStaticProd is StakingBankStatic {
         list[12] = VALIDATOR_12;
         list[13] = VALIDATOR_13;
         list[14] = VALIDATOR_14;
+        list[15] = VALIDATOR_15;
+        list[16] = VALIDATOR_16;
 
         return list;
     }
@@ -84,6 +90,8 @@ contract StakingBankStaticProd is StakingBankStatic {
             || _validator == VALIDATOR_12
             || _validator == VALIDATOR_13
             || _validator == VALIDATOR_14
+            || _validator == VALIDATOR_15
+            || _validator == VALIDATOR_16
         );
     }
 }

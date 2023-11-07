@@ -5,12 +5,12 @@ import { ContractFactory, Contract, Wallet } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
 import { loadFixture } from 'ethereum-waffle';
 
-import { resolveValidatorInfo } from '../scripts/registerNewValidator';
+import { resolveValidatorInfo, ValidatorInfo, ValidatorInfoV2 } from '../scripts/registerNewValidator';
 
 use(waffleChai);
 
 const StakingBankStaticProd = artifacts.readArtifactSync('StakingBankStaticProd');
-const validatorsCount = 15;
+const validatorsCount = 17;
 
 async function fixture([owner]: Wallet[]): Promise<{
   contract: Contract;
@@ -34,7 +34,7 @@ describe.only('StakingBankStaticProd', () => {
     expect(await contract.getNumberOfValidators()).to.eq(validatorsCount);
   });
 
-  describe('cross check all validators', () => {
+  describe.only('cross check all validators', () => {
     const arr = new Array(validatorsCount).fill(0);
 
     console.log(arr);
@@ -45,7 +45,9 @@ describe.only('StakingBankStaticProd', () => {
         const validator = await contract.validators(address);
         const info = await resolveValidatorInfo(validator.location);
 
-        expect(info.validator).to.equal(address);
+        expect((info as ValidatorInfo).validator || (info as ValidatorInfoV2).chains.avax.walletAddress).to.equal(
+          address
+        );
       });
     });
   });

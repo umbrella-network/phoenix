@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.12.0] - 2023-09-25
+### Added
+- 2 additional validators
+
+### Changed
+- update one validator url
+
 ## [4.11.0] - 2023-08-03
 ### Added
 - on-chain setup and deployment for `base` blockchain
