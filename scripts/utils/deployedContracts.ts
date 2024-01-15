@@ -13,7 +13,7 @@ const Token = artifacts.readArtifactSync('Token');
 
 export const deployedRegistry = async (): Promise<Contract> => {
   return new ethers.Contract(config.contractRegistry.address, Registry.abi, provider).connect(
-    (await ethers.getSigners())[0]
+    (await ethers.getSigners())[0],
   );
 };
 

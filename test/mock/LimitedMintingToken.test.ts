@@ -84,7 +84,7 @@ describe('LimitedMintingToken', () => {
         await tx.wait();
 
         await expect(contract.connect(owner).mint(owner.address, '1')).to.be.revertedWith(
-          'This address already claimed the maximum daily amount'
+          'This address already claimed the maximum daily amount',
         );
       });
     });
@@ -134,7 +134,7 @@ describe('LimitedMintingToken', () => {
     describe('when caller is not the owner', () => {
       it('rejects the call', async () => {
         await expect(contract.connect(wallet1).setDailyAllowance(newAllowance)).to.be.revertedWith(
-          'Ownable: caller is not the owner'
+          'Ownable: caller is not the owner',
         );
       });
     });

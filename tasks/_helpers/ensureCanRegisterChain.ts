@@ -6,7 +6,7 @@ import { ChainContractNames } from '../../types/types';
 export const ensureCanRegisterChain = async (
   hre: HardhatRuntimeEnvironment,
   registry: Contract,
-  chainName: ChainContractNames
+  chainName: ChainContractNames,
 ): Promise<boolean> => {
   console.log('ensureCanRegisterChain', chainName);
 
@@ -40,7 +40,7 @@ export const ensureCanRegisterChain = async (
     (isForeign && chainName !== ChainContractNames.ForeignChain)
   ) {
     throw Error(
-      `One type of chain allowed per setup, isForeign: ${isForeign} in conflict with chainName: ${chainName}`
+      `One type of chain allowed per setup, isForeign: ${isForeign} in conflict with chainName: ${chainName}`,
     );
   }
 

@@ -23,7 +23,7 @@ class DeviationSigner {
     target: string,
     validator: SignerWithAddress,
     keys: string[],
-    priceDatas: PriceDataStruct[]
+    priceDatas: PriceDataStruct[],
   ): Promise<string> {
     const hash = await this.hashData(networkId, target, keys, priceDatas);
     const toSign = ethers.utils.arrayify(hash);
@@ -33,7 +33,7 @@ class DeviationSigner {
   async hashData(networkId: number, target: string, keys: string[], priceDatas: PriceDataStruct[]): Promise<string> {
     const testimony = ethers.utils.defaultAbiCoder.encode(
       ['uint256', 'address', ...(await this.priceDatasAbi())],
-      [networkId, target, keys, priceDatas]
+      [networkId, target, keys, priceDatas],
     );
 
     return ethers.utils.keccak256(testimony);
