@@ -17,7 +17,7 @@ export const deployedRegistry = async (): Promise<Contract> => {
   );
 };
 
-export const deployedContract = async (name: 'IStakingBank' | 'UMB' | 'Chain'): Promise<Contract> => {
+export const deployedContract = async (name: 'StakingBank' | 'UMB' | 'Chain'): Promise<Contract> => {
   const address = await (await deployedRegistry()).getAddressByString(name);
   let abi;
 

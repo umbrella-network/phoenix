@@ -1,19 +1,15 @@
 import {
   ARBITRUM_PRODUCTION,
-  AVALANCHE_PRODUCTION, BASE_PRODUCTION,
+  AVALANCHE_PRODUCTION,
+  BASE_PRODUCTION,
   BNB_PRODUCTION,
-  ETH_PRODUCTION, LINEA_PRODUCTION,
+  ETH_PRODUCTION,
+  LINEA_PRODUCTION,
   LOCALHOST,
-  POLYGON_PRODUCTION
+  POLYGON_PRODUCTION,
 } from './networks';
 
-const {
-  DEPLOYER_PK,
-  STAGING_DEPLOYER_PK,
-  PROD_DEPLOYER_PK,
-  FORKING_ENV,
-  FAKE_MAINNET
-} = process.env;
+const { DEPLOYER_PK, STAGING_DEPLOYER_PK, PROD_DEPLOYER_PK, FORKING_ENV, FAKE_MAINNET } = process.env;
 
 const localAccounts = DEPLOYER_PK
   ? [DEPLOYER_PK]
@@ -43,6 +39,7 @@ export function getPrivteKeys(network = ''): string[] {
     case BASE_PRODUCTION:
       return prodAccounts;
 
-    default: return localAccounts;
+    default:
+      return localAccounts;
   }
 }

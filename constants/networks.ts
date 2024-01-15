@@ -28,7 +28,6 @@ export const POLYGON_PRODUCTION = 'polygon_production';
 export const BNB_PRODUCTION = 'bnb_production';
 export const LINEA_PRODUCTION = 'linea_production';
 
-
 export const MASTER_CHAIN_NAME = BNB;
 
 export const FORKED_BNB_ID = 560000;
@@ -45,8 +44,7 @@ export const isMasterChain = (chainId: number | string): boolean => {
     return FORKING_ENV == MASTER_CHAIN_NAME;
   }
 
-  const masterChain = [LOCALHOST_ID, BNB_ID, BNB_STAGING_ID, FORKED_BNB_ID]
-    .includes(parseInt(`${chainId}`, 10));
+  const masterChain = [LOCALHOST_ID, BNB_ID, BNB_STAGING_ID, FORKED_BNB_ID].includes(parseInt(`${chainId}`, 10));
 
   console.log(`isMasterChain(${chainId})?`, masterChain);
   return masterChain;
