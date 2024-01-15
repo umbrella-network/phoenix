@@ -1,4 +1,4 @@
-export * as networks from  './networks';
+export * as networks from './networks';
 
 export const CHAIN = 'Chain';
 export const CHAIN_BYTES32 = '0x436861696e000000000000000000000000000000000000000000000000000000';
@@ -18,4 +18,4 @@ export const UMBRELLA_FEEDS_READER_FACTORY = 'UmbrellaFeedsReaderFactory';
 export const UMB = 'UMB';
 export const UMB_BYTES32 = '0x554d420000000000000000000000000000000000000000000000000000000000';
 
-export type ChainType = typeof CHAIN | typeof  FOREIGN_CHAIN;
+export type ChainType = typeof CHAIN | typeof FOREIGN_CHAIN;

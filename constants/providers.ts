@@ -4,7 +4,10 @@ import {
   ARBITRUM_STAGING,
   AVALANCHE_PRODUCTION,
   AVALANCHE_SANDBOX,
-  AVALANCHE_STAGING, BASE_PRODUCTION, BASE_SANDBOX, BASE_STAGING,
+  AVALANCHE_STAGING,
+  BASE_PRODUCTION,
+  BASE_SANDBOX,
+  BASE_STAGING,
   BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
@@ -19,17 +22,12 @@ import {
   LINEA_STAGING,
   POLYGON_PRODUCTION,
   POLYGON_SANDBOX,
-  POLYGON_STAGING
+  POLYGON_STAGING,
 } from './networks';
 
-const {
-  INFURA_ID,
-  FAKE_MAINNET,
-  FORKING_ENV,
-  CHAIN_ID
-} = process.env;
+const { INFURA_ID, FAKE_MAINNET, FORKING_ENV, CHAIN_ID } = process.env;
 
-type ProviderData = { url: string, chainId: number }
+type ProviderData = { url: string; chainId: number };
 
 const chainId = (id: number): number => {
   const netId = parseInt(CHAIN_ID || id.toString(10), 10);
@@ -51,78 +49,78 @@ export const forkingChainId = (): number => {
 
 const localProviderData: ProviderData = {
   url: 'http://localhost:8545',
-  chainId: forkingChainId()
+  chainId: forkingChainId(),
 };
 
 const lineaTestnetProviderData: ProviderData = {
   url: `https://linea-goerli.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(59140)
+  chainId: chainId(59140),
 };
 
 const baseTestnetProviderData: ProviderData = {
   url: 'https://base-goerli.public.blastapi.io',
-  chainId: chainId(84531)
+  chainId: chainId(84531),
 };
 
 const arbitrumTestnetProviderData: ProviderData = {
   url: `https://arbitrum-goerli.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(421613)
+  chainId: chainId(421613),
 };
 
 const avaxTestnetProviderData: ProviderData = {
   url: 'https://api.avax-test.network/ext/bc/C/rpc',
-  chainId: chainId(43113)
+  chainId: chainId(43113),
 };
 
 const bnbTestnetProviderData: ProviderData = {
   url: 'https://data-seed-prebsc-2-s1.binance.org:8545',
   // url: 'https://data-seed-prebsc-1-s3.binance.org:8545',
-  chainId: chainId(97)
+  chainId: chainId(97),
 };
 
 const ethTestnetProviderData: ProviderData = {
   url: `https://goerli.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(5)
+  chainId: chainId(5),
 };
 
 const polygonTestnetProviderData: ProviderData = {
   url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(80001)
+  chainId: chainId(80001),
 };
 
 const arbitrumMainnetProviderData: ProviderData = {
   url: `https://arbitrum-mainnet.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(42161)
+  chainId: chainId(42161),
 };
 
 const avaxMainnetProviderData: ProviderData = {
   url: 'https://api.avax.network/ext/bc/C/rpc',
-  chainId: 43114
+  chainId: 43114,
 };
 
 const bnbMainnetProviderData: ProviderData = {
   url: 'https://bsc-dataseed.binance.org/',
-  chainId: chainId(56)
+  chainId: chainId(56),
 };
 
 const polygonMainnetProviderData: ProviderData = {
   url: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(137)
+  chainId: chainId(137),
 };
 
 const ethMainnetProviderData: ProviderData = {
   url: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(1)
+  chainId: chainId(1),
 };
 
 const lineaMainnetProviderData: ProviderData = {
   url: `https://linea-mainnet.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(59144)
+  chainId: chainId(59144),
 };
 
 const baseMainnetProviderData: ProviderData = {
   url: 'https://base-mainnet.public.blastapi.io',
-  chainId: chainId(8453)
+  chainId: chainId(8453),
 };
 
 const resolveProviderData = (networkName: string): ProviderData => {
@@ -186,7 +184,7 @@ export const getProviderData = (networkName: string): ProviderData => {
   if (FAKE_MAINNET) {
     return {
       url: localProviderData.url,
-      chainId: data.chainId
+      chainId: data.chainId,
     };
   }
 
