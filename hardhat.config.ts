@@ -6,7 +6,7 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
-import '@nomiclabs/hardhat-etherscan';
+import '@nomicfoundation/hardhat-verify';
 import 'solidity-coverage';
 
 // there is undefined issue in this repo, ts-node is ignoring flag TS_NODE_TRANSPILE_ONLY=1 and throw errors
