@@ -59,7 +59,7 @@ describe('StakingBankStaticProd', () => {
           const info = await resolveValidatorInfo(validator.location);
 
           expect((info as ValidatorInfo).validator || (info as ValidatorInfoV2).chains.avax.walletAddress).to.equal(
-            address
+            address,
           );
         } catch (e) {
           throw new Error(`verification failed for ${validator.location}: ${(e as Error).message}`);

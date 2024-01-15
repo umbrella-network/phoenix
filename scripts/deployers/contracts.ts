@@ -42,13 +42,13 @@ export const resolveValidators = async (): Promise<Validator[]> => {
       console.log(`validator ${wallet.address} ETH balance:`, balance.toString());
 
       return { location, wallet, balance, privateKey };
-    })
+    }),
   );
 };
 
 export const deployChain = async (
   contractRegistryAddress: string,
-  chainName = ChainContractNames.Chain
+  chainName = ChainContractNames.Chain,
 ): Promise<Contract> => {
   console.log(`deploying ${chainName}...`);
   const ChainContract = await ethers.getContractFactory(chainName);
@@ -225,14 +225,14 @@ const resolveTokenContract = async (signer: Signer): Promise<Contract> => {
 
 export const deployAllContracts = async (
   registryAddress = '',
-  doRegistration = false
+  doRegistration = false,
 ): Promise<{ chain: string; bank: string; token: string }> => {
   if (!config.validators.length) {
     const wallet = ethers.Wallet.createRandom({ extraEntropy: Buffer.from(Math.random().toString(10)) });
     console.log('random wallet:', { pk: wallet.privateKey, address: wallet.address });
 
     throw new Error(
-      'please setup (VALIDATOR_PK, VALIDATOR_LOCATION) or (VALIDATOR_?_PK, VALIDATOR_?_LOCATION) in .env'
+      'please setup (VALIDATOR_PK, VALIDATOR_LOCATION) or (VALIDATOR_?_PK, VALIDATOR_?_LOCATION) in .env',
     );
   }
 

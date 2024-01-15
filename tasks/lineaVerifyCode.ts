@@ -16,7 +16,7 @@ task('linea-verify', 'task for debugging')
     const { AVASCAN_API } = process.env;
     const response = await axios.get(
       'https://api-testnet.snowtrace.io/api?' +
-        `module=contract&action=getsourcecode&address=${address}&apikey=${AVASCAN_API}`
+        `module=contract&action=getsourcecode&address=${address}&apikey=${AVASCAN_API}`,
     );
 
     const f = __dirname + `/../flattened/${taskArgs.name}.stdandard.json`;

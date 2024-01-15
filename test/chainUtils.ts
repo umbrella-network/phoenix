@@ -48,7 +48,7 @@ export const prepareData = async (
   dataTimestamp: number,
   root: string | null,
   fcdKeys: string[] = [],
-  fcdValues: (number | string)[] = []
+  fcdValues: (number | string)[] = [],
 ): Promise<SubmitPreparedData> => {
   let testimony = '0x' + abiUintEncoder(dataTimestamp, 32) + root?.replace('0x', '');
 
@@ -141,7 +141,7 @@ export const setupForChainWithMocks = async (props: {
     contractRegistry.address,
     timePadding,
     requiredSignatures,
-    allowForMixedType
+    allowForMixedType,
   );
 
   return {
@@ -171,7 +171,7 @@ export const fetchLogVotersEvents = (tx: Receipt): { blockId: number; voter: str
 
   const txEvents = tx.events.filter(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (e: any) => e.topics[0] === sighash
+    (e: any) => e.topics[0] === sighash,
   );
 
   return txEvents.map((e) => {

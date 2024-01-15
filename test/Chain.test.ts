@@ -48,7 +48,7 @@ describe('Chain', () => {
 
   const executeSubmitWrapper = async (
     dataTimestamp: number,
-    validators: SignerWithAddress[] | Wallet[] = [validator]
+    validators: SignerWithAddress[] | Wallet[] = [validator],
   ) => {
     await executeSubmit({
       chain: contract,
@@ -278,7 +278,7 @@ describe('Chain', () => {
 
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
           id,
-          'round #1'
+          'round #1',
         );
 
         await mintBlocks(timePadding + 1);
@@ -286,21 +286,21 @@ describe('Chain', () => {
 
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
           (id + 1) % numberOfValidators,
-          'round #2'
+          'round #2',
         );
 
         await mintBlocks(timePadding + 1);
         console.log(await blockTimestamp());
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
           (id + 2) % numberOfValidators,
-          'round #3'
+          'round #3',
         );
 
         await mintBlocks(timePadding + 1);
         console.log(await blockTimestamp());
         expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
           (id + 3) % numberOfValidators,
-          'round #4'
+          'round #4',
         );
       });
 
@@ -314,25 +314,25 @@ describe('Chain', () => {
 
           expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
             id,
-            'round #1'
+            'round #1',
           );
 
           await mintBlocks(timePadding + 1);
           expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
             (id + 1) % numberOfValidators,
-            'round #2'
+            'round #2',
           );
 
           await mintBlocks(timePadding + 1);
           expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
             (id + 2) % numberOfValidators,
-            'round #3'
+            'round #3',
           );
 
           await mintBlocks(timePadding + 1);
           expect(await contract.getLeaderIndex(numberOfValidators, await hre.ethers.provider.getBlockNumber())).to.eq(
             (id + 3) % numberOfValidators,
-            'round #4'
+            'round #4',
           );
         });
       });
@@ -365,15 +365,15 @@ describe('Chain', () => {
           const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
 
           await expect(
-            contract.connect(validator).submit(dataTimestamp, root, [], [], [], [r], [s])
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [], [r], [s]),
           ).to.be.revertedWith('NotEnoughSignatures');
 
           await expect(
-            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [], [s])
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [], [s]),
           ).to.be.revertedWith('out-of-bounds or negative index');
 
           await expect(
-            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [])
+            contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], []),
           ).to.be.revertedWith('out-of-bounds or negative index');
 
           await expect(contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])).not.to.be
@@ -401,7 +401,7 @@ describe('Chain', () => {
             const { r, s, v, dataTimestamp } = await prepareData(validator, t + 5, root);
 
             await expect(
-              contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
+              contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]),
             ).to.be.revertedWith('oh, so you can predict the future:                               4');
           });
         });
@@ -451,7 +451,7 @@ describe('Chain', () => {
           it('expect getBlockIdAtTimestamp return valid ID', async () => {
             expect(await contract.getBlockIdAtTimestamp(previousDataTimestamp)).to.eq(previousDataTimestamp);
             expect(await contract.getBlockIdAtTimestamp(previousDataTimestamp + timePadding)).to.eq(
-              previousDataTimestamp
+              previousDataTimestamp,
             );
 
             const newId = previousDataTimestamp + timePadding + 1;
@@ -484,7 +484,7 @@ describe('Chain', () => {
             const { r, s, v, dataTimestamp } = await prepareData(validator, previousDataTimestamp, root);
 
             await expect(
-              contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
+              contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]),
             ).to.be.revertedWith('BlockSubmittedToFastOrDataToOld');
           });
 
@@ -519,11 +519,11 @@ describe('Chain', () => {
               expect(blockIds.length).gt(1);
 
               await expect(contract.verifyProofs([blockIds[0]], proofs, proofItemsCounter, leaves)).to.revertedWith(
-                'panic code 50'
+                'panic code 50',
               );
 
               await expect(contract.verifyProofs(blockIds, proofs, [proofItemsCounter[0]], leaves)).to.revertedWith(
-                'panic code 50'
+                'panic code 50',
               );
 
               const verified = await contract.verifyProofs(blockIds, proofs, proofItemsCounter, [leaves[0]]);
@@ -539,7 +539,7 @@ describe('Chain', () => {
               await mockSubmitWrapper();
               const { r, s, v, dataTimestamp } = await prepareData(validator, await blockTimestamp(), root);
               await expect(
-                contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
+                contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]),
               ).to.revertedWith('BlockSubmittedToFast');
             });
 
@@ -573,7 +573,7 @@ describe('Chain', () => {
 
                   console.log({ dataTimestamp, root });
                   await expect(
-                    contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s])
+                    contract.connect(validator).submit(dataTimestamp, root, [], [], [v], [r], [s]),
                   ).to.revertedWith('BlockSubmittedToFastOrDataToOld');
                 });
               });
@@ -598,7 +598,7 @@ describe('Chain', () => {
             await blockTimestamp(),
             root,
             fcdKeys,
-            values
+            values,
           );
 
           await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not.be.reverted;
@@ -627,17 +627,17 @@ describe('Chain', () => {
             await blockTimestamp(),
             root,
             fcdKeys,
-            values
+            values,
           );
 
           // recover sig will return some other address than validator (because we will loop over just one fcd element),
           // so mock function will fail
           await expect(contract.submit(dataTimestamp, root, [fcdKeys[0]], values, [v], [r], [s])).to.be.revertedWith(
-            'Mock on the method is not initialized'
+            'Mock on the method is not initialized',
           );
 
           await expect(contract.submit(dataTimestamp, root, fcdKeys, [values[0]], [v], [r], [s])).to.be.revertedWith(
-            'out-of-bounds or negative index'
+            'out-of-bounds or negative index',
           );
 
           await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.not.be.reverted;
@@ -652,7 +652,7 @@ describe('Chain', () => {
             await blockTimestamp(),
             root,
             fcdKeys,
-            values
+            values,
           );
 
           await expect(contract.submit(dataTimestamp, root, fcdKeys, values, [v], [r], [s])).to.be.reverted;
@@ -667,13 +667,13 @@ describe('Chain', () => {
               await blockTimestamp(),
               root,
               fcdKeys,
-              fcdValues
+              fcdValues,
             );
 
             submittedDataTimestamp = dataTimestamp;
 
             await expect(
-              contract.connect(validator).submit(dataTimestamp, root, fcdKeys, fcdValues, [v], [r], [s])
+              contract.connect(validator).submit(dataTimestamp, root, fcdKeys, fcdValues, [v], [r], [s]),
             ).to.emit(contract, 'LogMint');
           });
 

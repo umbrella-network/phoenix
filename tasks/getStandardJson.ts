@@ -27,7 +27,7 @@ task('standard-json', 'get Standard Json')
     }
 
     const response = await axios.get(
-      apiUrl + `?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`
+      apiUrl + `?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`,
     );
 
     const f = __dirname + `/../flattened/${taskArgs.contract}.stdandard.json`;

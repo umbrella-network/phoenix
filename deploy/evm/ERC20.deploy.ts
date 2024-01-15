@@ -43,7 +43,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
     'importAddresses',
     [UMB_BYTES32],
-    [erc20.address]
+    [erc20.address],
   );
 };
 

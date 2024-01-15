@@ -4,7 +4,7 @@ import { isLocalNetwork, sleep } from './helpers';
 export const verifyCode = async (
   hre: HardhatRuntimeEnvironment,
   address: string,
-  constructorArguments: any // eslint-disable-line @typescript-eslint/no-explicit-any
+  constructorArguments: any, // eslint-disable-line @typescript-eslint/no-explicit-any
 ): Promise<void> => {
   if (isLocalNetwork(hre) || process.env.FAKE_MAINNET) {
     return;

@@ -13,7 +13,7 @@ const { AddressZero } = ethers.constants;
 const verifyChainRegistration = async (
   hre: HardhatRuntimeEnvironment,
   oldChainAddress: string,
-  newChainAddress: string
+  newChainAddress: string,
 ) => {
   const onMasterChain = isMasterChain(await hre.getChainId());
   const CHAIN_NAME = onMasterChain ? CHAIN : FOREIGN_CHAIN;
