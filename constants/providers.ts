@@ -2,6 +2,8 @@ import {
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
   ARBITRUM_STAGING,
+  ARTHERA_SANDBOX,
+  ASTAR_SANDBOX,
   AVALANCHE_PRODUCTION,
   AVALANCHE_SANDBOX,
   AVALANCHE_STAGING,
@@ -20,9 +22,12 @@ import {
   LINEA_PRODUCTION,
   LINEA_SANDBOX,
   LINEA_STAGING,
+  MELD_SANDBOX,
+  OKX_SANDBOX,
   POLYGON_PRODUCTION,
   POLYGON_SANDBOX,
   POLYGON_STAGING,
+  XDC_SANDBOX,
 } from './networks';
 
 const { INFURA_ID, FAKE_MAINNET, FORKING_ENV, CHAIN_ID } = process.env;
@@ -55,6 +60,37 @@ const localProviderData: ProviderData = {
 const lineaTestnetProviderData: ProviderData = {
   url: `https://linea-goerli.infura.io/v3/${INFURA_ID}`,
   chainId: chainId(59140),
+};
+
+// https://docs.xdc.community/get-details/wallet-integration/metamask
+// https://docs.xdc.community/get-details/networks/apothem
+const apothemTestnetProviderData: ProviderData = {
+  url: 'https://earpc.apothem.network', // <-- this is for smart contract deployment, https://rpc.apothem.network'
+  chainId: chainId(51),
+};
+
+// https://docs.astar.network/docs/build/environment/endpoints/
+const astarTestnetProviderData: ProviderData = {
+  url: 'https://rpc.startale.com/zkatana',
+  chainId: chainId(1261120),
+};
+
+// https://www.okx.com/pl/x1/docs/getting-started/user-guide/network-information
+// https://www.okx.com/pl/x1/faucet
+const okxTestnetProviderData: ProviderData = {
+  url: 'https://testrpc.x1.tech',
+  chainId: chainId(195),
+};
+
+// https://docs.arthera.net/build/developing-sc/intro#arthera-testnet-network-info
+const artheraTestnetProviderData: ProviderData = {
+  url: 'https://rpc-test.arthera.net',
+  chainId: chainId(10243),
+};
+
+const meldTestnetProviderData: ProviderData = {
+  url: 'https://testnet-rpc.meld.com',
+  chainId: chainId(222000222),
 };
 
 const baseTestnetProviderData: ProviderData = {
@@ -125,6 +161,21 @@ const baseMainnetProviderData: ProviderData = {
 
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
+    case OKX_SANDBOX:
+      return okxTestnetProviderData;
+
+    case ASTAR_SANDBOX:
+      return astarTestnetProviderData;
+
+    case ARTHERA_SANDBOX:
+      return artheraTestnetProviderData;
+
+    case XDC_SANDBOX:
+      return apothemTestnetProviderData;
+
+    case MELD_SANDBOX:
+      return meldTestnetProviderData;
+
     case LINEA_STAGING:
     case LINEA_SANDBOX:
       return lineaTestnetProviderData;

@@ -1,6 +1,11 @@
 export const ETH = 'ethereum';
 export const BNB = 'bnb';
 export const BNB_SANDBOX = 'bnb_sandbox';
+export const XDC_SANDBOX = 'xdc_sandbox';
+export const OKX_SANDBOX = 'okx_sandbox';
+export const ARTHERA_SANDBOX = 'arthera_sandbox';
+export const ASTAR_SANDBOX = 'astar_sandbox';
+export const MELD_SANDBOX = 'meld_sandbox';
 
 export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
