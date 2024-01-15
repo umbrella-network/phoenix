@@ -6,7 +6,7 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
-import '@nomiclabs/hardhat-etherscan';
+import '@nomicfoundation/hardhat-verify';
 import 'solidity-coverage';
 
 // there is undefined issue in this repo, ts-node is ignoring flag TS_NODE_TRANSPILE_ONLY=1 and throw errors
@@ -19,12 +19,12 @@ import {HardhatNetworkForkingUserConfig, HardhatUserConfig} from 'hardhat/types'
 import {
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
-  ARBITRUM_STAGING, AVALANCHE_PRODUCTION, AVALANCHE_SANDBOX,
+  ARBITRUM_STAGING, ARTHERA_SANDBOX, ASTAR_SANDBOX, AVALANCHE_PRODUCTION, AVALANCHE_SANDBOX,
   AVALANCHE_STAGING, BASE_PRODUCTION, BASE_STAGING,
   BNB, BNB_PRODUCTION, BNB_SANDBOX,
   BNB_STAGING, ETH, ETH_PRODUCTION, ETH_SANDBOX,
   ETH_STAGING, LINEA_PRODUCTION, LINEA_SANDBOX, LINEA_STAGING,
-  LOCALHOST, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING
+  LOCALHOST, MELD_SANDBOX, OKX_SANDBOX, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING, XDC_SANDBOX
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
 import {forkingChainId, getProviderData} from './constants/providers';
@@ -241,6 +241,36 @@ const config: HardhatUserConfig = {
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(BNB_SANDBOX).chainId,
       gasPrice: gwei(10)
+    },
+    xdc_sandbox: {
+      url: getProviderData(XDC_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(XDC_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    okx_sandbox: {
+      url: getProviderData(OKX_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(OKX_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    astar_sandbox: {
+      url: getProviderData(ASTAR_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ASTAR_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    arthera_sandbox: {
+      url: getProviderData(ARTHERA_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ARTHERA_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    meld_sandbox: {
+      url: getProviderData(MELD_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(MELD_SANDBOX).chainId,
+      gasPrice: 'auto'
     },
     arbitrum_production: {
       url: getProviderData(ARBITRUM_PRODUCTION).url,

@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
 import { CHAIN, CHAIN_BYTES32, REGISTRY } from '../../constants';
-import { HARDHAT, LOCALHOST } from '../../constants/networks';
+import { ASTAR_SANDBOX, HARDHAT, LOCALHOST } from '../../constants/networks';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -12,7 +12,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   if ([HARDHAT, LOCALHOST].includes(hre.network.name)) {
     console.log(`deploying Registry on ${hre.network.name} (${await hre.getChainId()})`);
-    const registry = await deploy(REGISTRY, { from: deployer.address, log: true, waitConfirmations: 1 });
+    console.log(`deployer balanceOf(${deployer.address}): (${await hre.ethers.provider.getBalance(deployer.address)})`);
+
+    const gasLimit = hre.network.name == ASTAR_SANDBOX ? 10e6 : undefined;
+    const registry = await deploy(REGISTRY, { from: deployer.address, log: true, waitConfirmations: 1, gasLimit });
     await verifyCode(hre, registry.address, []);
     return;
   }
