@@ -2,11 +2,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
 import { CHAIN, CHAIN_BYTES32, REGISTRY } from '../../constants';
-import {
-  ASTAR_SANDBOX,
-  HARDHAT,
-  LOCALHOST,
-} from '../../constants/networks';
+import { ASTAR_SANDBOX, HARDHAT, LOCALHOST } from '../../constants/networks';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
