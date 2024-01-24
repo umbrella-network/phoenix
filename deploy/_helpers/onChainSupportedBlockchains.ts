@@ -1,4 +1,5 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { ROOTSTOCK_SANDBOX } from '../../constants/networks';
 
 export function onChainSupportedBlockchains(hre: HardhatRuntimeEnvironment): boolean {
   if (hre.network.name.includes('linea')) return true;
@@ -10,6 +11,7 @@ export function onChainSupportedBlockchains(hre: HardhatRuntimeEnvironment): boo
   if (hre.network.name.includes('xdc_sandbox')) return true;
   if (hre.network.name.includes('okx_sandbox')) return true;
   if (hre.network.name.includes('astar_sandbox')) return true;
+  if (hre.network.name.includes(ROOTSTOCK_SANDBOX)) return true;
 
   return false;
 }

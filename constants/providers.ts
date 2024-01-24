@@ -27,6 +27,7 @@ import {
   POLYGON_PRODUCTION,
   POLYGON_SANDBOX,
   POLYGON_STAGING,
+  ROOTSTOCK_SANDBOX,
   XDC_SANDBOX,
 } from './networks';
 
@@ -55,6 +56,11 @@ export const forkingChainId = (): number => {
 const localProviderData: ProviderData = {
   url: 'http://localhost:8545',
   chainId: forkingChainId(),
+};
+
+const rootstockTestnetProviderData: ProviderData = {
+  url: 'https://public-node.testnet.rsk.co/',
+  chainId: chainId(31),
 };
 
 const lineaTestnetProviderData: ProviderData = {
@@ -203,6 +209,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
     case POLYGON_STAGING:
     case POLYGON_SANDBOX:
       return polygonTestnetProviderData;
+
+    case ROOTSTOCK_SANDBOX:
+      return rootstockTestnetProviderData;
 
     case ARBITRUM_PRODUCTION:
       return arbitrumMainnetProviderData;

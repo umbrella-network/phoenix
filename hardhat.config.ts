@@ -19,12 +19,33 @@ import {HardhatNetworkForkingUserConfig, HardhatUserConfig} from 'hardhat/types'
 import {
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
-  ARBITRUM_STAGING, ARTHERA_SANDBOX, ASTAR_SANDBOX, AVALANCHE_PRODUCTION, AVALANCHE_SANDBOX,
-  AVALANCHE_STAGING, BASE_PRODUCTION, BASE_STAGING,
-  BNB, BNB_PRODUCTION, BNB_SANDBOX,
-  BNB_STAGING, ETH, ETH_PRODUCTION, ETH_SANDBOX,
-  ETH_STAGING, LINEA_PRODUCTION, LINEA_SANDBOX, LINEA_STAGING,
-  LOCALHOST, MELD_SANDBOX, OKX_SANDBOX, POLYGON_PRODUCTION, POLYGON_SANDBOX, POLYGON_STAGING, XDC_SANDBOX
+  ARBITRUM_STAGING,
+  ARTHERA_SANDBOX,
+  ASTAR_SANDBOX,
+  AVALANCHE_PRODUCTION,
+  AVALANCHE_SANDBOX,
+  AVALANCHE_STAGING,
+  BASE_PRODUCTION,
+  BASE_STAGING,
+  BNB,
+  BNB_PRODUCTION,
+  BNB_SANDBOX,
+  BNB_STAGING,
+  ETH,
+  ETH_PRODUCTION,
+  ETH_SANDBOX,
+  ETH_STAGING,
+  LINEA_PRODUCTION,
+  LINEA_SANDBOX,
+  LINEA_STAGING,
+  LOCALHOST,
+  MELD_SANDBOX,
+  OKX_SANDBOX,
+  POLYGON_PRODUCTION,
+  POLYGON_SANDBOX,
+  POLYGON_STAGING,
+  ROOTSTOCK_SANDBOX,
+  XDC_SANDBOX
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
 import {forkingChainId, getProviderData} from './constants/providers';
@@ -270,6 +291,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(MELD_SANDBOX).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(MELD_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    rootstock_sandbox: {
+      url: getProviderData(ROOTSTOCK_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ROOTSTOCK_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     arbitrum_production: {
