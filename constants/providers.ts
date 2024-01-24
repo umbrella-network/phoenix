@@ -99,8 +99,8 @@ const baseTestnetProviderData: ProviderData = {
 };
 
 const arbitrumTestnetProviderData: ProviderData = {
-  url: `https://arbitrum-goerli.infura.io/v3/${INFURA_ID}`,
-  chainId: chainId(421613),
+  url: `https://arbitrum-sepolia.infura.io/v3/${INFURA_ID}`,
+  chainId: chainId(421614),
 };
 
 const avaxTestnetProviderData: ProviderData = {
