@@ -6,6 +6,7 @@ export const OKX_SANDBOX = 'okx_sandbox';
 export const ARTHERA_SANDBOX = 'arthera_sandbox';
 export const ASTAR_SANDBOX = 'astar_sandbox';
 export const MELD_SANDBOX = 'meld_sandbox';
+export const ROOTSTOCK_SANDBOX = 'rootstock_sandbox';
 
 export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
