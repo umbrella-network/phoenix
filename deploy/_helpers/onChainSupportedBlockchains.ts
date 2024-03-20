@@ -12,6 +12,7 @@ export function onChainSupportedBlockchains(hre: HardhatRuntimeEnvironment): boo
   if (hre.network.name.includes('okx_sandbox')) return true;
   if (hre.network.name.includes('astar_sandbox')) return true;
   if (hre.network.name.includes(ROOTSTOCK_SANDBOX)) return true;
+  if (hre.network.name.includes('zk_link_')) return true;
 
   return false;
 }

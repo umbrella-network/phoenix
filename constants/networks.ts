@@ -22,11 +22,15 @@ export const BNB_STAGING = 'bnb_staging';
 export const ETH_STAGING = 'eth_staging';
 export const POLYGON_STAGING = 'polygon_staging';
 
+export const ZK_LINK_NOVA_STAGING = 'zk_link_nova_staging';
+
 export const ARBITRUM_SANDBOX = 'arbitrum_sandbox';
 export const AVALANCHE_SANDBOX = 'avalanche_sandbox';
 export const POLYGON_SANDBOX = 'polygon_sandbox';
 export const ETH_SANDBOX = 'eth_sandbox';
+export const ZK_LINK_NOVA_SANDBOX = 'zk_link_nova_sandbox';
 
+export const ZK_LINK_NOVA_PRODUCTION = 'zk_link_nova_production';
 export const ARBITRUM_PRODUCTION = 'arbitrum_production';
 export const AVALANCHE_PRODUCTION = 'avalanche_production';
 export const ETH_PRODUCTION = 'eth_production';

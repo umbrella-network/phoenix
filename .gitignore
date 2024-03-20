@@ -33,3 +33,7 @@ deployments/localhost
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# zk link
+artifacts-zk
+cache-zk

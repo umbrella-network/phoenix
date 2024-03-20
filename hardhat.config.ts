@@ -8,6 +8,8 @@ import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
 import '@nomicfoundation/hardhat-verify';
 import 'solidity-coverage';
+import '@matterlabs/hardhat-zksync-solc';
+import '@matterlabs/hardhat-zksync-verify';
 
 // there is undefined issue in this repo, ts-node is ignoring flag TS_NODE_TRANSPILE_ONLY=1 and throw errors
 // on missing typechain/
@@ -45,7 +47,7 @@ import {
   POLYGON_SANDBOX,
   POLYGON_STAGING,
   ROOTSTOCK_SANDBOX,
-  XDC_SANDBOX
+  XDC_SANDBOX, ZK_LINK_NOVA_PRODUCTION, ZK_LINK_NOVA_SANDBOX, ZK_LINK_NOVA_STAGING
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
 import {forkingChainId, getProviderData} from './constants/providers';
@@ -93,7 +95,7 @@ const apiKey = (): string | Record<string, string> => {
     'lineatestnet': LINEASCAN_API,
     'linea': LINEASCAN_API,
     'base-goerli': 'PLACEHOLDER_STRING',
-    'base-mainnet': BASESCAN_API
+    'base-mainnet': BASESCAN_API,
   };
 };
 
@@ -299,6 +301,36 @@ const config: HardhatUserConfig = {
       chainId: getProviderData(ROOTSTOCK_SANDBOX).chainId,
       gasPrice: 'auto'
     },
+    zk_link_nova_staging: {
+      url: getProviderData(ZK_LINK_NOVA_STAGING).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ZK_LINK_NOVA_STAGING).chainId,
+      gasPrice: 'auto',
+      ethNetwork: 'sepolia', // The Ethereum Web3 RPC URL, or the identifier of the network (e.g. `mainnet`, `sepolia`)
+      // Verification endpoint for Sepolia
+      verifyURL: 'https://explorer.sepolia.era.zksync.dev/contract_verification',
+      zksync: true, // enables zksolc compiler
+    },
+    zk_link_nova_sandbox: {
+      url: getProviderData(ZK_LINK_NOVA_SANDBOX).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ZK_LINK_NOVA_SANDBOX).chainId,
+      gasPrice: 'auto',
+      ethNetwork: 'sepolia', // The Ethereum Web3 RPC URL, or the identifier of the network (e.g. `mainnet`, `sepolia`)
+      // Verification endpoint for Sepolia
+      verifyURL: 'https://explorer.sepolia.era.zksync.dev/contract_verification',
+      zksync: true, // enables zksolc compiler
+    },
+    zk_link_nova_productin: {
+      url: getProviderData(ZK_LINK_NOVA_PRODUCTION).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ZK_LINK_NOVA_PRODUCTION).chainId,
+      gasPrice: 'auto',
+      ethNetwork: 'mainnet', // The Ethereum Web3 RPC URL, or the identifier of the network (e.g. `mainnet`, `sepolia`)
+      // Verification endpoint for Sepolia
+      verifyURL: 'https://explorer.era.zksync.dev/contract_verification',
+      zksync: true, // enables zksolc compiler
+    },
     arbitrum_production: {
       url: getProviderData(ARBITRUM_PRODUCTION).url,
       accounts: getPrivteKeys(PROD_PK),
@@ -421,6 +453,27 @@ const config: HardhatUserConfig = {
         },
       }
     ]
+  },
+  zksolc: {
+    version: '1.4.0', // optional eg 'latest'
+    settings: {
+      // compilerPath: 'zksolc',  // optional. Can be used if compiler is located in a specific folder
+      libraries:{}, // optional. References to non-inlinable libraries
+      missingLibrariesPath: './.zksolc-libraries-cache/missingLibraryDependencies.json', // optional. cache
+      isSystem: false, // optional.  Enables Yul instructions available only for zkSync system contracts and libraries
+      forceEvmla: false, // optional. Falls back to EVM legacy assembly if there is a bug with Yul
+      optimizer: {
+        enabled: true, // optional. True by default
+        mode: '3', // optional. 3 by default, z to optimize bytecode size
+        // optional. Try to recompile with optimizer mode "z" if the bytecode is too large
+        fallback_to_optimizing_for_size: false,
+      },
+      experimental: {
+        dockerImage: '', // deprecated
+        tag: ''   // deprecated
+      },
+      contractsToCompile: [] //optional. Compile only specific contracts
+    }
   },
   namedAccounts: {
     deployer: 0,
