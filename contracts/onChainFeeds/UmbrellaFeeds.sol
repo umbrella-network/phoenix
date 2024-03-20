@@ -34,10 +34,14 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
     /// @dev decimals for prices stored in this contract
     uint8 public immutable DECIMALS;  // solhint-disable-line var-name-mixedcase
 
+    /// @dev in case selfdestruct is not supported, this flag will make sure contract is not usable anymore
+    bool public disabled;
+
     /// @notice map of all prices stored in this contract, key for map is hash of feed name
     /// eg for "ETH-USD" feed, key will be hash("ETH-USD")
     mapping (bytes32 => PriceData) private _prices;
 
+    error SelfDestruct();
     error ArraysDataDoNotMatch();
     error FeedNotExist();
     error NotEnoughSignatures();
@@ -77,7 +81,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
             revert ContractNotInitialised();
         }
 
-        selfdestruct(payable(msg.sender));
+        disabled = true;
     }
 
     /// @inheritdoc IUmbrellaFeeds
@@ -86,6 +90,7 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         PriceData[] calldata _priceDatas,
         Signature[] calldata _signatures
     ) external {
+        if (disabled) revert SelfDestruct();
         if (_priceKeys.length != _priceDatas.length) revert ArraysDataDoNotMatch();
 
         bytes32 priceDataHash = keccak256(abi.encode(getChainId(), address(this), _priceKeys, _priceDatas));
@@ -109,6 +114,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function getManyPriceData(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {
+        if (disabled) revert SelfDestruct();
+
         data = new PriceData[](_keys.length);
 
         for (uint256 i; i < _keys.length;) {
@@ -121,6 +128,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function getManyPriceDataRaw(bytes32[] calldata _keys) external view returns (PriceData[] memory data) {
+        if (disabled) revert SelfDestruct();
+
         data = new PriceData[](_keys.length);
 
         for (uint256 i; i < _keys.length;) {
@@ -131,17 +140,23 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function prices(bytes32 _key) external view returns (PriceData memory data) {
+        if (disabled) revert SelfDestruct();
+
         data = _prices[_key];
     }
 
     /// @inheritdoc IUmbrellaFeeds
     function getPriceData(bytes32 _key) external view returns (PriceData memory data) {
+        if (disabled) revert SelfDestruct();
+
         data = _prices[_key];
         if (data.timestamp == 0) revert FeedNotExist();
     }
 
     /// @inheritdoc IUmbrellaFeeds
     function getPrice(bytes32 _key) external view returns (uint128 price) {
+        if (disabled) revert SelfDestruct();
+
         PriceData memory data = _prices[_key];
         if (data.timestamp == 0) revert FeedNotExist();
 
@@ -150,6 +165,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function getPriceTimestamp(bytes32 _key) external view returns (uint128 price, uint32 timestamp) {
+        if (disabled) revert SelfDestruct();
+
         PriceData memory data = _prices[_key];
         if (data.timestamp == 0) revert FeedNotExist();
 
@@ -161,6 +178,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
         view
         returns (uint128 price, uint32 timestamp, uint24 heartbeat)
     {
+        if (disabled) revert SelfDestruct();
+
         PriceData memory data = _prices[_key];
         if (data.timestamp == 0) revert FeedNotExist();
 
@@ -169,6 +188,8 @@ contract UmbrellaFeeds is IUmbrellaFeeds {
 
     /// @inheritdoc IUmbrellaFeeds
     function getPriceDataByName(string calldata _name) external view returns (PriceData memory data) {
+        if (disabled) revert SelfDestruct();
+
         bytes32 key = keccak256(abi.encodePacked(_name));
         data = _prices[key];
     }

@@ -39,9 +39,9 @@ contract UmbrellaFeedsDestroyTest is SignerHelper {
     forge test -vvv --match-test test_UmbrellaFeeds_destroy_ok
     */
     function test_UmbrellaFeeds_destroy_ok() public {
-        (bool success, bytes memory data) = address(feeds).staticcall(abi.encodeWithSelector(UmbrellaFeeds.getPriceData.selector, abi.encodePacked(priceKeys[0])));
-        assertTrue(success);
-        assertEq(data.length, 0, "expect no data");
+        (bool success,) = address(feeds).staticcall(abi.encodeWithSelector(UmbrellaFeeds.getPriceData.selector, abi.encodePacked(priceKeys[0])));
+        assertTrue(!success, "expect call to fail");
+        assertTrue(feeds.disabled(), "expect to be disabled");
     }
 
     function _executeUpdate(UmbrellaFeeds _feeds) internal {
