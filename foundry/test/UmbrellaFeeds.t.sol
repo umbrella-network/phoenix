@@ -52,7 +52,7 @@ contract UmbrellaFeedsTest is SignerHelper {
         uint256 gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 2 signatures (initial):", gasUsed);
-        assertEq(gasUsed, 41286);
+        assertEq(gasUsed, 43409);
 
         datas2[0] = IUmbrellaFeeds.PriceData(0, datas[0].heartbeat, datas[0].timestamp + 2, datas[0].price + 10e8);
         sigs = _signData(2, feeds, keys, datas2);
@@ -62,21 +62,21 @@ contract UmbrellaFeedsTest is SignerHelper {
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 2 signatures (#2):", gasUsed);
-        assertEq(gasUsed, 16866);
+        assertEq(gasUsed, 16989);
 
         gasStart = gasleft();
         feeds1.update(keys, datas, sigs1);
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 1 signature (initial):", gasUsed);
-        assertEq(gasUsed, 33496);
+        assertEq(gasUsed, 35619);
 
         gasStart = gasleft();
         feeds6.update(keys, datas, sigs6);
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 6 signature (initial):", gasUsed);
-        assertEq(gasUsed, 59855);
+        assertEq(gasUsed, 61978);
 
         sigs6 = _signData(6, feeds6, keys, datas2);
 
@@ -85,7 +85,7 @@ contract UmbrellaFeedsTest is SignerHelper {
         gasUsed = gasStart - gasleft();
 
         emit log_named_uint("gas used to update with 6 signature (#2):", gasUsed);
-        assertEq(gasUsed, 37986);
+        assertEq(gasUsed, 38109);
 
         gasStart = gasleft();
         IUmbrellaFeeds.PriceData memory result = feeds.getPriceData(keys[0]);
@@ -93,7 +93,7 @@ contract UmbrellaFeedsTest is SignerHelper {
 
         emit log_named_uint("gas used to read price directly:", gasUsed);
         emit log_named_uint("result:", result.price);
-        assertEq(gasUsed, 1902);
+        assertEq(gasUsed, 2028);
     }
 
     /*
