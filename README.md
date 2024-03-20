@@ -198,14 +198,14 @@ npx hardhat registerReaderFactory --network polygon_sandbox
 On blockchain with only on-chain data:
 
 ```shell
-npx hardhat deploy --network linea_sandbox
+npx hardhat deploy --network zk_link_nova_staging
 
-npx hardhat registerStakingBankStatic --network linea_sandbox
+npx hardhat registerStakingBankStatic --network zk_link_nova_staging
 # remove feed json
-npx hardhat deploy --network linea_sandbox
+npx hardhat deploy --network zk_link_nova_staging
 
-npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network linea_sandbox
-npx hardhat registerReaderFactory --network linea_sandbox
+npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network zk_link_nova_staging
+npx hardhat registerReaderFactory --network zk_link_nova_staging
 ```
 
 #### Code verification on Linea

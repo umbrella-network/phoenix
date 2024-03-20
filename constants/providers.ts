@@ -29,6 +29,9 @@ import {
   POLYGON_STAGING,
   ROOTSTOCK_SANDBOX,
   XDC_SANDBOX,
+  ZK_LINK_NOVA_PRODUCTION,
+  ZK_LINK_NOVA_SANDBOX,
+  ZK_LINK_NOVA_STAGING,
 } from './networks';
 
 const { INFURA_ID, FAKE_MAINNET, FORKING_ENV, CHAIN_ID } = process.env;
@@ -56,6 +59,11 @@ export const forkingChainId = (): number => {
 const localProviderData: ProviderData = {
   url: 'http://localhost:8545',
   chainId: forkingChainId(),
+};
+
+const zkLinkNovaTestnetProviderData: ProviderData = {
+  url: 'https://sepolia.era.zksync.dev/',
+  chainId: chainId(300),
 };
 
 const rootstockTestnetProviderData: ProviderData = {
@@ -128,6 +136,11 @@ const ethTestnetProviderData: ProviderData = {
 const polygonTestnetProviderData: ProviderData = {
   url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
   chainId: chainId(80001),
+};
+
+const zkLinkNovaMainnetProviderData: ProviderData = {
+  url: 'https://rpc.zklink.io',
+  chainId: chainId(810180),
 };
 
 const arbitrumMainnetProviderData: ProviderData = {
@@ -213,6 +226,10 @@ const resolveProviderData = (networkName: string): ProviderData => {
     case ROOTSTOCK_SANDBOX:
       return rootstockTestnetProviderData;
 
+    case ZK_LINK_NOVA_STAGING:
+    case ZK_LINK_NOVA_SANDBOX:
+      return zkLinkNovaTestnetProviderData;
+
     case ARBITRUM_PRODUCTION:
       return arbitrumMainnetProviderData;
 
@@ -233,6 +250,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
 
     case BASE_PRODUCTION:
       return baseMainnetProviderData;
+
+    case ZK_LINK_NOVA_PRODUCTION:
+      return zkLinkNovaMainnetProviderData;
   }
 
   throw new Error(`${networkName} not supported`);
