@@ -37,6 +37,7 @@ export const ETH_PRODUCTION = 'eth_production';
 export const POLYGON_PRODUCTION = 'polygon_production';
 export const BNB_PRODUCTION = 'bnb_production';
 export const LINEA_PRODUCTION = 'linea_production';
+export const ROOTSTOCK_PRODUCTION = 'rootstock_production';
 
 export const MASTER_CHAIN_NAME = BNB;
 

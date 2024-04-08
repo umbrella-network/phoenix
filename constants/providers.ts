@@ -27,6 +27,7 @@ import {
   POLYGON_PRODUCTION,
   POLYGON_SANDBOX,
   POLYGON_STAGING,
+  ROOTSTOCK_PRODUCTION,
   ROOTSTOCK_SANDBOX,
   XDC_SANDBOX,
   ZK_LINK_NOVA_PRODUCTION,
@@ -69,6 +70,11 @@ const zkLinkNovaTestnetProviderData: ProviderData = {
 const rootstockTestnetProviderData: ProviderData = {
   url: 'https://public-node.testnet.rsk.co/',
   chainId: chainId(31),
+};
+
+const rootstockMainnetProviderData: ProviderData = {
+  url: 'https://public-node.rsk.co',
+  chainId: chainId(30),
 };
 
 const lineaTestnetProviderData: ProviderData = {
@@ -250,6 +256,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
 
     case BASE_PRODUCTION:
       return baseMainnetProviderData;
+
+    case ROOTSTOCK_PRODUCTION:
+      return rootstockMainnetProviderData;
 
     case ZK_LINK_NOVA_PRODUCTION:
       return zkLinkNovaMainnetProviderData;

@@ -46,6 +46,7 @@ import {
   POLYGON_PRODUCTION,
   POLYGON_SANDBOX,
   POLYGON_STAGING,
+  ROOTSTOCK_PRODUCTION,
   ROOTSTOCK_SANDBOX,
   XDC_SANDBOX, ZK_LINK_NOVA_PRODUCTION, ZK_LINK_NOVA_SANDBOX, ZK_LINK_NOVA_STAGING
 } from './constants/networks';
@@ -376,6 +377,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(BASE_PRODUCTION).url,
       accounts: getPrivteKeys(PROD_PK),
       chainId: getProviderData(BASE_PRODUCTION).chainId,
+      live: true
+    },
+    rootstock_production: {
+      url: getProviderData(ROOTSTOCK_PRODUCTION).url,
+      accounts: getPrivteKeys(PROD_PK),
+      chainId: getProviderData(ROOTSTOCK_PRODUCTION).chainId,
       live: true
     },
     docker: {

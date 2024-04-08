@@ -7,6 +7,7 @@ import {
   LINEA_PRODUCTION,
   LOCALHOST,
   POLYGON_PRODUCTION,
+  ROOTSTOCK_PRODUCTION,
 } from './networks';
 
 const { DEPLOYER_PK, STAGING_DEPLOYER_PK, PROD_DEPLOYER_PK, FORKING_ENV, FAKE_MAINNET } = process.env;
@@ -37,6 +38,7 @@ export function getPrivteKeys(network = ''): string[] {
     case ETH_PRODUCTION:
     case LINEA_PRODUCTION:
     case BASE_PRODUCTION:
+    case ROOTSTOCK_PRODUCTION:
       return prodAccounts;
 
     default:
