@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Changed
+- replace `destroy` with flag for Zk-Link
+
+
+## [4.13.0] - 2024-04-04
+### Added
+- Rootstock mainnet
+- new EVM testnets: XDC (Apothem),  Meld, Arthera, OKX and Astar
 
 ## [4.12.1] - 2023-11-07
 ### Added

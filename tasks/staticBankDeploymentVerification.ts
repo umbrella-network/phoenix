@@ -48,5 +48,5 @@ task('static-bank-verify', 'verify if bank has 15 validators and chain has new b
     if (lastBlockId != 0) throw Error('chain should not be registered!');
 
     console.log(hre.network.name, 'OK');
-  }
+  },
 );

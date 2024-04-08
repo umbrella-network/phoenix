@@ -13,11 +13,11 @@ const Token = artifacts.readArtifactSync('Token');
 
 export const deployedRegistry = async (): Promise<Contract> => {
   return new ethers.Contract(config.contractRegistry.address, Registry.abi, provider).connect(
-    (await ethers.getSigners())[0]
+    (await ethers.getSigners())[0],
   );
 };
 
-export const deployedContract = async (name: 'IStakingBank' | 'UMB' | 'Chain'): Promise<Contract> => {
+export const deployedContract = async (name: 'StakingBank' | 'UMB' | 'Chain'): Promise<Contract> => {
   const address = await (await deployedRegistry()).getAddressByString(name);
   let abi;
 

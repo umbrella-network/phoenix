@@ -33,7 +33,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         waitConfirmations: 1,
       },
       'importContracts',
-      [stakingBank.address]
+      [stakingBank.address],
     );
   }
 
