@@ -16,6 +16,7 @@ export const STAKING_BANK_STATE = 'StakingBankState';
 export const UMBRELLA_FEEDS = 'UmbrellaFeeds';
 export const UMBRELLA_FEEDS_READER_FACTORY = 'UmbrellaFeedsReaderFactory';
 export const UMB = 'UMB';
+export const UNISWAPV3_FETCHER_HELPER = 'UniswapV3FetcherHelper';
 export const UMB_BYTES32 = '0x554d420000000000000000000000000000000000000000000000000000000000';
 
 export type ChainType = typeof CHAIN | typeof FOREIGN_CHAIN;

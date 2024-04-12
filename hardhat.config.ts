@@ -458,6 +458,14 @@ const config: HardhatUserConfig = {
             runs: 0,
           },
         },
+      }, {
+        version: '0.8.22',
+        settings: {
+          optimizer: {
+            enabled: false,
+            runs: 0,
+          },
+        },
       }
     ]
   },
