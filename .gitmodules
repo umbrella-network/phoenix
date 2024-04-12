@@ -1,3 +1,6 @@
 [submodule "foundry/lib/ds-test"]
 	path = foundry/lib/ds-test
 	url = https://github.com/dapphub/ds-test
+[submodule "uniswap/v3-periphery"]
+	path = contracts/gitmodules/uniswap/v3-periphery
+	url = https://github.com/Uniswap/v3-periphery
