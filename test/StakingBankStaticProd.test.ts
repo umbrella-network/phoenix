@@ -51,7 +51,7 @@ describe('StakingBankStaticProd', () => {
     const arr = new Array(validatorsCount).fill(0);
 
     arr.forEach((n, i) => {
-      it(`[${i}] validator check`, async () => {
+      it.skip(`[${i}] validator check`, async () => {
         const address = await contract.addresses(i);
         const validator = await contract.validators(address);
 

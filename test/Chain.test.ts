@@ -14,6 +14,7 @@ import { blockTimestamp, increaseTime, mintBlocks } from './utils';
 import { ChainStatus } from './types/ChainStatus';
 import {
   abiUintEncoder,
+  buildTree,
   executeSubmit,
   fetchLogVotersEvents,
   inputs,
@@ -21,10 +22,10 @@ import {
   prepareData,
   setupForChainWithMocks,
   sortWallets,
-  tree,
 } from './chainUtils';
 import { BaseChain } from '../typechain';
 import { SubmitPreparedData } from '../types/types';
+import SortedMerkleTree from '../lib/SortedMerkleTree';
 
 use(waffleChai);
 
@@ -32,15 +33,15 @@ const { SIGNED_NUMBER_PREFIX } = SDKConstants;
 
 const timePadding = 100;
 
-const root = tree.getRoot();
-
 describe('Chain', () => {
   let owner: SignerWithAddress,
     validator: SignerWithAddress,
     validator2: SignerWithAddress,
     validatorAddress: string,
     stakingBank: MockContract,
-    contract: Contract;
+    contract: Contract,
+    root: string,
+    tree: SortedMerkleTree;
 
   const mockSubmitWrapper = async (leader = validator, totalSupply = 1000, balance = 1000) => {
     await mockSubmit({ stakingBank, leader, totalSupply, balance });
@@ -60,6 +61,11 @@ describe('Chain', () => {
   };
 
   let genesisSnapshotId: unknown;
+
+  before(() => {
+    tree = buildTree();
+    root = tree.getRoot();
+  });
 
   beforeEach(async () => {
     genesisSnapshotId = await doSnapshot(hre);
@@ -489,11 +495,11 @@ describe('Chain', () => {
           });
 
           describe('verify Proof', () => {
-            const k = 'BTC-USD';
-            const v = inputs[k];
-            const proof = tree.getProofForKey(k);
-
             it('.verifyProofForBlock()', async () => {
+              const k = 'BTC-USD';
+              const v = inputs[k];
+              const proof = tree.getProofForKey(k);
+
               expect(await contract.verifyProofForBlock(dataTimestamp, proof, LeafKeyCoder.encode(k), v)).to.be.true;
             });
           });

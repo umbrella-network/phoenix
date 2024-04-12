@@ -3,7 +3,6 @@ import { Contract } from 'ethers';
 
 import configuration from '../../config';
 
-const config = configuration();
 const provider = hre.ethers.provider;
 
 const Registry = artifacts.readArtifactSync('Registry');
@@ -12,7 +11,7 @@ const Chain = artifacts.readArtifactSync('Chain');
 const Token = artifacts.readArtifactSync('Token');
 
 export const deployedRegistry = async (): Promise<Contract> => {
-  return new ethers.Contract(config.contractRegistry.address, Registry.abi, provider).connect(
+  return new ethers.Contract(configuration().contractRegistry.address, Registry.abi, provider).connect(
     (await ethers.getSigners())[0],
   );
 };

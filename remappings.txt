@@ -1,5 +1,6 @@
 @openzeppelin/=node_modules/@openzeppelin/
 @uniswap/=node_modules/@uniswap/
+uniswap/=gitmodules/uniswap/
 @umb-network/=node_modules/@umb-network/
 ds-test/=foundry/lib/ds-test/src/
 contracts/=contracts/

@@ -35,7 +35,7 @@ import {
   BNB_STAGING,
   ETH,
   ETH_PRODUCTION,
-  ETH_SANDBOX,
+  ETH_SANDBOX, ETH_SEPOLIA,
   ETH_STAGING,
   LINEA_PRODUCTION,
   LINEA_SANDBOX,
@@ -81,6 +81,7 @@ const apiKey = (): string | Record<string, string> => {
   return {
     'mainnet': ETHERSCAN_API,
     'goerli': ETHERSCAN_API,
+    'sepolia': ETHERSCAN_API,
     // bsc
     'bsc': BSCSCAN_API,
     'bscTestnet': BSCSCAN_API,
@@ -214,6 +215,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(ETH_STAGING).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(ETH_STAGING).chainId,
+      gasPrice: 'auto'
+    },
+    eth_sepolia: {
+      url: getProviderData(ETH_SEPOLIA).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ETH_SEPOLIA).chainId,
       gasPrice: 'auto'
     },
     polygon_staging: {
@@ -451,6 +458,14 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
+        version: '0.7.6',
+        settings: {
+          optimizer: {
+            enabled: false,
+            runs: 0,
+          },
+        },
+      }, {
         version: '0.8.13',
         settings: {
           optimizer: {
@@ -467,7 +482,25 @@ const config: HardhatUserConfig = {
           },
         },
       }
-    ]
+    ],
+    overrides: {
+      '@uniswap/v3-core/contracts/libraries/FullMath.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+      '@uniswap/v3-core/contracts/libraries/TickBitmap.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+      'gitmodules/uniswap/v3-periphery/contracts/libraries/PoolAddress.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+      'gitmodules/uniswap/v3-periphery/contracts/libraries/PoolTicksCounter.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+    },
   },
   zksolc: {
     version: '1.4.0', // optional eg 'latest'

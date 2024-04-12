@@ -1,11 +1,19 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import { CHAIN, CHAIN_BYTES32, REGISTRY } from '../../constants';
+import {CHAIN, CHAIN_BYTES32, REGISTRY, STAKING_BANK} from '../../constants';
 import { ASTAR_SANDBOX, HARDHAT, LOCALHOST } from '../../constants/networks';
 import { verifyCode } from '../../scripts/utils/verifyContract';
+import {supportedLayer2Blockchain} from "../_helpers/supportedLayer2Blockchain";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  if (!supportedLayer2Blockchain(hre)) {
+    console.log('-'.repeat(80));
+    console.log(`${STAKING_BANK} is not supported on ${hre.network.name}`);
+    console.log('-'.repeat(80));
+    return;
+  }
+
   const { deployments } = hre;
   const { deploy, read } = deployments;
   const [deployer] = await hre.ethers.getSigners();
