@@ -3,6 +3,7 @@ pragma solidity 0.8.22;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+import {IUniswapV3Factory} from "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import {IUniswapV3Pool} from "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import {IQuoterV2} from "gitmodules/uniswap/v3-periphery/contracts/interfaces/IQuoterV2.sol";
 
@@ -11,9 +12,8 @@ contract UniswapV3FetcherHelper {
     bytes4 internal constant _SYMBOL_SELECTOR = bytes4(keccak256("symbol()"));
     bytes4 internal constant _DECIMALS_SELECTOR = bytes4(keccak256("decimals()"));
 
+    IUniswapV3Factory immutable uniswapV3Factory;
     IQuoterV2 immutable uniswapV3Quoter;
-
-    error NoDecimals();
 
     struct PriceData {
         IUniswapV3Pool[] pools;
@@ -27,7 +27,8 @@ contract UniswapV3FetcherHelper {
         bool success;
     }
 
-    constructor(IQuoterV2 _quoter) {
+    constructor(IUniswapV3Factory _factory, IQuoterV2 _quoter) {
+        uniswapV3Factory = _factory;
         uniswapV3Quoter = _quoter;
     }
 
@@ -45,8 +46,12 @@ contract UniswapV3FetcherHelper {
         }
     }
 
-    /// @dev this method will return estimations for swap for one base otken
+    /// @dev this method will return estimations for swap for one base token
     /// it can not be view, but to get estimation you have to call it in a static way
+    /// Tokens that do not have `.decimals()` are not supported
+    /// @param _data array of PriceData, each PriceData can accept multiple pools per one price, price is fetched from
+    /// pool, that has biggest liquidity (quote.balanceOf(pool))
+    /// TODO balanceOf might be not liquidity and by sending token to pool we can in theory affect this fetcher
     function getPrices(PriceData[] calldata _data)
         external
         virtual
@@ -60,13 +65,22 @@ contract UniswapV3FetcherHelper {
             PriceData memory data = _data[i];
             Price memory price = prices[i];
 
-            IUniswapV3Pool pool = findBiggestPool(data.pools, data.quote);
+            (uint256 baseDecimals, bool baseHasDecimals) = _decimals(data.base);
+            if (!baseHasDecimals) continue;
 
-            uint256 oneBaseToken =  10 ** _decimals(data.base);
-            uint256 quoteDecimals = _decimals(data.quote);
+            uint256 oneBaseToken = 10 ** baseDecimals;
+
+            (uint256 quoteDecimals, bool quoteHasDecimals) = _decimals(data.quote);
+            if (!quoteHasDecimals) continue;
+
+            IUniswapV3Pool pool = _findBiggestPool(data.pools, data.quote);
+            if (address(pool) == address(0)) continue;
+
+            uint24 fee = pool.fee();
+            if (address(pool) != _getPool(data.base, data.quote, fee)) continue;
 
             (bool success, bytes memory result) = address(uniswapV3Quoter).call(abi.encodeWithSelector(
-                IQuoterV2.quoteExactInputSingle.selector, data.base, data.quote, oneBaseToken, pool.fee(), 0
+                IQuoterV2.quoteExactInputSingle.selector, data.base, data.quote, oneBaseToken, fee, 0
             ));
 
             if (success) {
@@ -74,19 +88,22 @@ contract UniswapV3FetcherHelper {
                 price.success = true;
             }
 
-            if (quoteDecimals == 18) {
-                // price OK
-            } else if (quoteDecimals > 18) {
-                price.price /= 10 ** (quoteDecimals - 18);
-            } else {
-                price.price *= 10 ** (18 - quoteDecimals);
+            unchecked {
+                // safe to unchech because we checking over/under-flow conditions manually
+                if (quoteDecimals == 18) {
+                    // price OK
+                } else if (quoteDecimals > 18) {
+                    price.price /= 10 ** (quoteDecimals - 18);
+                } else {
+                    price.price *= 10 ** (18 - quoteDecimals);
+                }
             }
         }
     }
 
     /// @dev finds pool with biggest quote liquidity
-    function findBiggestPool(IUniswapV3Pool[] memory _pools, address _quote)
-        public
+    function _findBiggestPool(IUniswapV3Pool[] memory _pools, address _quote)
+        internal
         view
         virtual
         returns (IUniswapV3Pool biggestPool)
@@ -104,11 +121,21 @@ contract UniswapV3FetcherHelper {
         }
     }
 
-    function _decimals(address _token) public view virtual returns (uint256 decimals) {
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory data) = _token.staticcall(abi.encode(_DECIMALS_SELECTOR));
-        if (!success) revert NoDecimals();
+    function _decimals(address _token) internal view virtual returns (uint256 decimals, bool success) {
+        bytes memory data;
 
-        decimals = abi.decode(data, (uint256));
+        // solhint-disable-next-line avoid-low-level-calls
+        (success, data) = _token.staticcall(abi.encode(_DECIMALS_SELECTOR));
+        if (success && data.length != 0) decimals = abi.decode(data, (uint256));
+        else success = false;
+    }
+
+    function _getPool(address _token0, address _token1, uint24 _fee) internal view virtual returns (address pool) {
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory data) = address(uniswapV3Factory).staticcall(
+            abi.encodeWithSelector(IUniswapV3Factory.getPool.selector, _token0, _token1, _fee)
+        );
+
+        if (success) pool = abi.decode(data, (address));
     }
 }
