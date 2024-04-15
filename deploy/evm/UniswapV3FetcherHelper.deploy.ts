@@ -37,6 +37,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     case ETH_PRODUCTION:
       factory = '0x1F98431c8aD98523631AE4a59f267346ea31F984';
       break;
+
+    case ETH_SEPOLIA:
+      factory = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c';
+      break;
   }
 
   if (!factory) throw new Error(`Uniswap Factory not setu up for ${hre.network.name}`);
