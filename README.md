@@ -47,7 +47,9 @@ In case on missing lib: `brew install libusb`.
 4. `git submodule update --init --recursive`
 5. `git submodule add --name gitmodules/uniswap/v3-periphery https://github.com/Uniswap/v3-periphery gitmodules/uniswap/v3-periphery`
 
-`git submodule update --init --recursive`
+```
+git submodule update --init --recursive
+```
 ---
 
 ### Remove submodule
