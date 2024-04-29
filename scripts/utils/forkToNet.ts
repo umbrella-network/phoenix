@@ -4,6 +4,8 @@ export const forkToNet = async (hre: HardhatRuntimeEnvironment, network: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fork: any = hre.config.networks[network];
 
+  if (!fork.url) throw new Error(`[forkToNet] missing setup for ${network}`);
+
   console.log(`### switch to forking ${network} ###`);
 
   await hre.network.provider.request({
