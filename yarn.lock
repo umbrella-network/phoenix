@@ -1108,7 +1108,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/hardhat-verify@npm:2.0.5, @nomicfoundation/hardhat-verify@npm:^2.0.0":
+"@nomicfoundation/hardhat-verify@npm:2.0.6":
+  version: 2.0.6
+  resolution: "@nomicfoundation/hardhat-verify@npm:2.0.6"
+  dependencies:
+    "@ethersproject/abi": ^5.1.2
+    "@ethersproject/address": ^5.0.2
+    cbor: ^8.1.0
+    chalk: ^2.4.2
+    debug: ^4.1.1
+    lodash.clonedeep: ^4.5.0
+    semver: ^6.3.0
+    table: ^6.8.0
+    undici: ^5.14.0
+  peerDependencies:
+    hardhat: ^2.0.4
+  checksum: 38091d1d35e6c88b547e11c5ba0ad2b23db7df6c8d708a7a48625a9cf4adf6c51bf3544e2b6bb729280952056fddc43212ad3f04f5f1f66b04e1ee0aed58b8ca
+  languageName: node
+  linkType: hard
+
+"@nomicfoundation/hardhat-verify@npm:^2.0.0":
   version: 2.0.5
   resolution: "@nomicfoundation/hardhat-verify@npm:2.0.5"
   dependencies:
@@ -7956,9 +7975,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat-deploy@npm:0.11.44":
-  version: 0.11.44
-  resolution: "hardhat-deploy@npm:0.11.44"
+"hardhat-deploy@npm:0.12.4":
+  version: 0.12.4
+  resolution: "hardhat-deploy@npm:0.12.4"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -7983,8 +8002,8 @@ __metadata:
     match-all: ^1.2.6
     murmur-128: ^0.2.1
     qs: ^6.9.4
-    zksync-web3: ^0.14.3
-  checksum: c37ec9bcba32abb3f81bf40480b5523b6825e27b344e11ccbc3d121655f41dba09debfa70f7ad871c7d5fa7d14d7a65938f9415cfd2a18293f12a39763cf2d31
+    zksync-ethers: ^5.0.0
+  checksum: 995a20a7ae8d10d2b961690e0903cd2a4a07198bc3d20a15d4734f2d9aade261b6f0ffb9e01b8fc013de34b687e401ed0c90dfc4d592571576f133ce8cbf3003
   languageName: node
   linkType: hard
 
@@ -11683,7 +11702,7 @@ __metadata:
     "@ethersproject/providers": 5.7.2
     "@matterlabs/hardhat-zksync-solc": 1.1.4
     "@matterlabs/hardhat-zksync-verify": 0.5.1
-    "@nomicfoundation/hardhat-verify": 2.0.5
+    "@nomicfoundation/hardhat-verify": 2.0.6
     "@nomiclabs/hardhat-ethers": 2.2.3
     "@nomiclabs/hardhat-solhint": 2.0.1
     "@nomiclabs/hardhat-waffle": 2.0.3
@@ -11710,7 +11729,7 @@ __metadata:
     ethereum-waffle: 3.4.4
     ethers: 5.7.2
     hardhat: 2.19.4
-    hardhat-deploy: 0.11.44
+    hardhat-deploy: 0.12.4
     hardhat-deploy-ethers: 0.3.0-beta.13
     hardhat-gas-reporter: 1.0.9
     husky: 4.3.0
@@ -15912,14 +15931,5 @@ __metadata:
   peerDependencies:
     ethers: ~5.7.0
   checksum: 347ec845f18e9463350827cee5725da4d6ce8031f6c4c0b5e54c1bbac2a8c1d10a5bae3d9e61ec3ad987c8bad9921eab24cacd0415a9dabbee3ad8a71237823a
-  languageName: node
-  linkType: hard
-
-"zksync-web3@npm:^0.14.3":
-  version: 0.14.4
-  resolution: "zksync-web3@npm:0.14.4"
-  peerDependencies:
-    ethers: ^5.7.0
-  checksum: f702a3437f48a8d42c4bb35b8dd13671a168aadfc4e23ce723d62959220ccb6bf9c529c60331fe5b91afaa622147c6a37490551474fe3e35c06ac476524b5160
   languageName: node
   linkType: hard
