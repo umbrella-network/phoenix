@@ -41,16 +41,15 @@ jobs:
 
       - run: yarn install
 
-      - name: Install submoduls
-        run: git submodule update --init --recursive
-
       - name: Install Foundry
         uses: onbjerg/foundry-toolchain@v1
         with:
           version: nightly
 
       - name: Run Foundry tests
-        run: forge test -vvv
+        run: |
+          git submodule update --init --recursive
+          forge test -vvv
 
       - name: Compile contracts
         run: yarn compile
