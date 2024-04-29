@@ -1,9 +1,9 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import {networks, REGISTRY, UMB, UMB_BYTES32, ERC20} from '../../constants';
+import { networks, REGISTRY, UMB, UMB_BYTES32, ERC20 } from '../../constants';
 import { deployerSigner } from '../../tasks/_helpers/jsonRpcProvider';
-import {supportedLayer2Blockchain} from "../_helpers/supportedLayer2Blockchain";
+import { supportedLayer2Blockchain } from '../_helpers/supportedLayer2Blockchain';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if (!supportedLayer2Blockchain(hre)) {

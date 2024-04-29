@@ -9,7 +9,7 @@ import { waffleChai } from '@ethereum-waffle/chai';
 import { forkToNet } from '../../scripts/utils/forkToNet';
 import { UNISWAPV3_FETCHER_HELPER } from '../../constants';
 import { resolveContract } from '../../scripts/utils/helpers';
-import {UniswapV3FetcherHelper} from '../../typechain';
+import { UniswapV3FetcherHelper } from '../../typechain';
 
 import PriceDataStruct = UniswapV3FetcherHelper.PriceDataStruct;
 
