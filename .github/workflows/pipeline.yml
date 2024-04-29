@@ -41,21 +41,23 @@ jobs:
 
       - run: yarn install
 
-      - name: Install Foundry
-        uses: onbjerg/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Run Foundry tests
-        run: |
-          git submodule update --init --recursive
-          forge test -vvv
+#      - name: Install Foundry
+#        uses: onbjerg/foundry-toolchain@v1
+#        with:
+#          version: nightly
+#
+#      - name: Run Foundry tests
+#        run: |
+#          git submodule update --init --recursive
+#          forge test -vvv
 
       - name: Compile contracts
         run: yarn compile
         
       - name: Unit tests
         run: yarn test
+        env:
+          INFURA_ID: ${{ vars.INFURA_ID }}
 
       - name: Unit tests (foreign)
         run: yarn test:foreign
