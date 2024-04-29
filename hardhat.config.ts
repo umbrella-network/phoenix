@@ -52,6 +52,7 @@ import {
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
 import {forkingChainId, getProviderData} from './constants/providers';
+import {UNISWAPV3_QUOTERV2} from "./constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (BigInt.prototype as any).toJSON = function () {
@@ -484,6 +485,10 @@ const config: HardhatUserConfig = {
       }
     ],
     overrides: {
+      [UNISWAPV3_QUOTERV2]: {
+        version: '0.7.6',
+        settings: {},
+      },
       '@uniswap/v3-core/contracts/libraries/FullMath.sol': {
         version: '0.7.6',
         settings: {},
