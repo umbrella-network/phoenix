@@ -12,14 +12,14 @@ contract UniswapV3FetcherHelper {
     bytes4 internal constant _SYMBOL_SELECTOR = bytes4(keccak256("symbol()"));
     bytes4 internal constant _DECIMALS_SELECTOR = bytes4(keccak256("decimals()"));
 
-    IUniswapV3Factory immutable uniswapV3Factory;
-    IQuoterV2 immutable uniswapV3Quoter;
-
     struct PriceData {
         IUniswapV3Pool[] pools;
         address base;
         address quote;
     }
+
+    IUniswapV3Factory immutable public uniswapV3Factory;
+    IQuoterV2 immutable public uniswapV3Quoter;
 
     /// @param price is amount out (normalized to 18 decimals) returned by Uniswap pool for 1 quote token
     struct Price {

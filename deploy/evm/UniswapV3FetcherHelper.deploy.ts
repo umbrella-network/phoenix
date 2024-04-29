@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import { QUOTER, UNISWAPV3_FETCHER_HELPER } from '../../constants';
+import { QUOTERV2, UNISWAPV3_FETCHER_HELPER } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { ETH_PRODUCTION, ETH_SEPOLIA, HARDHAT } from '../../constants/networks';
 
@@ -29,7 +29,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log(`Deploying ${UNISWAPV3_FETCHER_HELPER} on chain: ${hre.network.name}`);
 
-  const quoter = await hre.deployments.get(QUOTER);
+  const quoter = await hre.deployments.get(QUOTERV2);
   let factory = '';
 
   switch (hre.network.name) {
@@ -51,6 +51,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await verifyCode(hre, chain.address, args);
 };
 
-func.dependencies = [QUOTER];
+func.dependencies = [QUOTERV2];
 func.tags = [UNISWAPV3_FETCHER_HELPER];
 export default func;

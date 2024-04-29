@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import { QUOTER } from '../../constants';
+import { QUOTERV2 } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { ETH_PRODUCTION, ETH_SEPOLIA, HARDHAT } from '../../constants/networks';
 
@@ -15,7 +15,7 @@ function supportedBlockchain(hre: HardhatRuntimeEnvironment): boolean {
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if (!supportedBlockchain(hre)) {
     console.log('-'.repeat(80));
-    console.log(`${QUOTER} is not supported on ${hre.network.name}`);
+    console.log(`${QUOTERV2} is not supported on ${hre.network.name}`);
     console.log('-'.repeat(80));
     return;
   }
@@ -23,7 +23,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = hre.deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  console.log(`Deploying ${QUOTER} on chain: ${hre.network.name}`);
+  console.log(`Deploying ${QUOTERV2} on chain: ${hre.network.name}`);
 
   let uniswapV3Factory = '';
   let weth = '';
@@ -42,11 +42,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   const args = [uniswapV3Factory, weth];
-  console.log(`[${hre.network.name}] ${QUOTER} args: ${args}`);
+  console.log(`[${hre.network.name}] ${QUOTERV2} args: ${args}`);
 
-  const chain = await deploy(QUOTER, { from: deployer, log: true, args, waitConfirmations: 1 });
+  const chain = await deploy(QUOTERV2, { from: deployer, log: true, args, waitConfirmations: 1 });
   await verifyCode(hre, chain.address, args);
 };
 
-func.tags = [QUOTER];
+func.tags = [QUOTERV2];
 export default func;
