@@ -26,7 +26,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       weth = '0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92';
       break;
 
-    default: throw new Error(`${QUOTERV2} not set up for ${hre.network.name}`);
+    default:
+      throw new Error(`${QUOTERV2} not set up for ${hre.network.name}`);
   }
 
   const args = [uniswapV3Factory, weth];
