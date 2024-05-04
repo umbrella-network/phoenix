@@ -1,7 +1,7 @@
 import 'hardhat';
 import '@nomiclabs/hardhat-ethers';
 
-import hre, {ethers} from 'hardhat';
+import hre, { ethers } from 'hardhat';
 import { expect, use } from 'chai';
 import { Contract } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
@@ -59,7 +59,6 @@ describe('UniswapV3FetchersHelpers', () => {
 
     expect(result.success).false;
   });
-
 
   it('#getPrices with zero pool', async () => {
     const data: PriceDataStruct[] = [
