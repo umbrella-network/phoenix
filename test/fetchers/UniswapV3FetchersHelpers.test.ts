@@ -1,7 +1,7 @@
 import 'hardhat';
 import '@nomiclabs/hardhat-ethers';
 
-import hre from 'hardhat';
+import hre, {ethers} from 'hardhat';
 import { expect, use } from 'chai';
 import { Contract } from 'ethers';
 import { waffleChai } from '@ethereum-waffle/chai';
@@ -40,16 +40,45 @@ describe('UniswapV3FetchersHelpers', () => {
     contract = await resolveContract(hre, UNISWAPV3_FETCHER_HELPER, signer);
   });
 
-  it.only('no data', async () => {
+  it('#getPrices: no data', async () => {
     const [[result]] = await contract.callStatic.getPrices([]);
 
     expect(result).undefined;
   });
 
-  it('no pools', async () => {
+  it('#getPrices: no pools', async () => {
     const data: PriceDataStruct[] = [
       <PriceDataStruct>{
         pools: [],
+        base: WBTC,
+        quote: USDC,
+      },
+    ];
+
+    const [[result]] = await contract.callStatic.getPrices(data);
+
+    expect(result.success).false;
+  });
+
+
+  it('#getPrices with zero pool', async () => {
+    const data: PriceDataStruct[] = [
+      <PriceDataStruct>{
+        pools: [ethers.constants.AddressZero],
+        base: WBTC,
+        quote: USDC,
+      },
+    ];
+
+    const [[result]] = await contract.callStatic.getPrices(data);
+
+    expect(result.success).false;
+  });
+
+  it('#getPrices with invalid pool', async () => {
+    const data: PriceDataStruct[] = [
+      <PriceDataStruct>{
+        pools: [ethers.constants.AddressZero.replace('0x0', '0x1')],
         base: WBTC,
         quote: USDC,
       },
