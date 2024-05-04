@@ -5,21 +5,7 @@ import { QUOTERV2 } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { ETH_PRODUCTION, ETH_SEPOLIA, HARDHAT } from '../../constants/networks';
 
-function supportedBlockchain(hre: HardhatRuntimeEnvironment): boolean {
-  if (hre.network.name.includes('hardhat')) return true;
-  if (hre.network.name.includes('eth_sepolia')) return true;
-
-  return false;
-}
-
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  if (!supportedBlockchain(hre)) {
-    console.log('-'.repeat(80));
-    console.log(`${QUOTERV2} is not supported on ${hre.network.name}`);
-    console.log('-'.repeat(80));
-    return;
-  }
-
   const { deploy } = hre.deployments;
   const { deployer } = await hre.getNamedAccounts();
 
@@ -39,6 +25,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       uniswapV3Factory = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c';
       weth = '0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92';
       break;
+
+    default: throw new Error(`${QUOTERV2} not set up for ${hre.network.name}`);
   }
 
   const args = [uniswapV3Factory, weth];
