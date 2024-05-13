@@ -19,12 +19,12 @@ describe('Sovryn', () => {
   let contract: Contract;
 
   before(async () => {
-    await forkToNet(hre, 'rootstock_production', 6342268);
+    await forkToNet(hre, 'rootstock_production', 6342497);
     const abi = fs.readFileSync(__dirname + '/SovrynSwapNetwork.abi.json', 'utf-8');
     contract = new Contract(SovrynSwapNetworkAddress, abi, hre.ethers.provider);
   });
 
-  it.only('#conversionPath', async () => {
+  it('#conversionPath', async () => {
     const result: string[] = await contract.callStatic.conversionPath(weBTC, rUSDT);
     console.log(result);
 
@@ -32,13 +32,15 @@ describe('Sovryn', () => {
   });
 
   it.only('#rateByPath weBTC/USDT', async () => {
-    const path = [
-      '0x542fDA317318eBF1d3DEAf76E0b632741A7e677d',
-      '0x30a9B9bE9Aa8Fd64ee43B1B6c9bD474601373D34',
-      '0xef213441A85dF4d7ACbDaE0Cf78004e1E486bB96',
-    ];
+    const path: string[] = await contract.callStatic.conversionPath(weBTC, rUSDT);
 
-    // TODO fetch tokens decinals
+    // const path = [
+    //   '0x542fDA317318eBF1d3DEAf76E0b632741A7e677d',
+    //   '0x30a9B9bE9Aa8Fd64ee43B1B6c9bD474601373D34',
+    //   '0xef213441A85dF4d7ACbDaE0Cf78004e1E486bB96',
+    // ];
+
+    // TODO fetch tokens decimals
     const one = 10n ** 18n;
     const result: BigNumber = await contract.callStatic.rateByPath(path, BigInt(one));
     console.log(result.toString());
