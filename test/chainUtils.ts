@@ -34,11 +34,12 @@ keys.forEach((k, i) => {
   inputsData[k] = LeafValueCoder.isSignedValue(k) ? LeafValueCoder.encode(-321, k) : LeafValueCoder.encode(i + 1, k);
 });
 
-console.log({ inputsData });
-
 export const inputs = inputsData;
 
-export const tree = new SortedMerkleTree(inputs);
+export const buildTree = () => {
+  console.log({ inputs });
+  return new SortedMerkleTree(inputs);
+};
 
 export const abiUintEncoder = (n: number | string, bits = 256): string =>
   (typeof n === 'number' ? n.toString(16) : remove0x(n)).padStart(bits / 4, '0');

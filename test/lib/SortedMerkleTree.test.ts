@@ -89,8 +89,12 @@ describe('Tree', () => {
       data[k] = LeafValueCoder.encode(Math.round(Math.random() * 1000), 'label');
     });
 
-    const tree = new SortedMerkleTree(data);
-    console.log(tree);
+    let tree: SortedMerkleTree;
+
+    before(() => {
+      tree = new SortedMerkleTree(data);
+      console.log(tree);
+    });
 
     it('keys order should not matter', async () => {
       const dataReverse: Record<string, Buffer> = {};

@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { TransactionReceipt } from '@ethersproject/providers';
+import { Contract, ethers, Signer } from 'ethers';
 
 export const sleep = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -96,4 +97,16 @@ export const pressToContinue = (hre: HardhatRuntimeEnvironment, charToPress = 'y
     // process.stdout.write( key );
     callback();
   });
+};
+
+export const resolveContract = async (
+  hre: HardhatRuntimeEnvironment,
+  contractName: string,
+  signer: string | Signer,
+  atAddress?: string,
+): Promise<Contract> => {
+  const deployment = await hre.deployments.get(contractName);
+  const wallet = typeof signer === 'string' ? hre.ethers.provider.getSigner(signer) : signer;
+
+  return new ethers.Contract(atAddress ? atAddress : deployment.address, deployment.abi, wallet);
 };
