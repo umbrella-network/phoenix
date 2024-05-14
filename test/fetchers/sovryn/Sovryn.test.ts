@@ -31,7 +31,7 @@ describe('Sovryn', () => {
     expect(result.length).gt(0);
   });
 
-  it.only('#rateByPath weBTC/USDT', async () => {
+  it.only('#rateByPath 1weBTC = ? USDT', async () => {
     const path: string[] = await contract.callStatic.conversionPath(weBTC, rUSDT);
 
     // const path = [
@@ -43,8 +43,17 @@ describe('Sovryn', () => {
     // TODO fetch tokens decimals
     const one = 10n ** 18n;
     const result: BigNumber = await contract.callStatic.rateByPath(path, BigInt(one));
-    console.log(result.toString());
+    console.log(hre.ethers.utils.formatUnits(result, 18));
 
-    expect(result.div(one).toNumber()).closeTo(61965, 1.0);
+    expect(result.div(one).toNumber()).closeTo(62388, 1.0);
+  });
+
+  it.only('#rateByPath weBTC/USDT', async () => {
+    const path: string[] = await contract.callStatic.conversionPath(weBTC, rUSDT);
+    const one = 1e8;
+    const result: BigNumber = await contract.callStatic.rateByPath(path, BigInt(one));
+    console.log(hre.ethers.utils.formatUnits(result, 9));
+
+    expect(result.div(one).toNumber()).closeTo(62388, 1.0);
   });
 });
