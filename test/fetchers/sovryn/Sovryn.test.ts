@@ -19,7 +19,8 @@ describe('Sovryn', () => {
   let contract: Contract;
 
   before(async () => {
-    await forkToNet(hre, 'rootstock_production', 6342497);
+    // tests number were checked with https://alpha.sovryn.app/swap on block 6343774
+    await forkToNet(hre, 'rootstock_production', 6343774);
     const abi = fs.readFileSync(__dirname + '/SovrynSwapNetwork.abi.json', 'utf-8');
     contract = new Contract(SovrynSwapNetworkAddress, abi, hre.ethers.provider);
   });
@@ -45,15 +46,16 @@ describe('Sovryn', () => {
     const result: BigNumber = await contract.callStatic.rateByPath(path, BigInt(one));
     console.log(hre.ethers.utils.formatUnits(result, 18));
 
-    expect(result.div(one).toNumber()).closeTo(62388, 1.0);
+    expect(result.div(one).toNumber()).closeTo(61487, 1.0);
   });
 
-  it.only('#rateByPath weBTC/USDT', async () => {
+  it.only('#rateByPath weBTC/USDT 1e8, because UMB feeds contract is 8 decimals', async () => {
     const path: string[] = await contract.callStatic.conversionPath(weBTC, rUSDT);
-    const one = 1e8;
+    const precision = 10;
+    const one = 10 ** precision;
     const result: BigNumber = await contract.callStatic.rateByPath(path, BigInt(one));
-    console.log(hre.ethers.utils.formatUnits(result, 9));
+    console.log(hre.ethers.utils.formatUnits(result, precision));
 
-    expect(result.div(one).toNumber()).closeTo(62388, 1.0);
+    expect(result.toNumber() / one).closeTo(61697.00, 0.01);
   });
 });
