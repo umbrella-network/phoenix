@@ -61,7 +61,7 @@ describe.skip('Sovryn', () => {
     expect(result.length).gt(0);
   });
 
-  it.only('research', async () => {
+  it.skip('research', async () => {
     /*
     https://wiki.sovryn.com/en/technical-documents/API/ApiDoc
     see section: SovrynSwapNetwork and ConversionPathFinder
