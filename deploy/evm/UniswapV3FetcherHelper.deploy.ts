@@ -7,11 +7,7 @@ import { ETH_PRODUCTION, ETH_SEPOLIA, HARDHAT } from '../../constants/networks';
 
 function supportedBlockchain(hre: HardhatRuntimeEnvironment): boolean {
   if (hre.network.name.includes('hardhat')) return true;
-  if (hre.network.name.includes('polygon')) return true;
   if (hre.network.name.includes('eth')) return true;
-  if (hre.network.name.includes('arbitrum')) return true;
-  if (hre.network.name.includes('avalanche')) return true;
-  if (hre.network.name.includes('bnb')) return true;
 
   return false;
 }

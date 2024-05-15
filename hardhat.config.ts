@@ -6,7 +6,6 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
-import '@nomicfoundation/hardhat-verify';
 import 'solidity-coverage';
 import '@matterlabs/hardhat-zksync-solc';
 import '@matterlabs/hardhat-zksync-verify';
