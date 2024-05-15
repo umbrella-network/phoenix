@@ -17,6 +17,7 @@ export const UMBRELLA_FEEDS = 'UmbrellaFeeds';
 export const UMBRELLA_FEEDS_READER_FACTORY = 'UmbrellaFeedsReaderFactory';
 export const UMB = 'UMB';
 export const UNISWAPV3_FETCHER_HELPER = 'UniswapV3FetcherHelper';
+export const SOVRYN_FETCHER_HELPER = 'SovrynFetcherHelper';
 export const QUOTERV2 = 'QuoterV2';
 export const UMB_BYTES32 = '0x554d420000000000000000000000000000000000000000000000000000000000';
 

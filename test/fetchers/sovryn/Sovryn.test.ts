@@ -9,7 +9,7 @@ import fs from 'fs';
 
 import { forkToNet } from '../../../scripts/utils/forkToNet';
 import { resolveContract, toBytes32 } from '../../../scripts/utils/helpers';
-import { SOVERYN_FETCHER_HELPER } from '../../../constants';
+import { SOVRYN_FETCHER_HELPER } from '../../../constants';
 
 use(waffleChai);
 
@@ -47,11 +47,11 @@ describe('Sovryn', () => {
     const abi = fs.readFileSync(__dirname + '/SovrynSwapNetwork.abi.json', 'utf-8');
     sovrynSwapNetwork = new Contract(SovrynSwapNetworkAddress, abi, hre.ethers.provider);
 
-    await hre.deployments.fixture([SOVERYN_FETCHER_HELPER], {
+    await hre.deployments.fixture([SOVRYN_FETCHER_HELPER], {
       fallbackToGlobal: false,
     });
 
-    sovrynFetcherHelper = await resolveContract(hre, SOVERYN_FETCHER_HELPER, signer);
+    sovrynFetcherHelper = await resolveContract(hre, SOVRYN_FETCHER_HELPER, signer);
   });
 
   it('#conversionPath', async () => {
@@ -61,7 +61,7 @@ describe('Sovryn', () => {
     expect(result.length).gt(0);
   });
 
-  it.skip('research', async () => {
+  it.only('research', async () => {
     /*
     https://wiki.sovryn.com/en/technical-documents/API/ApiDoc
     see section: SovrynSwapNetwork and ConversionPathFinder
@@ -72,7 +72,8 @@ describe('Sovryn', () => {
 
     const registry: string = await sovrynSwapNetwork.registry();
 
-    const bytes32 = toBytes32('ConversionPathFinder');
+    // const bytes32 = toBytes32('ConversionPathFinder');
+    const bytes32 = toBytes32('SovrynSwapNetwork');
     console.log(bytes32);
 
     const data =
