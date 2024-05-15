@@ -67,7 +67,7 @@ describe.skip('Sovryn', () => {
     see section: SovrynSwapNetwork and ConversionPathFinder
 
     contracts are registered in registry
-    registry can be updated, can we fetch it from
+    registry can be updated, can we fetch it from it?
     */
 
     const registry: string = await sovrynSwapNetwork.registry();
