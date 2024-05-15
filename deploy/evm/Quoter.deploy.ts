@@ -1,12 +1,27 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import { QUOTERV2 } from '../../constants';
+import {QUOTERV2} from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { ETH_PRODUCTION, ETH_SEPOLIA, HARDHAT } from '../../constants/networks';
 
+function supportedBlockchain(hre: HardhatRuntimeEnvironment): boolean {
+  if (hre.network.name.includes('hardhat')) return true;
+  if (hre.network.name.includes('eth')) return true;
+
+  return false;
+}
+
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = hre.deployments;
+
+  if (!supportedBlockchain(hre)) {
+    console.log('-'.repeat(80));
+    console.log(`${QUOTERV2} is not supported on ${hre.network.name}`);
+    console.log('-'.repeat(80));
+    return;
+  }
+
   const { deployer } = await hre.getNamedAccounts();
 
   console.log(`Deploying ${QUOTERV2} on chain: ${hre.network.name}`);

@@ -119,7 +119,6 @@ describe('Sovryn', () => {
     //   '0xef213441A85dF4d7ACbDaE0Cf78004e1E486bB96',
     // ];
 
-    // TODO fetch tokens decimals
     const one = 10n ** 18n;
     const result: BigNumber = await sovrynSwapNetwork.callStatic.rateByPath(path, BigInt(one));
     console.log(hre.ethers.utils.formatUnits(result, 18));
@@ -131,7 +130,7 @@ describe('Sovryn', () => {
     expect(result).eq(result2.prices[0].price);
   });
 
-  it('#rateByPath weBTC/USDT 1e8, because UMB feeds contract is 8 decimals', async () => {
+  it('#rateByPath weBTC/USDT try with small amount', async () => {
     const path: string[] = await sovrynSwapNetwork.callStatic.conversionPath(weBTC, rUSDT);
     const precision = 10;
     const amountIn = 10 ** precision; // this should be part of config?
@@ -141,7 +140,7 @@ describe('Sovryn', () => {
     expect(result.toNumber() / amountIn).closeTo(61697.0, 0.01);
   });
 
-  it('#getPrices for same toke', async () => {
+  it('#getPrices for same token', async () => {
     const amountDecimals = 8;
     const inputData: InputData[] = [{ base: weBTC, quote: weBTC, amount: 10 ** amountDecimals }];
 
@@ -152,7 +151,6 @@ describe('Sovryn', () => {
   });
 
   it('#getPrices max capacity', async () => {
-    // base quote and amountDecimals should be pulled from yaml feeds file
     const amountDecimals = 8;
     const inputData: InputData = { base: weBTC, quote: rUSDT, amount: 10 ** amountDecimals };
     const arr: InputData[] = new Array(300).fill(inputData);
@@ -180,6 +178,8 @@ describe('Sovryn', () => {
     console.log('formated price that should be returned', priceNumber);
 
     /*
+    results:
+    
     price timestamp 1715671726
     number of fetched prices 1
     raw price 6169700566041n true
