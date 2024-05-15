@@ -13,6 +13,23 @@ import { SOVERYN_FETCHER_HELPER } from '../../../constants';
 
 use(waffleChai);
 
+interface InputData {
+  base: string;
+  quote: string;
+  amount: bigint | number;
+}
+
+/// @param price is amount out (normalized to 18 decimals) returned by Uniswap pool for 1 quote token
+interface Price {
+  price: BigNumber;
+  success: boolean
+}
+
+type GetPriceResult = {
+  prices: Price[],
+  timestamp: BigNumber
+}
+
 describe('Sovryn', () => {
   const SovrynSwapNetworkAddress = '0x98ace08d2b759a265ae326f010496bcd63c15afc';
   const rUSDT = '0xef213441a85df4d7acbdae0cf78004e1e486bb96';
@@ -73,8 +90,8 @@ describe('Sovryn', () => {
     const [conversionPathFinderAddr] = hre.ethers.utils.defaultAbiCoder.decode(['address'], conversionPathFinderData);
 
     console.log(conversionPathFinderAddr);
-    const abi = fs.readFileSync(__dirname + '/ConversionPathFinder.abi.json', 'utf-8');
-    const conversionPathFinder = new Contract(conversionPathFinderAddr, abi, hre.ethers.provider);
+    // const abi = fs.readFileSync(__dirname + '/ConversionPathFinder.abi.json', 'utf-8');
+    // const conversionPathFinder = new Contract(conversionPathFinderAddr, abi, hre.ethers.provider);
 
     // const path: string[] = await sovrynSwapNetwork.callStatic.conversionPath(weBTC, rUSDT);
     //
@@ -92,7 +109,7 @@ describe('Sovryn', () => {
     // expect(result.div(one).toNumber()).closeTo(61487, 1.0);
   });
 
-  it.only('#rateByPath 1weBTC = ? USDT', async () => {
+  it('#rateByPath 1weBTC = ? USDT', async () => {
     const path: string[] = await sovrynSwapNetwork.callStatic.conversionPath(weBTC, rUSDT);
 
     // const path = [
@@ -123,12 +140,34 @@ describe('Sovryn', () => {
     expect(result.toNumber() / amountIn).closeTo(61697.0, 0.01);
   });
 
-  it.only('integration example for pegasus', async () => {
+  it('#getPrices for same toke', async () => {
+    const amountDecimals = 8;
+    const inputData: InputData[] = [{ base: weBTC, quote: weBTC, amount: 10 ** amountDecimals }];
+
+    const results: GetPriceResult = await sovrynFetcherHelper.getPrices(inputData);
+    console.log(results);
+
+    expect(results.prices[0].success).false;
+  });
+
+  it('#getPrices max capacity', async () => {
     // base quote and amountDecimals should be pulled from yaml feeds file
     const amountDecimals = 8;
-    const inputData = [{ base: weBTC, quote: rUSDT, amount: 10 ** amountDecimals }];
+    const inputData: InputData = { base: weBTC, quote: rUSDT, amount: 10 ** amountDecimals };
+    const arr: InputData[] = new Array(300).fill(inputData);
 
-    const results = await sovrynFetcherHelper.getPrices(inputData);
+    const results: GetPriceResult = await sovrynFetcherHelper.getPrices(arr);
+
+    expect(results.prices.length).eq(arr.length);
+    console.log(results.prices.map(p => [p.price.toNumber(), p.success]));
+  });
+
+  it('integration example for pegasus', async () => {
+    // base quote and amountDecimals should be pulled from yaml feeds file
+    const amountDecimals = 8;
+    const inputData: InputData[] = [{ base: weBTC, quote: rUSDT, amount: 10 ** amountDecimals }];
+
+    const results: GetPriceResult = await sovrynFetcherHelper.getPrices(inputData);
 
     console.log('price timestamp', results.timestamp.toNumber());
     console.log('number of fetched prices', results.prices.length);
