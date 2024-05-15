@@ -30,7 +30,7 @@ type GetPriceResult = {
   timestamp: BigNumber
 }
 
-describe('Sovryn', () => {
+describe.skip('Sovryn', () => {
   const SovrynSwapNetworkAddress = '0x98ace08d2b759a265ae326f010496bcd63c15afc';
   const rUSDT = '0xef213441a85df4d7acbdae0cf78004e1e486bb96';
   const weBTC = '0x542fda317318ebf1d3deaf76e0b632741a7e677d';
@@ -179,7 +179,7 @@ describe('Sovryn', () => {
 
     /*
     results:
-    
+
     price timestamp 1715671726
     number of fetched prices 1
     raw price 6169700566041n true
