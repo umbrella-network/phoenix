@@ -22,13 +22,13 @@ interface InputData {
 /// @param price is amount out (normalized to 18 decimals) returned by Uniswap pool for 1 quote token
 interface Price {
   price: BigNumber;
-  success: boolean
+  success: boolean;
 }
 
 type GetPriceResult = {
-  prices: Price[],
-  timestamp: BigNumber
-}
+  prices: Price[];
+  timestamp: BigNumber;
+};
 
 describe.skip('Sovryn', () => {
   const SovrynSwapNetworkAddress = '0x98ace08d2b759a265ae326f010496bcd63c15afc';
@@ -158,7 +158,7 @@ describe.skip('Sovryn', () => {
     const results: GetPriceResult = await sovrynFetcherHelper.getPrices(arr);
 
     expect(results.prices.length).eq(arr.length);
-    console.log(results.prices.map(p => [p.price.toNumber(), p.success]));
+    console.log(results.prices.map((p) => [p.price.toNumber(), p.success]));
   });
 
   it('integration example for pegasus', async () => {

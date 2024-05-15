@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import {QUOTERV2} from '../../constants';
+import { QUOTERV2 } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { ETH_PRODUCTION, ETH_SEPOLIA, HARDHAT } from '../../constants/networks';
 
