@@ -7,10 +7,10 @@ contract SovrynFetcherHelper {
     struct InputData {
         address base;
         address quote;
-        uint256 amount;
+        uint8 amountInDecimals;
     }
 
-    /// @param price is amount out (normalized to 18 decimals) returned by Uniswap pool for 1 quote token
+    /// @param price is amount out (normalized to 18 decimals) returned by Sovryn pool for 1 quote token
     struct Price {
         uint256 price;
         bool success;
@@ -40,7 +40,7 @@ contract SovrynFetcherHelper {
             (address[] memory path, bool success) = _conversionPath(inputData.base, inputData.quote);
             if (!success) continue;
 
-            (price.price, success) = _rateByPath(path, inputData.amount);
+            (price.price, success) = _rateByPath(path, 10 ** inputData.amountInDecimals);
             if (!success) continue;
 
             price.success = true;

@@ -10,23 +10,31 @@ import {IQuoterV2} from "gitmodules/uniswap/v3-periphery/contracts/interfaces/IQ
 
 
 contract UniswapV3FetcherHelper {
-    struct PriceData {
-        IUniswapV3Pool[] pools;
+    struct InputData {
+        IUniswapV3Pool pool;
         address base;
         address quote;
+        uint8 amountInDecimals;
     }
-
-    bytes4 internal constant _SYMBOL_SELECTOR = bytes4(keccak256("symbol()"));
-    bytes4 internal constant _DECIMALS_SELECTOR = bytes4(keccak256("decimals()"));
-
-    IUniswapV3Factory immutable public uniswapV3Factory;
-    IQuoterV2 immutable public uniswapV3Quoter;
 
     /// @param price is amount out (normalized to 18 decimals) returned by Uniswap pool for 1 quote token
     struct Price {
         uint256 price;
         bool success;
     }
+
+    struct LiquidityData {
+        int24 tick;
+        uint256 liquidity;
+    }
+
+    uint256 internal constant _DECIMALS = 18;
+
+    bytes4 internal constant _SYMBOL_SELECTOR = bytes4(keccak256("symbol()"));
+    bytes4 internal constant _DECIMALS_SELECTOR = bytes4(keccak256("decimals()"));
+
+    IUniswapV3Factory immutable public uniswapV3Factory;
+    IQuoterV2 immutable public uniswapV3Quoter;
 
     constructor(IUniswapV3Factory _factory, IQuoterV2 _quoter) {
         uniswapV3Factory = _factory;
@@ -38,8 +46,8 @@ contract UniswapV3FetcherHelper {
     /// Tokens that do not have `.decimals()` are not supported
     /// @param _data array of PriceData, each PriceData can accept multiple pools per one price, price is fetched from
     /// pool, that has biggest liquidity (quote.balanceOf(pool))
-    /// TODO balanceOf might be not liquidity and by sending token to pool we can in theory affect this fetcher
-    function getPrices(PriceData[] calldata _data)
+    /// @return prices prices normalized from input amount (10 ** prices[n].amountInDecimals) to one token price
+    function getPrices(InputData[] calldata _data)
         external
         virtual
         returns (Price[] memory prices, uint256 timestamp)
@@ -49,51 +57,37 @@ contract UniswapV3FetcherHelper {
         prices = new Price[](n);
 
         for (uint256 i = 0; i < n; i++) {
-            PriceData memory data = _data[i];
+            InputData memory data = _data[i];
             Price memory price = prices[i];
 
             (uint256 baseDecimals, bool baseHasDecimals) = _decimals(data.base);
             if (!baseHasDecimals) continue;
 
-            uint256 oneBaseToken = 10 ** baseDecimals;
-
             (uint256 quoteDecimals, bool quoteHasDecimals) = _decimals(data.quote);
             if (!quoteHasDecimals) continue;
 
-            IUniswapV3Pool pool = _findBiggestPool(data.pools, data.quote);
-            if (address(pool) == address(0)) continue;
+            if (address(data.pool) == address(0)) continue;
 
-            (uint24 fee, bool success) = _getPoolFee(pool);
+            (uint24 fee, bool success) = _getPoolFee(data.pool);
             if (!success) continue;
 
-            if (address(pool) != _getPool(data.base, data.quote, fee)) continue;
+            if (address(data.pool) != _getPool(data.base, data.quote, fee)) continue;
 
             IQuoterV2.QuoteExactInputSingleParams memory params = IQuoterV2.QuoteExactInputSingleParams({
                 tokenIn: data.base,
                 tokenOut: data.quote,
-                amountIn: oneBaseToken,
+                amountIn: 10 ** data.amountInDecimals,
                 fee: fee,
                 sqrtPriceLimitX96: 0
             });
 
             try uniswapV3Quoter.quoteExactInputSingle(params)
-                returns (uint256 oneTokenPrice, uint160, uint32, uint256)
+                returns (uint256 tokenPrice, uint160, uint32, uint256)
             {
-                price.price = oneTokenPrice;
+                price.price = _normalizeOneTokenPrice(data.amountInDecimals, baseDecimals, quoteDecimals, tokenPrice);
                 price.success = true;
             } catch (bytes memory) {
                 continue;
-            }
-
-            unchecked {
-                // safe to unchech because we checking over/under-flow conditions manually
-                if (quoteDecimals == 18) {
-                    // price OK
-                } else if (quoteDecimals > 18) {
-                    price.price /= 10 ** (quoteDecimals - 18);
-                } else {
-                    price.price *= 10 ** (18 - quoteDecimals);
-                }
             }
         }
     }
@@ -112,23 +106,19 @@ contract UniswapV3FetcherHelper {
         }
     }
 
-    /// @dev finds pool with biggest quote liquidity
-    function _findBiggestPool(IUniswapV3Pool[] memory _pools, address _quote)
-        internal
+    function liquidityData(IUniswapV3Pool[] calldata _pools)
+        external
         view
         virtual
-        returns (IUniswapV3Pool biggestPool)
+        returns (LiquidityData[] memory data)
     {
-        uint256 biggestBalance = 0;
+        uint256 n = _pools.length;
+        data = new LiquidityData[](n);
 
-        for (uint256 i = 0; i < _pools.length; i++) {
+        for (uint256 i = 0; i < n; i++) {
             IUniswapV3Pool pool = _pools[i];
-            uint256 balance = IERC20(_quote).balanceOf(address(pool));
-
-            if (balance > biggestBalance) {
-                biggestPool = pool;
-                biggestBalance = balance;
-            }
+            (, data[i].tick,,,,,) = pool.slot0();
+            data[i].liquidity = pool.liquidity();
         }
     }
 
@@ -139,6 +129,32 @@ contract UniswapV3FetcherHelper {
         (success, data) = _token.staticcall(abi.encode(_DECIMALS_SELECTOR));
         if (success && data.length != 0) decimals = abi.decode(data, (uint256));
         else success = false;
+    }
+
+    function _normalizeOneTokenPrice(
+        uint256 _amountInDecimals,
+        uint256 _baseDecimals,
+        uint256 _quoteDecimals,
+        uint256 _price
+    )
+        internal
+        pure
+        virtual
+        returns (uint256 normalizedPrice)
+    {
+        // normalize price from `amountInDecimals` to `oneToken`
+        if (_amountInDecimals == _baseDecimals) normalizedPrice = _price;
+        else if (_amountInDecimals < _baseDecimals) normalizedPrice = _price * (10 ** (_baseDecimals - _amountInDecimals));
+        else normalizedPrice = _price / (10 ** (_amountInDecimals - _baseDecimals));
+
+        // safe to uncheck because we checking over/under-flow conditions manually
+        if (_quoteDecimals == _DECIMALS) {
+            // price OK
+        } else if (_quoteDecimals > _DECIMALS) {
+            normalizedPrice /= 10 ** (_quoteDecimals - _DECIMALS);
+        } else {
+            normalizedPrice *= 10 ** (_DECIMALS - _quoteDecimals);
+        }
     }
 
     function _getPool(address _token0, address _token1, uint24 _fee) internal view virtual returns (address pool) {
