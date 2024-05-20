@@ -52,7 +52,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: ethers.constants.AddressZero,
         base: WBTC,
         quote: USDC,
-        amountInDecimals: 1
+        amountInDecimals: 1,
       },
     ];
 
@@ -67,7 +67,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: ethers.constants.AddressZero.replace('0x0', '0x1'),
         base: WBTC,
         quote: USDC,
-        amountInDecimals: 1
+        amountInDecimals: 1,
       },
     ];
 
@@ -82,7 +82,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: WBTC,
         quote: USDC,
-        amountInDecimals: 8
+        amountInDecimals: 8,
       },
     ];
 
@@ -97,7 +97,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: USDC,
         quote: WBTC,
-        amountInDecimals: 4
+        amountInDecimals: 4,
       },
     ];
 
@@ -112,7 +112,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: USDC,
         quote: hre.ethers.constants.AddressZero,
-        amountInDecimals: 1
+        amountInDecimals: 1,
       },
     ];
 
@@ -127,7 +127,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: hre.ethers.constants.AddressZero,
         quote: USDC,
-        amountInDecimals: 1
+        amountInDecimals: 1,
       },
     ];
 
@@ -142,7 +142,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: USDC,
         quote: hre.ethers.constants.AddressZero.replace('0x0', '0x1'),
-        amountInDecimals: 3
+        amountInDecimals: 3,
       },
     ];
 
@@ -157,7 +157,7 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: hre.ethers.constants.AddressZero.replace('0x000', '0x111'),
         quote: USDC,
-        amountInDecimals: 3
+        amountInDecimals: 3,
       },
     ];
 
@@ -174,7 +174,7 @@ describe('UniswapV3FetchersHelpers', () => {
     expect(symbols[2]).eq('WETH');
   });
 
-  describe('USDC-ETH getPrices',  () => {
+  describe('USDC-ETH getPrices', () => {
     const expected6DecimalsResult = 282966776790952;
 
     it('with amountInDecimals=6', async () => {
@@ -183,7 +183,7 @@ describe('UniswapV3FetchersHelpers', () => {
           pool: USDC_ETH_POOL_1,
           base: USDC,
           quote: WETH, // how much WETH I will get for 1 base token
-          amountInDecimals: 6
+          amountInDecimals: 6,
         },
       ];
 
@@ -199,7 +199,7 @@ describe('UniswapV3FetchersHelpers', () => {
           pool: USDC_ETH_POOL_1,
           base: USDC,
           quote: WETH, // how much WETH I will get for 1 base token
-          amountInDecimals: 8
+          amountInDecimals: 8,
         },
       ];
 
@@ -216,7 +216,7 @@ describe('UniswapV3FetchersHelpers', () => {
           pool: USDC_ETH_POOL_1,
           base: USDC,
           quote: WETH, // how much WETH I will get for 1 base token
-          amountInDecimals: 4
+          amountInDecimals: 4,
         },
       ];
 
@@ -228,7 +228,7 @@ describe('UniswapV3FetchersHelpers', () => {
     });
   });
 
-  describe('ETH/USDC getPrices',  () => {
+  describe('ETH/USDC getPrices', () => {
     const expected18DecimalsResult = 3530_445979000000000000n;
 
     it('with amountInDecimals=18', async () => {
@@ -237,7 +237,7 @@ describe('UniswapV3FetchersHelpers', () => {
           pool: USDC_ETH_POOL_1,
           base: WETH,
           quote: USDC,
-          amountInDecimals: 18
+          amountInDecimals: 18,
         },
       ];
 
@@ -253,7 +253,7 @@ describe('UniswapV3FetchersHelpers', () => {
           pool: USDC_ETH_POOL_1,
           base: WETH,
           quote: USDC,
-          amountInDecimals: 20
+          amountInDecimals: 20,
         },
       ];
 
@@ -270,7 +270,7 @@ describe('UniswapV3FetchersHelpers', () => {
           pool: USDC_ETH_POOL_1,
           base: WETH,
           quote: USDC,
-          amountInDecimals: 15
+          amountInDecimals: 15,
         },
       ];
 
@@ -288,12 +288,13 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_2,
         base: WETH,
         quote: USDC,
-        amountInDecimals: 18
-      }, <InputDataStruct>{
+        amountInDecimals: 18,
+      },
+      <InputDataStruct>{
         pool: USDC_ETH_POOL_1,
         base: WETH,
         quote: USDC,
-        amountInDecimals: 18
+        amountInDecimals: 18,
       },
     ];
 
@@ -316,19 +317,19 @@ describe('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: WETH,
         quote: USDC,
-        amountInDecimals: 18
+        amountInDecimals: 18,
       },
       <InputDataStruct>{
         pool: WBTC_USDT_POOL,
         base: WBTC,
         quote: USDT,
-        amountInDecimals: 8
+        amountInDecimals: 8,
       },
       <InputDataStruct>{
         pool: WBTC_USDC_POOL,
         base: WBTC,
         quote: USDT, // this is invalid token, pool is for USDC
-        amountInDecimals: 8
+        amountInDecimals: 8,
       },
     ];
 

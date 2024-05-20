@@ -169,7 +169,7 @@ describe.skip('Sovryn', () => {
     console.log('number of fetched prices', results.prices.length);
     const rawPrice = results.prices[0].price.toBigInt();
     console.log('raw price', rawPrice, results.prices[0].success);
-    const intPart = rawPrice / (10n ** 18n);
+    const intPart = rawPrice / 10n ** 18n;
     // is there better way to convert to float?
     const priceNumber = Number(intPart) + parseFloat(rawPrice.toString().replace(intPart.toString(), '0.'));
     console.log('formated price that should be returned', priceNumber);
