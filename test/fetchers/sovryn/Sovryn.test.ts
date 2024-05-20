@@ -16,7 +16,7 @@ use(waffleChai);
 interface InputData {
   base: string;
   quote: string;
-  amount: bigint | number;
+  amountInDecimals: number;
 }
 
 /// @param price is amount out (normalized to 18 decimals) returned by Uniswap pool for 1 quote token
@@ -121,13 +121,13 @@ describe.skip('Sovryn', () => {
 
     const one = 10n ** 18n;
     const result: BigNumber = await sovrynSwapNetwork.callStatic.rateByPath(path, BigInt(one));
-    console.log(hre.ethers.utils.formatUnits(result, 18));
+    console.log(hre.ethers.utils.formatUnits(result.toString(), 18));
 
     expect(result.div(one).toNumber()).closeTo(61487, 1.0);
 
-    const result2 = await sovrynFetcherHelper.getPrices([{ base: weBTC, quote: rUSDT, amount: one }]);
+    const result2 = await sovrynFetcherHelper.getPrices([{ base: weBTC, quote: rUSDT, amountInDecimals: 18 }]);
     console.log(result2);
-    expect(result).eq(result2.prices[0].price);
+    expect(result2.prices[0].price).eq(result);
   });
 
   it('#rateByPath weBTC/USDT try with small amount', async () => {
@@ -141,8 +141,7 @@ describe.skip('Sovryn', () => {
   });
 
   it('#getPrices for same token', async () => {
-    const amountDecimals = 8;
-    const inputData: InputData[] = [{ base: weBTC, quote: weBTC, amount: 10 ** amountDecimals }];
+    const inputData: InputData[] = [{ base: weBTC, quote: weBTC, amountInDecimals: 8 }];
 
     const results: GetPriceResult = await sovrynFetcherHelper.getPrices(inputData);
     console.log(results);
@@ -151,20 +150,18 @@ describe.skip('Sovryn', () => {
   });
 
   it('#getPrices max capacity', async () => {
-    const amountDecimals = 8;
-    const inputData: InputData = { base: weBTC, quote: rUSDT, amount: 10 ** amountDecimals };
+    const inputData: InputData = { base: weBTC, quote: rUSDT, amountInDecimals: 8 };
     const arr: InputData[] = new Array(300).fill(inputData);
 
     const results: GetPriceResult = await sovrynFetcherHelper.getPrices(arr);
 
     expect(results.prices.length).eq(arr.length);
-    console.log(results.prices.map((p) => [p.price.toNumber(), p.success]));
+    console.log(results.prices.map((p) => [p.price.div(10n ** 10n).toNumber() / 1e8, p.success]));
   });
 
   it('integration example for pegasus', async () => {
     // base quote and amountDecimals should be pulled from yaml feeds file
-    const amountDecimals = 8;
-    const inputData: InputData[] = [{ base: weBTC, quote: rUSDT, amount: 10 ** amountDecimals }];
+    const inputData: InputData[] = [{ base: weBTC, quote: rUSDT, amountInDecimals: 8 }];
 
     const results: GetPriceResult = await sovrynFetcherHelper.getPrices(inputData);
 
@@ -172,7 +169,7 @@ describe.skip('Sovryn', () => {
     console.log('number of fetched prices', results.prices.length);
     const rawPrice = results.prices[0].price.toBigInt();
     console.log('raw price', rawPrice, results.prices[0].success);
-    const intPart = rawPrice / BigInt(10 ** amountDecimals);
+    const intPart = rawPrice / 10n ** 18n;
     // is there better way to convert to float?
     const priceNumber = Number(intPart) + parseFloat(rawPrice.toString().replace(intPart.toString(), '0.'));
     console.log('formated price that should be returned', priceNumber);
@@ -182,10 +179,10 @@ describe.skip('Sovryn', () => {
 
     price timestamp 1715671726
     number of fetched prices 1
-    raw price 6169700566041n true
+    raw price 61697005660410000000000n true
     formated price that should be returned 61697.00566041
      */
 
-    expect(results.prices[0].price.toBigInt()).eq(61697_00566041n);
+    expect(results.prices[0].price.toBigInt()).eq(61697_005660410000000000n);
   });
 });
