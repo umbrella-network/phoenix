@@ -8,8 +8,9 @@ import {IUniswapV3Pool} from "@uniswap/v3-core/contracts/interfaces/IUniswapV3Po
 import {IUniswapV3PoolImmutables} from "@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolImmutables.sol";
 import {IQuoterV2} from "gitmodules/uniswap/v3-periphery/contracts/interfaces/IQuoterV2.sol";
 
+import {CommonFetcher} from "../CommonFetcher.sol";
 
-contract UniswapV3FetcherHelper {
+contract UniswapV3FetcherHelper is CommonFetcher {
     struct InputData {
         IUniswapV3Pool pool;
         address base;
@@ -28,10 +29,7 @@ contract UniswapV3FetcherHelper {
         uint256 liquidity;
     }
 
-    uint256 internal constant _DECIMALS = 18;
-
     bytes4 internal constant _SYMBOL_SELECTOR = bytes4(keccak256("symbol()"));
-    bytes4 internal constant _DECIMALS_SELECTOR = bytes4(keccak256("decimals()"));
 
     IUniswapV3Factory immutable public uniswapV3Factory;
     IQuoterV2 immutable public uniswapV3Quoter;
@@ -57,38 +55,7 @@ contract UniswapV3FetcherHelper {
         prices = new Price[](n);
 
         for (uint256 i = 0; i < n; i++) {
-            InputData memory data = _data[i];
-            Price memory price = prices[i];
-
-            (uint256 baseDecimals, bool baseHasDecimals) = _decimals(data.base);
-            if (!baseHasDecimals) continue;
-
-            (uint256 quoteDecimals, bool quoteHasDecimals) = _decimals(data.quote);
-            if (!quoteHasDecimals) continue;
-
-            if (address(data.pool) == address(0)) continue;
-
-            (uint24 fee, bool success) = _getPoolFee(data.pool);
-            if (!success) continue;
-
-            if (address(data.pool) != _getPool(data.base, data.quote, fee)) continue;
-
-            IQuoterV2.QuoteExactInputSingleParams memory params = IQuoterV2.QuoteExactInputSingleParams({
-                tokenIn: data.base,
-                tokenOut: data.quote,
-                amountIn: 10 ** data.amountInDecimals,
-                fee: fee,
-                sqrtPriceLimitX96: 0
-            });
-
-            try uniswapV3Quoter.quoteExactInputSingle(params)
-                returns (uint256 tokenPrice, uint160, uint32, uint256)
-            {
-                price.price = _normalizeOneTokenPrice(data.amountInDecimals, baseDecimals, quoteDecimals, tokenPrice);
-                price.success = true;
-            } catch (bytes memory) {
-                continue;
-            }
+            prices[i] = _getPrice(_data[i]);
         }
     }
 
@@ -122,38 +89,35 @@ contract UniswapV3FetcherHelper {
         }
     }
 
-    function _decimals(address _token) internal view virtual returns (uint256 decimals, bool success) {
-        bytes memory data;
+    function _getPrice(InputData memory _data) internal virtual returns (Price memory price) {
+        (uint256 baseDecimals, bool baseHasDecimals) = _decimals(_data.base);
+        if (!baseHasDecimals) return price;
 
-        // solhint-disable-next-line avoid-low-level-calls
-        (success, data) = _token.staticcall(abi.encode(_DECIMALS_SELECTOR));
-        if (success && data.length != 0) decimals = abi.decode(data, (uint256));
-        else success = false;
-    }
+        (uint256 quoteDecimals, bool quoteHasDecimals) = _decimals(_data.quote);
+        if (!quoteHasDecimals) return price;
 
-    function _normalizeOneTokenPrice(
-        uint256 _amountInDecimals,
-        uint256 _baseDecimals,
-        uint256 _quoteDecimals,
-        uint256 _price
-    )
-        internal
-        pure
-        virtual
-        returns (uint256 normalizedPrice)
-    {
-        // normalize price from `amountInDecimals` to `oneToken`
-        if (_amountInDecimals == _baseDecimals) normalizedPrice = _price;
-        else if (_amountInDecimals < _baseDecimals) normalizedPrice = _price * (10 ** (_baseDecimals - _amountInDecimals));
-        else normalizedPrice = _price / (10 ** (_amountInDecimals - _baseDecimals));
+        if (address(_data.pool) == address(0)) return price;
 
-        // safe to uncheck because we checking over/under-flow conditions manually
-        if (_quoteDecimals == _DECIMALS) {
-            // price OK
-        } else if (_quoteDecimals > _DECIMALS) {
-            normalizedPrice /= 10 ** (_quoteDecimals - _DECIMALS);
-        } else {
-            normalizedPrice *= 10 ** (_DECIMALS - _quoteDecimals);
+        (uint24 fee, bool success) = _getPoolFee(_data.pool);
+        if (!success) return price;
+
+        if (address(_data.pool) != _getPool(_data.base, _data.quote, fee)) return price;
+
+        IQuoterV2.QuoteExactInputSingleParams memory params = IQuoterV2.QuoteExactInputSingleParams({
+            tokenIn: _data.base,
+            tokenOut: _data.quote,
+            amountIn: 10 ** _data.amountInDecimals,
+            fee: fee,
+            sqrtPriceLimitX96: 0
+        });
+
+        try uniswapV3Quoter.quoteExactInputSingle(params)
+            returns (uint256 tokenPrice, uint160, uint32, uint256)
+        {
+            price.price = _normalizeOneTokenPrice(_data.amountInDecimals, baseDecimals, quoteDecimals, tokenPrice);
+            price.success = true;
+        } catch (bytes memory) {
+            // continue;
         }
     }
 

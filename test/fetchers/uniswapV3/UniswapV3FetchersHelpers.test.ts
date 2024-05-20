@@ -15,7 +15,7 @@ import InputDataStruct = UniswapV3FetcherHelper.InputDataStruct;
 
 use(waffleChai);
 
-describe.only('UniswapV3FetchersHelpers', () => {
+describe('UniswapV3FetchersHelpers', () => {
   const USDC_ETH_POOL_1 = '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640';
   const USDC_ETH_POOL_2 = '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8';
   const WBTC_USDC_POOL = '0x99ac8ca7087fa4a2a1fb6357269965a2014abc35';
@@ -229,7 +229,7 @@ describe.only('UniswapV3FetchersHelpers', () => {
   });
 
   describe('ETH/USDC getPrices',  () => {
-    const expected18DecimalsResult = 3530_445979;
+    const expected18DecimalsResult = 3530_445979000000000000n;
 
     it('with amountInDecimals=18', async () => {
       const data: InputDataStruct[] = [
@@ -261,7 +261,7 @@ describe.only('UniswapV3FetchersHelpers', () => {
 
       expect(timestamp).eq(1712922025, 'block timestamp');
       expect(result.price).lt(expected18DecimalsResult, 'greater input should produce lower price');
-      expect(result.price).eq(3529_980649, 'price of 1 WETH');
+      expect(result.price).eq(3529_980649000000000000n, 'price of 1 WETH');
     });
 
     it('with amountInDecimals=15', async () => {
@@ -278,7 +278,7 @@ describe.only('UniswapV3FetchersHelpers', () => {
 
       expect(timestamp).eq(1712922025, 'block timestamp');
       expect(result.price).gt(expected18DecimalsResult, 'smaller input should produce higher price');
-      expect(result.price).eq(3530_450000, 'price of 1 WETH');
+      expect(result.price).eq(3530_450000000000000000n, 'price of 1 WETH');
     });
   });
 
@@ -316,13 +316,7 @@ describe.only('UniswapV3FetchersHelpers', () => {
         pool: USDC_ETH_POOL_1,
         base: WETH,
         quote: USDC,
-        amountInDecimals: 8
-      },
-      {
-        pool: USDC_ETH_POOL_2,
-        base: WETH,
-        quote: USDC,
-        amountInDecimals: 10
+        amountInDecimals: 18
       },
       <InputDataStruct>{
         pool: WBTC_USDT_POOL,
@@ -333,8 +327,8 @@ describe.only('UniswapV3FetchersHelpers', () => {
       <InputDataStruct>{
         pool: WBTC_USDC_POOL,
         base: WBTC,
-        quote: USDT,
-        amountInDecimals: 10
+        quote: USDT, // this is invalid token, pool is for USDC
+        amountInDecimals: 8
       },
     ];
 

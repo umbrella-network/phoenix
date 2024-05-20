@@ -2,8 +2,9 @@
 pragma solidity 0.8.22;
 
 import {ISovrynSwapNetwork} from "./ISovrynSwapNetwork.sol";
+import {CommonFetcher} from "../CommonFetcher.sol";
 
-contract SovrynFetcherHelper {
+contract SovrynFetcherHelper is CommonFetcher {
     struct InputData {
         address base;
         address quote;
@@ -34,17 +35,30 @@ contract SovrynFetcherHelper {
         prices = new Price[](n);
 
         for (uint256 i = 0; i < n; i++) {
-            InputData memory inputData = _data[i];
-            Price memory price = prices[i];
-
-            (address[] memory path, bool success) = _conversionPath(inputData.base, inputData.quote);
-            if (!success) continue;
-
-            (price.price, success) = _rateByPath(path, 10 ** inputData.amountInDecimals);
-            if (!success) continue;
-
-            price.success = true;
+            prices[i] = _getPrice(_data[i]);
         }
+    }
+
+    function _getPrice(InputData memory _data)
+        internal
+        view
+        virtual
+        returns (Price memory price)
+    {
+        (uint256 baseDecimals, bool baseHasDecimals) = _decimals(_data.base);
+        if (!baseHasDecimals) return price;
+
+        (uint256 quoteDecimals, bool quoteHasDecimals) = _decimals(_data.quote);
+        if (!quoteHasDecimals) return price;
+
+        (address[] memory path, bool success) = _conversionPath(_data.base, _data.quote);
+        if (!success) return price;
+
+        (price.price, success) = _rateByPath(path, 10 ** _data.amountInDecimals);
+        if (!success) return price;
+
+        price.success = true;
+        price.price = _normalizeOneTokenPrice(_data.amountInDecimals, baseDecimals, quoteDecimals, price.price);
     }
 
     function _conversionPath(address _base, address _quote)
