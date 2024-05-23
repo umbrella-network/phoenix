@@ -22,6 +22,7 @@ export const BNB_STAGING = 'bnb_staging';
 export const ETH_STAGING = 'eth_staging';
 export const ETH_SEPOLIA = 'eth_sepolia';
 export const POLYGON_STAGING = 'polygon_staging';
+export const ROOTSTOCK_STAGING = 'rootstock_staging';
 
 export const ZK_LINK_NOVA_STAGING = 'zk_link_nova_staging';
 

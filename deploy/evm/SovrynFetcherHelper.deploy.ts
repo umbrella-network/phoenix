@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/types';
 
 import { SOVRYN_FETCHER_HELPER } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
-import { HARDHAT, ROOTSTOCK_PRODUCTION, ROOTSTOCK_SANDBOX } from '../../constants/networks';
+import { HARDHAT, ROOTSTOCK_PRODUCTION, ROOTSTOCK_SANDBOX, ROOTSTOCK_STAGING } from '../../constants/networks';
 
 function supportedBlockchain(hre: HardhatRuntimeEnvironment): boolean {
   if (hre.network.name.includes('hardhat')) return true;
@@ -34,6 +34,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       break;
 
     case ROOTSTOCK_SANDBOX:
+    case ROOTSTOCK_STAGING:
       sovrynSwapNetworkAddress = '0x6390df6de9f24902b29740371525c2ceaa8f5a4f';
       break;
 
