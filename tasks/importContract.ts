@@ -2,7 +2,7 @@ import { task } from 'hardhat/config';
 import { importContracToRegistry } from './_helpers/importContracToRegistry';
 
 /*
-npx hardhat importContract --network rootstock_staging --contract SovrynFetcherHelper
+npx hardhat importContract --network rootstock_sandbox --contract SovrynFetcherHelper
 npx hardhat importContract --network eth_sepolia --contract UniswapV3FetcherHelper
  */
 task('importContract')
