@@ -30,6 +30,7 @@ import {
   POLYGON_STAGING,
   ROOTSTOCK_PRODUCTION,
   ROOTSTOCK_SANDBOX,
+  ROOTSTOCK_STAGING,
   XDC_SANDBOX,
   ZK_LINK_NOVA_PRODUCTION,
   ZK_LINK_NOVA_SANDBOX,
@@ -239,6 +240,7 @@ const resolveProviderData = (networkName: string): ProviderData => {
       return polygonTestnetProviderData;
 
     case ROOTSTOCK_SANDBOX:
+    case ROOTSTOCK_STAGING:
       return rootstockTestnetProviderData;
 
     case ZK_LINK_NOVA_STAGING:

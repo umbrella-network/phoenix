@@ -46,7 +46,7 @@ import {
   POLYGON_SANDBOX,
   POLYGON_STAGING,
   ROOTSTOCK_PRODUCTION,
-  ROOTSTOCK_SANDBOX,
+  ROOTSTOCK_SANDBOX, ROOTSTOCK_STAGING,
   XDC_SANDBOX, ZK_LINK_NOVA_PRODUCTION, ZK_LINK_NOVA_SANDBOX, ZK_LINK_NOVA_STAGING
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
@@ -306,6 +306,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(ROOTSTOCK_SANDBOX).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(ROOTSTOCK_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    rootstock_staging: {
+      url: getProviderData(ROOTSTOCK_STAGING).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ROOTSTOCK_STAGING).chainId,
       gasPrice: 'auto'
     },
     zk_link_nova_staging: {
