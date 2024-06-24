@@ -25,6 +25,7 @@ contract UniswapV3FetcherHelper is CommonFetcher {
     }
 
     struct LiquidityData {
+        uint160 sqrtPriceX96;
         int24 tick;
         uint256 liquidity;
     }
@@ -84,7 +85,7 @@ contract UniswapV3FetcherHelper is CommonFetcher {
 
         for (uint256 i = 0; i < n; i++) {
             IUniswapV3Pool pool = _pools[i];
-            (, data[i].tick,,,,,) = pool.slot0();
+            (data[i].sqrtPriceX96, data[i].tick,,,,,) = pool.slot0();
             data[i].liquidity = pool.liquidity();
         }
     }
