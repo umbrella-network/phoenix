@@ -41,11 +41,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       weth = '0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92';
       break;
 
-      // case ROOTSTOCK_PRODUCTION:
-      // OKU https://docs.oku.trade/home/extra-information/deployed-contracts
-      // uniswapV3Factory = '0xaF37EC98A00FD63689CF3060BF3B6784E00caD82';
-      // weth = '0x542fDA317318eBF1d3DEAf76E0b632741A7e677d';
-      // break;
+    // case ROOTSTOCK_PRODUCTION:
+    // OKU https://docs.oku.trade/home/extra-information/deployed-contracts
+    // uniswapV3Factory = '0xaF37EC98A00FD63689CF3060BF3B6784E00caD82';
+    // weth = '0x542fDA317318eBF1d3DEAf76E0b632741A7e677d';
+    // break;
 
     default:
       throw new Error(`${QUOTERV2} not set up for ${hre.network.name}`);
