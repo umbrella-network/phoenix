@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import "../interfaces/IUmbrellaFeeds.sol";
-import "../interfaces/IRegistry.sol";
-import "../interfaces/IStakingBankStatic.sol";
+import "../../interfaces/IUmbrellaFeeds.sol";
+import "../../interfaces/IRegistry.sol";
+import "../../interfaces/IStakingBankStatic.sol";
 
 /// @dev Main contract for all on-chain data.
 /// Check `UmbrellaFeedsReader` to see how to integrate.

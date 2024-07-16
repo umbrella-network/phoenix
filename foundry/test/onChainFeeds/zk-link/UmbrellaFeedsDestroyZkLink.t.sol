@@ -1,14 +1,15 @@
 pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
+import {SignerHelper, Mock} from "../../SignerHelper.sol";
 
-import "../../contracts/interfaces/IRegistry.sol";
-import "./SignerHelper.sol";
+import {IRegistry} from "../../../../contracts/interfaces/IRegistry.sol";
+import {UmbrellaFeeds, IUmbrellaFeeds} from "../../../../contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol";
 
 /*
     forge test -vv --match-contract UmbrellaFeedsDestroyTest
 */
-contract UmbrellaFeedsDestroyTest is SignerHelper {
+contract UmbrellaFeedsDestroyZkLinkTest is SignerHelper {
     address public immutable registry;
     UmbrellaFeeds public immutable feeds;
 
@@ -39,9 +40,9 @@ contract UmbrellaFeedsDestroyTest is SignerHelper {
     forge test -vvv --match-test test_UmbrellaFeeds_destroy_ok
     */
     function test_UmbrellaFeeds_destroy_ok() public {
-        (bool success, bytes memory data) = address(feeds).staticcall(abi.encodeWithSelector(UmbrellaFeeds.getPriceData.selector, abi.encodePacked(priceKeys[0])));
-        assertTrue(success);
-        assertEq(data.length, 0, "expect no data");
+        (bool success,) = address(feeds).staticcall(abi.encodeWithSelector(UmbrellaFeeds.getPriceData.selector, abi.encodePacked(priceKeys[0])));
+        assertTrue(!success, "expect call to fail");
+        assertTrue(feeds.disabled(), "expect to be disabled");
     }
 
     function _executeUpdate(UmbrellaFeeds _feeds) internal {
