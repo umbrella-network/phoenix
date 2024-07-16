@@ -445,19 +445,19 @@ const config: HardhatUserConfig = {
         }
       },
       {
-        network: "rootstock_sandbox",
+        network: 'rootstock_sandbox',
         chainId: 31,
         urls: {
-          apiURL: "https://rootstock-testnet.blockscout.com/api/",
-          browserURL: "https://rootstock-testnet.blockscout.com/",
+          apiURL: 'https://rootstock-testnet.blockscout.com/api/',
+          browserURL: 'https://rootstock-testnet.blockscout.com/',
         }
       },
       {
-        network: "rootstock_production",
+        network: 'rootstock_production',
         chainId: 30,
         urls: {
-          apiURL: "https://rootstock.blockscout.com/api/",
-          browserURL: "https://rootstock.blockscout.com/",
+          apiURL: 'https://rootstock.blockscout.com/api/',
+          browserURL: 'https://rootstock.blockscout.com/',
         }
       },
     ]
