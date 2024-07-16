@@ -546,7 +546,19 @@ const config: HardhatUserConfig = {
         dockerImage: '', // deprecated
         tag: ''   // deprecated
       },
-      contractsToCompile: [] //optional. Compile only specific contracts
+      contractsToCompile: [
+        'contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol',
+
+        'contracts/onChainFeeds/UmbrellaFeedsReader.sol',
+        'contracts/onChainFeeds/UmbrellaFeedsReaderFactory.sol',
+
+        'contracts/stakingBankStatic/StakingBankStatic.sol',
+        'contracts/stakingBankStatic/StakingBankStaticDev.sol',
+        'contracts/stakingBankStatic/StakingBankStaticLocal.sol',
+        'contracts/stakingBankStatic/StakingBankStaticProd.sol',
+        'contracts/stakingBankStatic/StakingBankStaticSbx.sol',
+        'contracts/Registry.sol',
+      ] //optional. Compile only specific contracts
     }
   },
   namedAccounts: {

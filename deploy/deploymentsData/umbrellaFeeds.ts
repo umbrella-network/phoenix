@@ -16,7 +16,7 @@ const deploymentData = (network: string, umbrellaFeedsArgs: UmbrellaFeedsArgs): 
   let contractName = `contracts/onChainFeeds/UmbrellaFeeds.sol:${UMBRELLA_FEEDS}`;
 
   if (network.startsWith('zk_link_nova')) {
-    contractName = `contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol::${UMBRELLA_FEEDS}`;
+    contractName = `contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol:${UMBRELLA_FEEDS}`;
   }
 
   return {
