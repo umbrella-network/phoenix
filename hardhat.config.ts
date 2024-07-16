@@ -97,6 +97,7 @@ const apiKey = (): string | Record<string, string> => {
     'linea': LINEASCAN_API,
     'base-goerli': 'PLACEHOLDER_STRING',
     'base-mainnet': BASESCAN_API,
+    'rootstock_production': 'any non empty string'
   };
 };
 
@@ -442,7 +443,23 @@ const config: HardhatUserConfig = {
           apiURL: 'https://api.basescan.org/api',
           browserURL: 'https://basescan.org'
         }
-      }
+      },
+      {
+        network: 'rootstock_sandbox',
+        chainId: 31,
+        urls: {
+          apiURL: 'https://rootstock-testnet.blockscout.com/api/',
+          browserURL: 'https://rootstock-testnet.blockscout.com/',
+        }
+      },
+      {
+        network: 'rootstock_production',
+        chainId: 30,
+        urls: {
+          apiURL: 'https://rootstock.blockscout.com/api/',
+          browserURL: 'https://rootstock.blockscout.com/',
+        }
+      },
     ]
   },
   gasReporter: {
