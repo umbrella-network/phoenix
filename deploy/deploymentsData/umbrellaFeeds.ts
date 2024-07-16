@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 import { REGISTRY, UMBRELLA_FEEDS } from '../../constants';
 import { DeploymentData } from '../_helpers/types';
-import {HARDHAT, LOCALHOST} from '../../constants/networks';
+import { HARDHAT, LOCALHOST } from '../../constants/networks';
 
 type UmbrellaFeedsArgs = {
   contractRegistry: string;
