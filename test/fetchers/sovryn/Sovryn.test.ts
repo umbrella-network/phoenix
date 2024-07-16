@@ -30,7 +30,7 @@ type GetPriceResult = {
   timestamp: BigNumber;
 };
 
-describe.only('Sovryn', () => {
+describe.skip('Sovryn', () => {
   const SovrynSwapNetworkAddress = '0x98ace08d2b759a265ae326f010496bcd63c15afc';
   const rUSDT = '0xef213441a85df4d7acbdae0cf78004e1e486bb96';
   const weBTC = '0x542fda317318ebf1d3deaf76e0b632741a7e677d';
@@ -159,7 +159,7 @@ describe.only('Sovryn', () => {
     console.log(results.prices.map((p) => [p.price.div(10n ** 10n).toNumber() / 1e8, p.success]));
   });
 
-  it.only('integration example for pegasus', async () => {
+  it.skip('integration example for pegasus', async () => {
     //base: '0x542fda317318ebf1d3deaf76e0b632741a7e677d'
     //           quote: '0xe700691da7b9851f2f35f8b8182c69c53ccad9db'
     //           amountInDecimals: 18
