@@ -1,7 +1,9 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { ROOTSTOCK_PRODUCTION, ROOTSTOCK_SANDBOX } from '../../constants/networks';
+import { ETH_SEPOLIA } from '../../constants/networks';
 
 export function onChainSupportedBlockchains(hre: HardhatRuntimeEnvironment): boolean {
+  if (hre.network.name == ETH_SEPOLIA) return false;
+
   if (hre.network.name.includes('linea')) return true;
   if (hre.network.name.includes('polygon')) return true;
   if (hre.network.name.includes('base_')) return true;
@@ -11,8 +13,7 @@ export function onChainSupportedBlockchains(hre: HardhatRuntimeEnvironment): boo
   if (hre.network.name.includes('xdc_sandbox')) return true;
   if (hre.network.name.includes('okx_sandbox')) return true;
   if (hre.network.name.includes('astar_sandbox')) return true;
-  if (hre.network.name.includes(ROOTSTOCK_SANDBOX)) return true;
-  if (hre.network.name.includes(ROOTSTOCK_PRODUCTION)) return true;
+  if (hre.network.name.includes('rootstock_')) return true;
   if (hre.network.name.includes('zk_link_')) return true;
 
   return false;

@@ -5,20 +5,10 @@ import { CHAIN, ChainType, FOREIGN_CHAIN, REGISTRY, STAKING_BANK_STATIC } from '
 import { resolveChainName } from '../../tasks/_helpers/resolveChainName';
 import { deployChains } from '../_helpers/deployChains';
 import { checkStakingBankStaticUpdated } from '../_helpers/checkStakingBankStaticUpdated';
-
-function supportedBlockchain(hre: HardhatRuntimeEnvironment): boolean {
-  if (hre.network.name.includes('hardhat')) return true;
-  if (hre.network.name.includes('polygon')) return true;
-  if (hre.network.name.includes('eth')) return true;
-  if (hre.network.name.includes('arbitrum')) return true;
-  if (hre.network.name.includes('avalanche')) return true;
-  if (hre.network.name.includes('bnb')) return true;
-
-  return false;
-}
+import { supportedLayer2Blockchain } from '../_helpers/supportedLayer2Blockchain';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  if (!supportedBlockchain(hre)) {
+  if (!supportedLayer2Blockchain(hre)) {
     console.log('-'.repeat(80));
     console.log(`chain is not supported on ${hre.network.name}`);
     console.log('-'.repeat(80));

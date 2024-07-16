@@ -2,10 +2,10 @@ pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
 
-import "../../contracts/interfaces/IRegistry.sol";
-import "../../contracts/onChainFeeds/UmbrellaFeedsReaderFactory.sol";
-import "../../contracts/interfaces/AggregatorV3Interface.sol";
-import "./SignerHelper.sol";
+import "../../../contracts/interfaces/IRegistry.sol";
+import "../../../contracts/onChainFeeds/UmbrellaFeedsReaderFactory.sol";
+import "../../../contracts/interfaces/AggregatorV3Interface.sol";
+import "../SignerHelper.sol";
 
 /*
     forge test -vvv --match-contract UmbrellaFeedsReaderFactoryTest

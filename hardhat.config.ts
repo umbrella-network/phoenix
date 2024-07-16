@@ -6,7 +6,6 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
-import '@nomicfoundation/hardhat-verify';
 import 'solidity-coverage';
 import '@matterlabs/hardhat-zksync-solc';
 import '@matterlabs/hardhat-zksync-verify';
@@ -35,7 +34,7 @@ import {
   BNB_STAGING,
   ETH,
   ETH_PRODUCTION,
-  ETH_SANDBOX,
+  ETH_SANDBOX, ETH_SEPOLIA,
   ETH_STAGING,
   LINEA_PRODUCTION,
   LINEA_SANDBOX,
@@ -47,7 +46,7 @@ import {
   POLYGON_SANDBOX,
   POLYGON_STAGING,
   ROOTSTOCK_PRODUCTION,
-  ROOTSTOCK_SANDBOX,
+  ROOTSTOCK_SANDBOX, ROOTSTOCK_STAGING,
   XDC_SANDBOX, ZK_LINK_NOVA_PRODUCTION, ZK_LINK_NOVA_SANDBOX, ZK_LINK_NOVA_STAGING
 } from './constants/networks';
 import {getPrivteKeys, PROD_PK} from './constants/pk';
@@ -81,6 +80,7 @@ const apiKey = (): string | Record<string, string> => {
   return {
     'mainnet': ETHERSCAN_API,
     'goerli': ETHERSCAN_API,
+    'sepolia': ETHERSCAN_API,
     // bsc
     'bsc': BSCSCAN_API,
     'bscTestnet': BSCSCAN_API,
@@ -97,6 +97,7 @@ const apiKey = (): string | Record<string, string> => {
     'linea': LINEASCAN_API,
     'base-goerli': 'PLACEHOLDER_STRING',
     'base-mainnet': BASESCAN_API,
+    'rootstock_production': 'any non empty string'
   };
 };
 
@@ -216,6 +217,12 @@ const config: HardhatUserConfig = {
       chainId: getProviderData(ETH_STAGING).chainId,
       gasPrice: 'auto'
     },
+    eth_sepolia: {
+      url: getProviderData(ETH_SEPOLIA).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ETH_SEPOLIA).chainId,
+      gasPrice: 'auto'
+    },
     polygon_staging: {
       url: getProviderData(POLYGON_STAGING).url,
       accounts: getPrivteKeys(LOCALHOST),
@@ -300,6 +307,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(ROOTSTOCK_SANDBOX).url,
       accounts: getPrivteKeys(LOCALHOST),
       chainId: getProviderData(ROOTSTOCK_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    rootstock_staging: {
+      url: getProviderData(ROOTSTOCK_STAGING).url,
+      accounts: getPrivteKeys(LOCALHOST),
+      chainId: getProviderData(ROOTSTOCK_STAGING).chainId,
       gasPrice: 'auto'
     },
     zk_link_nova_staging: {
@@ -430,7 +443,23 @@ const config: HardhatUserConfig = {
           apiURL: 'https://api.basescan.org/api',
           browserURL: 'https://basescan.org'
         }
-      }
+      },
+      {
+        network: 'rootstock_sandbox',
+        chainId: 31,
+        urls: {
+          apiURL: 'https://rootstock-testnet.blockscout.com/api/',
+          browserURL: 'https://rootstock-testnet.blockscout.com/',
+        }
+      },
+      {
+        network: 'rootstock_production',
+        chainId: 30,
+        urls: {
+          apiURL: 'https://rootstock.blockscout.com/api/',
+          browserURL: 'https://rootstock.blockscout.com/',
+        }
+      },
     ]
   },
   gasReporter: {
@@ -451,6 +480,14 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
+        version: '0.7.6',
+        settings: {
+          optimizer: {
+            enabled: false,
+            runs: 0,
+          },
+        },
+      }, {
         version: '0.8.13',
         settings: {
           optimizer: {
@@ -458,8 +495,38 @@ const config: HardhatUserConfig = {
             runs: 0,
           },
         },
+      }, {
+        version: '0.8.22',
+        settings: {
+          optimizer: {
+            enabled: false,
+            runs: 0,
+          },
+        },
       }
-    ]
+    ],
+    overrides: {
+      '@uniswap/v3-core/contracts/libraries/FullMath.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+      '@uniswap/v3-core/contracts/libraries/TickBitmap.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+      'gitmodules/uniswap/v3-periphery/contracts/libraries/PoolAddress.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+      'gitmodules/uniswap/v3-periphery/contracts/libraries/PoolTicksCounter.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+      'gitmodules/uniswap/v3-periphery/contracts/lens/QuoterV2.sol': {
+        version: '0.7.6',
+        settings: {},
+      },
+    },
   },
   zksolc: {
     version: '1.4.0', // optional eg 'latest'
@@ -479,7 +546,19 @@ const config: HardhatUserConfig = {
         dockerImage: '', // deprecated
         tag: ''   // deprecated
       },
-      contractsToCompile: [] //optional. Compile only specific contracts
+      contractsToCompile: [
+        'contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol',
+
+        'contracts/onChainFeeds/UmbrellaFeedsReader.sol',
+        'contracts/onChainFeeds/UmbrellaFeedsReaderFactory.sol',
+
+        'contracts/stakingBankStatic/StakingBankStatic.sol',
+        'contracts/stakingBankStatic/StakingBankStaticDev.sol',
+        'contracts/stakingBankStatic/StakingBankStaticLocal.sol',
+        'contracts/stakingBankStatic/StakingBankStaticProd.sol',
+        'contracts/stakingBankStatic/StakingBankStaticSbx.sol',
+        'contracts/Registry.sol',
+      ] //optional. Compile only specific contracts
     }
   },
   namedAccounts: {

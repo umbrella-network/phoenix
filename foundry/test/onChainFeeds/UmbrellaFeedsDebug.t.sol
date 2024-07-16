@@ -1,13 +1,13 @@
 pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
-import "../lib/CheatCodes.sol";
-import "../lib/Mock.sol";
+import "../../lib/CheatCodes.sol";
+import "../../lib/Mock.sol";
 
-import "../../contracts/Registry.sol";
-import "../../contracts/onChainFeeds/UmbrellaFeeds.sol";
-import "../../contracts/stakingBankStatic/StakingBankStatic.sol";
-import "../../contracts/stakingBankStatic/StakingBankStaticDev.sol";
+import "../../../contracts/Registry.sol";
+import "../../../contracts/onChainFeeds/UmbrellaFeeds.sol";
+import "../../../contracts/stakingBankStatic/StakingBankStatic.sol";
+import "../../../contracts/stakingBankStatic/StakingBankStaticDev.sol";
 
 /*
     forge test -vvv --match-contract UmbrellaFeedsTest

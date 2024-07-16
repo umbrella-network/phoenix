@@ -5,9 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [4.14.0] - 2024-07-16
+### Added
+- `UniswapV3FetcherHelper`
+- `SovrynFetcherHelper`
+
 ### Changed
 - replace `destroy` with flag for Zk-Link
-
 
 ## [4.13.0] - 2024-04-04
 ### Added

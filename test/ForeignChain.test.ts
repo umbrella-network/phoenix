@@ -10,25 +10,26 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { doSnapshot, revertSnapshot } from '../scripts/utils/helpers';
 import { blockTimestamp, mintBlocks } from './utils';
 import { ChainStatus } from './types/ChainStatus';
-import { prepareData, tree } from './chainUtils';
+import { buildTree, prepareData } from './chainUtils';
 import { FOREIGN_CHAIN } from '../constants';
 import { registerChain } from '../tasks/_helpers/registerChain';
 import { deployerSigner } from '../tasks/_helpers/jsonRpcProvider';
+import SortedMerkleTree from '../lib/SortedMerkleTree';
 
 use(waffleChai);
 
 const timePadding = 100;
 const totalSupply = 10n ** 18n;
 
-const root = tree.getRoot();
-
 describe('ForeignChain @foreignchain', () => {
-  let validator: SignerWithAddress, contract: Contract;
+  let validator: SignerWithAddress, contract: Contract, root: string, tree: SortedMerkleTree;
 
   let genesisSnapshotId: unknown;
 
   before(async () => {
     genesisSnapshotId = await doSnapshot(hre);
+    tree = buildTree();
+    root = tree.getRoot();
   });
 
   after(async () => {

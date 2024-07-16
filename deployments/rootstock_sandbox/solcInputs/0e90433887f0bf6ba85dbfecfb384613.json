@@ -1,0 +1,39 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/fetchers/soveryn/ISovrynSwapNetwork.sol": {
+      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.0;\n\ninterface ISovrynSwapNetwork {\n    /**\n      * @dev returns the conversion path between two tokens in the network\n      * note that this method is quite expensive in terms of gas and should generally be called off-chain\n      *\n      * @param _sourceToken source token address\n      * @param _targetToken target token address\n      *\n      * @return conversion path between the two tokens\n    */\n    function conversionPath(address _sourceToken, address _targetToken) external view returns (address[] memory);\n\n    /**\n      * @dev returns the expected target amount of converting a given amount on a given path\n      * note that there is no support for circular paths\n      *\n      * @param _path        conversion path (see conversion path format above)\n      * @param _amount      amount of _path[0] tokens received from the sender\n      *\n      * @return expected target amount\n    */\n    function rateByPath(address[] calldata _path, uint256 _amount) external view returns (uint256);\n}\n"
+    },
+    "contracts/fetchers/soveryn/SovrynFetcherHelper.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.22;\n\nimport {ISovrynSwapNetwork} from \"./ISovrynSwapNetwork.sol\";\n\ncontract SovrynFetcherHelper {\n    struct InputData {\n        address base;\n        address quote;\n        uint256 amount;\n    }\n\n    /// @param price is amount out (normalized to 18 decimals) returned by Uniswap pool for 1 quote token\n    struct Price {\n        uint256 price;\n        bool success;\n    }\n\n    ISovrynSwapNetwork immutable public sovrynSwapNetwork;\n\n    constructor(address _sovrynSwapNetwork) {\n        sovrynSwapNetwork = ISovrynSwapNetwork(_sovrynSwapNetwork);\n    }\n\n    /// @dev this method will return estimations for swap for provided amounts\n    function getPrices(InputData[] calldata _data)\n        external\n        view\n        virtual\n        returns (Price[] memory prices, uint256 timestamp)\n    {\n        timestamp = block.timestamp;\n        uint256 n = _data.length;\n        prices = new Price[](n);\n\n        for (uint256 i = 0; i < n; i++) {\n            InputData memory inputData = _data[i];\n            Price memory price = prices[i];\n\n            (address[] memory path, bool success) = _conversionPath(inputData.base, inputData.quote);\n            if (!success) continue;\n\n            (price.price, success) = _rateByPath(path, inputData.amount);\n            if (!success) continue;\n\n            price.success = true;\n        }\n    }\n\n    function _conversionPath(address _base, address _quote)\n        internal\n        view\n        returns (address[] memory conversionPath, bool success)\n    {\n        try sovrynSwapNetwork.conversionPath(_base, _quote) returns (address[] memory path) {\n            return (path, true);\n        } catch (bytes memory) {\n            // error\n        }\n    }\n\n    function _rateByPath(address[] memory _path, uint256 _amountIn)\n        internal\n        view\n        returns (uint256 amountOut, bool success)\n    {\n        try sovrynSwapNetwork.rateByPath(_path, _amountIn) returns (uint256 result) {\n            return (result, true);\n        } catch (bytes memory) {\n            // error\n        }\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 0
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

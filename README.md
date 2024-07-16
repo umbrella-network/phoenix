@@ -45,8 +45,27 @@ In case on missing lib: `brew install libusb`.
 2. `git hf init`
 3. `npm install`
 4. `git submodule update --init --recursive`
+5. `git submodule add --name gitmodules/uniswap/v3-periphery https://github.com/Uniswap/v3-periphery gitmodules/uniswap/v3-periphery`
 
+```
+git submodule update --init --recursive
+```
 ---
+
+### Remove submodule
+
+example:
+
+```shell
+# Remove the submodule entry from .git/config
+git submodule deinit -f gitmodules/uniswap/v3-periphery
+
+# Remove the submodule directory from the superproject's .git/modules directory
+rm -rf .git/modules/gitmodules/uniswap/
+
+# Remove the entry in .gitmodules and remove the submodule directory located at path/to/submodule
+rm -rf gitmodules/uniswap/
+```
 
 ## Testing
 
@@ -70,11 +89,7 @@ forge test -vvv
   - `HARDHAT_MINING_AUTO=false` - this will simulate mainnet (you will have to wait block time seconds to mint tx)
 2. Deploy to localhost
 
-```shell script
-npm run deploy:all
-```
-
-## New deployment scripts
+## Deployment scripts
 
 [see new multichain architecture deployment steps](./MASTERCHAIN.md)
 
@@ -183,16 +198,16 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 On blockchain where we do have L2 consensus:
 
 ```shell
-npx hardhat deploy --network polygon_sandbox
-npx hardhat registerStakingBankStatic --network polygon_sandbox
+npx hardhat deploy --network rootstock_staging
+npx hardhat registerStakingBankStatic --network rootstock_staging
 # just in case chain needs to be redeployed
 # if staking bank changed, there might be need to force redeployment by removing deployment files for chain and feeds
-npx hardhat deploy --network polygon_sandbox
+npx hardhat deploy --network rootstock_staging
 
-npx hardhat registerChain --network polygon_sandbox
+npx hardhat registerChain --network rootstock_staging
 
-npx hardhat registerUmbrellaFeeds --destroy UMB-USD --network polygon_sandbox
-npx hardhat registerReaderFactory --network polygon_sandbox
+npx hardhat registerUmbrellaFeeds --destroy UMB-USD --network rootstock_staging
+npx hardhat registerReaderFactory --network rootstock_staging
 ```
 
 On blockchain with only on-chain data:

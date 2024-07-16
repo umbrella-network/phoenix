@@ -16,6 +16,7 @@ import {
   BNB_STAGING,
   ETH_PRODUCTION,
   ETH_SANDBOX,
+  ETH_SEPOLIA,
   ETH_STAGING,
   FORKED_BNB_ID,
   FORKED_ETH_ID,
@@ -29,6 +30,7 @@ import {
   POLYGON_STAGING,
   ROOTSTOCK_PRODUCTION,
   ROOTSTOCK_SANDBOX,
+  ROOTSTOCK_STAGING,
   XDC_SANDBOX,
   ZK_LINK_NOVA_PRODUCTION,
   ZK_LINK_NOVA_SANDBOX,
@@ -139,6 +141,11 @@ const ethTestnetProviderData: ProviderData = {
   chainId: chainId(5),
 };
 
+const ethSepoliaProviderData: ProviderData = {
+  url: `https://sepolia.infura.io/v3/${INFURA_ID}`,
+  chainId: chainId(11155111),
+};
+
 const polygonTestnetProviderData: ProviderData = {
   url: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
   chainId: chainId(80001),
@@ -221,6 +228,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
     case ETH_SANDBOX:
       return ethTestnetProviderData;
 
+    case ETH_SEPOLIA:
+      return ethSepoliaProviderData;
+
     case BNB_STAGING:
     case BNB_SANDBOX:
       return bnbTestnetProviderData;
@@ -230,6 +240,7 @@ const resolveProviderData = (networkName: string): ProviderData => {
       return polygonTestnetProviderData;
 
     case ROOTSTOCK_SANDBOX:
+    case ROOTSTOCK_STAGING:
       return rootstockTestnetProviderData;
 
     case ZK_LINK_NOVA_STAGING:
