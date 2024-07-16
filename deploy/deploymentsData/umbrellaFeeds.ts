@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 import { REGISTRY, UMBRELLA_FEEDS } from '../../constants';
 import { DeploymentData } from '../_helpers/types';
-import { HARDHAT, LOCALHOST } from '../../constants/networks';
+import {HARDHAT, LOCALHOST} from '../../constants/networks';
 
 type UmbrellaFeedsArgs = {
   contractRegistry: string;
@@ -10,12 +10,18 @@ type UmbrellaFeedsArgs = {
   decimals: number;
 };
 
-const deploymentData = (umbrellaFeedsArgs: UmbrellaFeedsArgs): DeploymentData => {
+const deploymentData = (network: string, umbrellaFeedsArgs: UmbrellaFeedsArgs): DeploymentData => {
   console.log(Object.values(umbrellaFeedsArgs));
+
+  let contractName = `contracts/onChainFeeds/UmbrellaFeeds.sol:${UMBRELLA_FEEDS}`;
+
+  if (network.startsWith('zk_link_nova')) {
+    contractName = `contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol::${UMBRELLA_FEEDS}`;
+  }
 
   return {
     args: Object.values(umbrellaFeedsArgs),
-    contractName: UMBRELLA_FEEDS,
+    contractName,
   };
 };
 
@@ -38,10 +44,9 @@ const requiredSignatures = (hre: HardhatRuntimeEnvironment): number => {
 export const umbrellaFeedsDeploymentData = async (hre: HardhatRuntimeEnvironment): Promise<DeploymentData> => {
   const { deployments } = hre;
   const decimals = 8;
-
   const registry = await deployments.get(REGISTRY);
 
-  return deploymentData({
+  return deploymentData(hre.network.name, {
     contractRegistry: registry.address,
     requiredSignatures: requiredSignatures(hre),
     decimals,
