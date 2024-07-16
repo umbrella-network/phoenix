@@ -1,14 +1,15 @@
 pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
+import {SignerHelper, Mock} from "../../SignerHelper.sol";
 
-import "../../contracts/interfaces/IRegistry.sol";
-import "./SignerHelper.sol";
+import {IRegistry} from "../../../../contracts/interfaces/IRegistry.sol";
+import {UmbrellaFeeds, IUmbrellaFeeds} from "../../../../contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol";
 
 /*
     forge test -vv --match-contract UmbrellaFeedsDestroyTest
 */
-contract UmbrellaFeedsDestroyTest is SignerHelper {
+contract UmbrellaFeedsDestroyZkLinkTest is SignerHelper {
     address public immutable registry;
     UmbrellaFeeds public immutable feeds;
 

@@ -39,12 +39,15 @@ contract SignerHelper is DSTest {
 
     function _signData(
         uint256 _numSigs,
-        UmbrellaFeeds _feeds,
+        IUmbrellaFeeds _feeds,
         bytes32[] memory _priceKeys,
         IUmbrellaFeeds.PriceData[] memory _priceDatas
     ) internal returns (IUmbrellaFeeds.Signature[] memory signatures) {
-        bytes32 priceDataHash = keccak256(abi.encode(_feeds.getChainId(), address(_feeds), _priceKeys, _priceDatas));
-        bytes32 hash = keccak256(abi.encodePacked(_feeds.ETH_PREFIX(), priceDataHash));
+        bytes32 priceDataHash = keccak256(abi.encode(
+            UmbrellaFeeds(address(_feeds)).getChainId(), address(_feeds), _priceKeys, _priceDatas)
+        );
+
+        bytes32 hash = keccak256(abi.encodePacked(UmbrellaFeeds(address(_feeds)).ETH_PREFIX(), priceDataHash));
 
         signatures = new UmbrellaFeeds.Signature[](_numSigs);
 
@@ -55,12 +58,15 @@ contract SignerHelper is DSTest {
 
     function _invalidSignData(
         uint256 _numSigs,
-        UmbrellaFeeds _feeds,
+        IUmbrellaFeeds _feeds,
         bytes32[] memory _priceKeys,
         IUmbrellaFeeds.PriceData[] memory _priceDatas
     ) internal returns (IUmbrellaFeeds.Signature[] memory signatures) {
-        bytes32 priceDataHash = keccak256(abi.encode(_feeds.getChainId(), address(_feeds), _priceKeys, _priceDatas));
-        bytes32 hash = keccak256(abi.encodePacked(_feeds.ETH_PREFIX(), priceDataHash));
+        bytes32 priceDataHash = keccak256(abi.encode(
+            UmbrellaFeeds(address(_feeds)).getChainId(), address(_feeds), _priceKeys, _priceDatas)
+        );
+
+        bytes32 hash = keccak256(abi.encodePacked(UmbrellaFeeds(address(_feeds)).ETH_PREFIX(), priceDataHash));
 
         signatures = new UmbrellaFeeds.Signature[](_numSigs);
 

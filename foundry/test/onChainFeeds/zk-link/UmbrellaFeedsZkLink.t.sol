@@ -1,14 +1,15 @@
 pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
+import {SignerHelper, Mock} from "../../SignerHelper.sol";
 
-import "../../contracts/interfaces/IRegistry.sol";
-import "./SignerHelper.sol";
+import {IRegistry} from "../../../../contracts/interfaces/IRegistry.sol";
+import {UmbrellaFeeds, IUmbrellaFeeds} from "../../../../contracts/onChainFeeds/zk-link/UmbrellaFeeds.sol";
 
 /*
     forge test -vvv --match-contract UmbrellaFeedsTest
 */
-contract UmbrellaFeedsTest is SignerHelper {
+contract UmbrellaFeedsZkLinkTest is SignerHelper {
     address public immutable registry;
     UmbrellaFeeds public immutable feeds;
     UmbrellaFeeds public immutable feeds1;
@@ -205,7 +206,7 @@ contract UmbrellaFeedsTest is SignerHelper {
         feeds.update(priceKeys, priceDatas, onesignature);
     }
 
-    function _executeUpdate(UmbrellaFeeds _feeds) internal {
+    function _executeUpdate(IUmbrellaFeeds _feeds) internal {
         UmbrellaFeeds.Signature[] memory signatures = _signData(2, _feeds, priceKeys, priceDatas);
         _feeds.update(priceKeys, priceDatas, signatures);
     }
