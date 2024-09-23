@@ -13,7 +13,7 @@ import {
   BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING,
+  BNB_STAGING, BOB_STAGING,
   ETH_PRODUCTION,
   ETH_SANDBOX,
   ETH_SEPOLIA,
@@ -37,7 +37,7 @@ import {
   ZK_LINK_NOVA_STAGING,
 } from './networks';
 
-const { INFURA_ID, FAKE_MAINNET, FORKING_ENV, CHAIN_ID } = process.env;
+const { INFURA_ID, BLAST_RPC_ID, FAKE_MAINNET, FORKING_ENV, CHAIN_ID } = process.env;
 
 type ProviderData = { url: string; chainId: number };
 
@@ -95,6 +95,12 @@ const apothemTestnetProviderData: ProviderData = {
 const astarTestnetProviderData: ProviderData = {
   url: 'https://rpc.startale.com/zkatana',
   chainId: chainId(1261120),
+};
+
+//
+const bobTestnetProviderData: ProviderData = {
+  url: `https://bob-sepolia.blastapi.io/${BLAST_RPC_ID}`,
+  chainId: chainId(195),
 };
 
 // https://www.okx.com/pl/x1/docs/getting-started/user-guide/network-information
@@ -193,6 +199,9 @@ const baseMainnetProviderData: ProviderData = {
 
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
+    case BOB_STAGING:
+      return bobTestnetProviderData;
+
     case OKX_SANDBOX:
       return okxTestnetProviderData;
 
