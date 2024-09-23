@@ -1,4 +1,4 @@
-import { task } from 'hardhat/config';
+import {task} from 'hardhat/config';
 import { ethers } from 'ethers';
 
 import { UMBRELLA_FEEDS } from '../constants';
@@ -8,15 +8,19 @@ import { DeviationSigner } from '../test/utils/DeviationSigner';
 import { deployerSigner } from './_helpers/jsonRpcProvider';
 
 /*
+VALIDATOR_0_PK=... \
+VALIDATOR_1_PK=... \
 npx hardhat testnetUpdateTx --network bnb_staging
+
+
  */
-task('testnetUpdateTx', 'testnet update tx').setAction(async (hre: HardhatRuntimeEnvironment) => {
+task('testnetUpdateTx', 'testnet update tx').setAction(async (_, hre: HardhatRuntimeEnvironment) => {
+  const networkId = (await hre.ethers.provider.getNetwork()).chainId;
   const deviationSigner = new DeviationSigner();
   const deployer = deployerSigner(hre);
 
   const umbrellaFeedsDeployments = await hre.deployments.get(UMBRELLA_FEEDS);
   const umbrellaFeeds = UmbrellaFeeds__factory.connect(umbrellaFeedsDeployments.address, deployer);
-  const networkId = (await hre.ethers.provider.getNetwork()).chainId;
 
   const t = Math.trunc(Date.now() / 1000);
 
@@ -31,8 +35,14 @@ task('testnetUpdateTx', 'testnet update tx').setAction(async (hre: HardhatRuntim
 
   const keys = Object.keys(data).map((k) => ethers.utils.id(k));
 
+  console.log({keys});
+  console.log(process.env.VALIDATOR_0_PK);
+  console.log(process.env.VALIDATOR_1_PK);
+
   const validator1 = new ethers.Wallet(process.env.VALIDATOR_0_PK || '');
   const validator2 = new ethers.Wallet(process.env.VALIDATOR_1_PK || '');
+
+  console.log(Object.values(data));
 
   const signatures = await Promise.all([
     deviationSigner.apply(hre, networkId, umbrellaFeeds.address, validator1, keys, Object.values(data)),
