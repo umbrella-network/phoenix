@@ -13,7 +13,8 @@ import {
   BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING, BOB_STAGING,
+  BNB_STAGING,
+  BOB_STAGING,
   ETH_PRODUCTION,
   ETH_SANDBOX,
   ETH_SEPOLIA,
@@ -100,7 +101,7 @@ const astarTestnetProviderData: ProviderData = {
 //
 const bobTestnetProviderData: ProviderData = {
   url: `https://bob-sepolia.blastapi.io/${BLAST_RPC_ID}`,
-  chainId: chainId(195),
+  chainId: chainId(808813),
 };
 
 // https://www.okx.com/pl/x1/docs/getting-started/user-guide/network-information

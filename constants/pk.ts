@@ -21,7 +21,7 @@ const prodAccounts = PROD_DEPLOYER_PK ? [PROD_DEPLOYER_PK] : [];
 
 export const PROD_PK = 'prod';
 
-export function getPrivteKeys(network = ''): string[] {
+export function getPrivateKeys(network = ''): string[] {
   if (FORKING_ENV || FAKE_MAINNET) {
     return prodAccounts;
   }
