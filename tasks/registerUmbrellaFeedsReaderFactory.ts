@@ -5,7 +5,7 @@ import { REGISTRY, UMBRELLA_FEEDS_READER_FACTORY } from '../constants';
 import { Registry__factory } from '../typechain';
 
 /*
-npx hardhat registerReaderFactory --network bnb_staging
+npx hardhat registerReaderFactory --network bob_staging
  */
 task('registerReaderFactory', 'UmbrellaFeedsReaderFactory registration')
   .addFlag('update', 'if contract is already registered, use this flag to update')
