@@ -31,7 +31,7 @@ import {
   BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING, BOB_STAGING,
+  BNB_STAGING, BOB_PRODUCTION, BOB_STAGING,
   ETH,
   ETH_PRODUCTION,
   ETH_SANDBOX, ETH_SEPOLIA,
@@ -240,6 +240,18 @@ const config: HardhatUserConfig = {
       url: getProviderData(BOB_STAGING).url,
       accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(BOB_STAGING).chainId,
+      gasPrice: 'auto'
+    },
+    bob_sandbox: {
+      url: getProviderData(BOB_STAGING).url,
+      accounts: getPrivateKeys(LOCALHOST),
+      chainId: getProviderData(BOB_STAGING).chainId,
+      gasPrice: 'auto'
+    },
+    bob_production: {
+      url: getProviderData(BOB_PRODUCTION).url,
+      accounts: getPrivateKeys(BOB_PRODUCTION),
+      chainId: getProviderData(BOB_PRODUCTION).chainId,
       gasPrice: 'auto'
     },
     linea_sandbox: {

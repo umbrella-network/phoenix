@@ -14,6 +14,7 @@ import {
   BNB_PRODUCTION,
   BNB_SANDBOX,
   BNB_STAGING,
+  BOB_PRODUCTION,
   BOB_STAGING,
   ETH_PRODUCTION,
   ETH_SANDBOX,
@@ -98,10 +99,16 @@ const astarTestnetProviderData: ProviderData = {
   chainId: chainId(1261120),
 };
 
-//
+// https://docs.gobob.xyz/docs/build/getting-started/networks
 const bobTestnetProviderData: ProviderData = {
   url: `https://bob-sepolia.blastapi.io/${BLAST_RPC_ID}`,
   chainId: chainId(808813),
+};
+
+// https://docs.gobob.xyz/docs/build/getting-started/networks
+const bobProductionProviderData: ProviderData = {
+  url: 'https://rpc.gobob.xyz/',
+  chainId: chainId(60808),
 };
 
 // https://www.okx.com/pl/x1/docs/getting-started/user-guide/network-information
@@ -283,6 +290,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
 
     case ZK_LINK_NOVA_PRODUCTION:
       return zkLinkNovaMainnetProviderData;
+
+    case BOB_PRODUCTION:
+      return bobProductionProviderData;
   }
 
   throw new Error(`${networkName} not supported`);

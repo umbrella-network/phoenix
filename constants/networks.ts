@@ -18,6 +18,7 @@ export const BASE_PRODUCTION = 'base_production';
 export const LINEA_SANDBOX = 'linea_sandbox';
 export const ARBITRUM_STAGING = 'arbitrum_staging';
 export const BOB_STAGING = 'bob_staging';
+export const BOB_PRODUCTION = 'bob_production';
 export const AVALANCHE_STAGING = 'avalanche_staging';
 export const BNB_STAGING = 'bnb_staging';
 export const ETH_STAGING = 'eth_staging';

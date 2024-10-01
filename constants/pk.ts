@@ -3,6 +3,7 @@ import {
   AVALANCHE_PRODUCTION,
   BASE_PRODUCTION,
   BNB_PRODUCTION,
+  BOB_PRODUCTION,
   ETH_PRODUCTION,
   LINEA_PRODUCTION,
   LOCALHOST,
@@ -39,6 +40,7 @@ export function getPrivateKeys(network = ''): string[] {
     case LINEA_PRODUCTION:
     case BASE_PRODUCTION:
     case ROOTSTOCK_PRODUCTION:
+    case BOB_PRODUCTION:
       return prodAccounts;
 
     default:

@@ -1,4 +1,4 @@
-import {task} from 'hardhat/config';
+import { task } from 'hardhat/config';
 import { ethers } from 'ethers';
 
 import { UMBRELLA_FEEDS } from '../constants';
@@ -41,7 +41,7 @@ task('testnetUpdateTx', 'testnet update tx').setAction(async (_, hre: HardhatRun
 
   const keys = Object.keys(data).map((k) => ethers.utils.id(k));
 
-  console.log({keys});
+  console.log({ keys });
   console.log(process.env.VALIDATOR_0_PK);
   console.log(process.env.VALIDATOR_1_PK);
 
@@ -61,8 +61,8 @@ task('testnetUpdateTx', 'testnet update tx').setAction(async (_, hre: HardhatRun
     keys,
     Object.values(data),
     signatures.map((sign) => {
-      const {v,r,s} = ethers.utils.splitSignature(sign);
-      return {v, r, s};
+      const { v, r, s } = ethers.utils.splitSignature(sign);
+      return { v, r, s };
     }),
   );
 
