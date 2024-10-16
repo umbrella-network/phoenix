@@ -11,7 +11,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { toBytes32 } from '../scripts/utils/helpers';
 import { UmbrellaFeeds, UmbrellaFeeds__factory } from '../typechain';
 
-import {REGISTRY, ISTAKING_BANK, UMBRELLA_FEEDS_ARTIFACTS } from '../constants';
+import { REGISTRY, ISTAKING_BANK, UMBRELLA_FEEDS_ARTIFACTS } from '../constants';
 import { DeviationSigner } from './utils/DeviationSigner';
 
 use(waffleChai);
