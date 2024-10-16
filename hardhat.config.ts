@@ -31,7 +31,7 @@ import {
   BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING,
+  BNB_STAGING, BOB_PRODUCTION, BOB_STAGING,
   ETH,
   ETH_PRODUCTION,
   ETH_SANDBOX, ETH_SEPOLIA,
@@ -49,7 +49,7 @@ import {
   ROOTSTOCK_SANDBOX, ROOTSTOCK_STAGING,
   XDC_SANDBOX, ZK_LINK_NOVA_PRODUCTION, ZK_LINK_NOVA_SANDBOX, ZK_LINK_NOVA_STAGING
 } from './constants/networks';
-import {getPrivteKeys, PROD_PK} from './constants/pk';
+import {getPrivateKeys, PROD_PK} from './constants/pk';
 import {forkingChainId, getProviderData} from './constants/providers';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -150,8 +150,8 @@ const config: HardhatUserConfig = {
       accounts: [
         {
           balance,
-          privateKey: getPrivteKeys().length
-            ? getPrivteKeys()[0]
+          privateKey: getPrivateKeys().length
+            ? getPrivateKeys()[0]
             // 0xc783df8a850f42e7f7e57013759c285caa701eb6
             : '0xc5e8f61d1ab959b397eecc0a37a6517b8e67a0e7cf1f4bce5591f3ed80199122'
         },
@@ -184,140 +184,158 @@ const config: HardhatUserConfig = {
       blockGasLimit: 80000000,
       url: 'http://localhost:8545',
       chainId: forkingChainId(),
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       live: false,
       saveDeployments: true,
       deploy: ['deploy/evm'],
     },
     linea_staging: {
       url: getProviderData(LINEA_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(LINEA_STAGING).chainId,
     },
     base_staging: {
       url: getProviderData(BASE_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(BASE_STAGING).chainId,
       gasMultiplier: 1.5
     },
     avalanche_staging: {
       url: getProviderData(AVALANCHE_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(AVALANCHE_STAGING).chainId,
     },
     bnb_staging: {
       url: getProviderData(BNB_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(BNB_STAGING).chainId,
       gasPrice: gwei(10)
     },
     ethereum_staging: {
       url: getProviderData(ETH_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ETH_STAGING).chainId,
       gasPrice: 'auto'
     },
     eth_sepolia: {
       url: getProviderData(ETH_SEPOLIA).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ETH_SEPOLIA).chainId,
       gasPrice: 'auto'
     },
     polygon_staging: {
       url: getProviderData(POLYGON_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(POLYGON_STAGING).chainId,
       gasPrice: 'auto',
       gasMultiplier: 2
     },
     arbitrum_staging: {
       url: getProviderData(ARBITRUM_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ARBITRUM_STAGING).chainId,
+      gasPrice: 'auto'
+    },
+    bob_staging: {
+      url: getProviderData(BOB_STAGING).url,
+      accounts: getPrivateKeys(LOCALHOST),
+      chainId: getProviderData(BOB_STAGING).chainId,
+      gasPrice: 'auto'
+    },
+    bob_sandbox: {
+      url: getProviderData(BOB_STAGING).url,
+      accounts: getPrivateKeys(LOCALHOST),
+      chainId: getProviderData(BOB_STAGING).chainId,
+      gasPrice: 'auto'
+    },
+    bob_production: {
+      url: getProviderData(BOB_PRODUCTION).url,
+      accounts: getPrivateKeys(BOB_PRODUCTION),
+      chainId: getProviderData(BOB_PRODUCTION).chainId,
       gasPrice: 'auto'
     },
     linea_sandbox: {
       url: getProviderData(LINEA_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(LINEA_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     arbitrum_sandbox: {
       url: getProviderData(ARBITRUM_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ARBITRUM_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     avalanche_sandbox: {
       url: getProviderData(AVALANCHE_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(AVALANCHE_SANDBOX).chainId,
       gasPrice: gwei(25)
     },
     polygon_sandbox: {
       url: getProviderData(POLYGON_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(POLYGON_SANDBOX).chainId,
       gasPrice: 'auto',
       gasMultiplier: 2
     },
     ethereum_sandbox: {
       url: getProviderData(ETH_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ETH_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     bnb_sandbox: {
       url: getProviderData(BNB_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(BNB_SANDBOX).chainId,
       gasPrice: gwei(10)
     },
     xdc_sandbox: {
       url: getProviderData(XDC_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(XDC_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     okx_sandbox: {
       url: getProviderData(OKX_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(OKX_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     astar_sandbox: {
       url: getProviderData(ASTAR_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ASTAR_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     arthera_sandbox: {
       url: getProviderData(ARTHERA_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ARTHERA_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     meld_sandbox: {
       url: getProviderData(MELD_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(MELD_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     rootstock_sandbox: {
       url: getProviderData(ROOTSTOCK_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ROOTSTOCK_SANDBOX).chainId,
       gasPrice: 'auto'
     },
     rootstock_staging: {
       url: getProviderData(ROOTSTOCK_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ROOTSTOCK_STAGING).chainId,
       gasPrice: 'auto'
     },
     zk_link_nova_staging: {
       url: getProviderData(ZK_LINK_NOVA_STAGING).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ZK_LINK_NOVA_STAGING).chainId,
       gasPrice: 'auto',
       ethNetwork: 'sepolia', // The Ethereum Web3 RPC URL, or the identifier of the network (e.g. `mainnet`, `sepolia`)
@@ -327,7 +345,7 @@ const config: HardhatUserConfig = {
     },
     zk_link_nova_sandbox: {
       url: getProviderData(ZK_LINK_NOVA_SANDBOX).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ZK_LINK_NOVA_SANDBOX).chainId,
       gasPrice: 'auto',
       ethNetwork: 'sepolia', // The Ethereum Web3 RPC URL, or the identifier of the network (e.g. `mainnet`, `sepolia`)
@@ -337,7 +355,7 @@ const config: HardhatUserConfig = {
     },
     zk_link_nova_productin: {
       url: getProviderData(ZK_LINK_NOVA_PRODUCTION).url,
-      accounts: getPrivteKeys(LOCALHOST),
+      accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(ZK_LINK_NOVA_PRODUCTION).chainId,
       gasPrice: 'auto',
       ethNetwork: 'mainnet', // The Ethereum Web3 RPC URL, or the identifier of the network (e.g. `mainnet`, `sepolia`)
@@ -347,19 +365,19 @@ const config: HardhatUserConfig = {
     },
     arbitrum_production: {
       url: getProviderData(ARBITRUM_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(ARBITRUM_PRODUCTION).chainId,
       gasPrice: 'auto',
     },
     avalanche_production: {
       url: getProviderData(AVALANCHE_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(AVALANCHE_PRODUCTION).chainId,
       gasPrice: 'auto',
     },
     eth_production: {
       url: getProviderData(ETH_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(ETH_PRODUCTION).chainId,
       live: true,
       gasPrice: 'auto',
@@ -367,14 +385,14 @@ const config: HardhatUserConfig = {
     },
     bnb_production: {
       url: getProviderData(BNB_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(BNB_PRODUCTION).chainId,
       gasPrice: gwei(5),
       live: true
     },
     polygon_production: {
       url: getProviderData(POLYGON_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(POLYGON_PRODUCTION).chainId,
       live: true,
       gasMultiplier: 2,
@@ -382,19 +400,19 @@ const config: HardhatUserConfig = {
     },
     linea_production: {
       url: getProviderData(LINEA_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(LINEA_PRODUCTION).chainId,
       live: true
     },
     base_production: {
       url: getProviderData(BASE_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(BASE_PRODUCTION).chainId,
       live: true
     },
     rootstock_production: {
       url: getProviderData(ROOTSTOCK_PRODUCTION).url,
-      accounts: getPrivteKeys(PROD_PK),
+      accounts: getPrivateKeys(PROD_PK),
       chainId: getProviderData(ROOTSTOCK_PRODUCTION).chainId,
       live: true
     },

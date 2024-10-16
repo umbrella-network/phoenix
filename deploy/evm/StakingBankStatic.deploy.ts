@@ -5,9 +5,10 @@ import { REGISTRY, STAKING_BANK, STAKING_BANK_STATIC } from '../../constants';
 import { verifyCode } from '../../scripts/utils/verifyContract';
 import { stakingBankStaticDeploymentData } from '../deploymentsData/stakingBankStatic';
 import { supportedLayer2Blockchain } from '../_helpers/supportedLayer2Blockchain';
+import { onChainSupportedBlockchains } from '../_helpers/onChainSupportedBlockchains';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  if (!supportedLayer2Blockchain(hre)) {
+  if (!supportedLayer2Blockchain(hre) && !onChainSupportedBlockchains(hre)) {
     console.log('-'.repeat(80));
     console.log(`${STAKING_BANK} is not supported on ${hre.network.name}`);
     console.log('-'.repeat(80));

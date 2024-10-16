@@ -3,6 +3,7 @@ import {
   AVALANCHE_PRODUCTION,
   BASE_PRODUCTION,
   BNB_PRODUCTION,
+  BOB_PRODUCTION,
   ETH_PRODUCTION,
   LINEA_PRODUCTION,
   LOCALHOST,
@@ -21,7 +22,7 @@ const prodAccounts = PROD_DEPLOYER_PK ? [PROD_DEPLOYER_PK] : [];
 
 export const PROD_PK = 'prod';
 
-export function getPrivteKeys(network = ''): string[] {
+export function getPrivateKeys(network = ''): string[] {
   if (FORKING_ENV || FAKE_MAINNET) {
     return prodAccounts;
   }
@@ -39,6 +40,7 @@ export function getPrivteKeys(network = ''): string[] {
     case LINEA_PRODUCTION:
     case BASE_PRODUCTION:
     case ROOTSTOCK_PRODUCTION:
+    case BOB_PRODUCTION:
       return prodAccounts;
 
     default:

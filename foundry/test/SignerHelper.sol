@@ -5,9 +5,9 @@ import "ds-test/test.sol";
 import "../lib/CheatCodes.sol";
 import "../lib/Mock.sol";
 
-import "../../contracts/onChainFeeds/UmbrellaFeeds.sol";
-import "../../contracts/stakingBankStatic/StakingBankStatic.sol";
-import "../../contracts/stakingBankStatic/StakingBankStaticCI.sol";
+import {UmbrellaFeeds, IUmbrellaFeeds} from "contracts/onChainFeeds/UmbrellaFeeds.sol";
+import {StakingBankStatic, IStakingBank} from "contracts/stakingBankStatic/StakingBankStatic.sol";
+import {StakingBankStaticCI} from "contracts/stakingBankStatic/StakingBankStaticCI.sol";
 
 
 contract SignerHelper is DSTest {

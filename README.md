@@ -213,15 +213,15 @@ npx hardhat registerReaderFactory --network rootstock_staging
 On blockchain with only on-chain data:
 
 ```shell
-npx hardhat deploy --network rootstock_production
+npx hardhat deploy --network bob_production
 
-npx hardhat registerStakingBankStatic --network rootstock_production
+npx hardhat registerStakingBankStatic --network bob_production
 # remove feed json
-npx hardhat deploy --network rootstock_production
+npx hardhat deploy --network bob_production
 
-npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network rootstock_production
-npx hardhat registerUmbrellaFeeds --network rootstock_production
-npx hardhat registerReaderFactory --network rootstock_production
+npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network bob_production
+npx hardhat registerUmbrellaFeeds --network bob_production
+npx hardhat registerReaderFactory --network bob_production
 ```
 
 #### Code verification on Linea

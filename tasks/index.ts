@@ -9,3 +9,4 @@ export * from './staticBankDeploymentVerificationAfter';
 export * from './debug';
 export * from './getStandardJson';
 export * from './importContract';
+export * from './testnetUpdateTx';

@@ -5,7 +5,7 @@ import { REGISTRY, STAKING_BANK, STAKING_BANK_STATIC } from '../constants';
 import { Registry__factory } from '../typechain';
 
 /*
-npx hardhat registerStakingBankStatic --network bnb_staging
+npx hardhat registerStakingBankStatic --network bob_staging
  */
 task('registerStakingBankStatic', 'chain contract registration')
   .addFlag('update', 'if contract is already registered, use this flag to update')

@@ -14,6 +14,8 @@ import {
   BNB_PRODUCTION,
   BNB_SANDBOX,
   BNB_STAGING,
+  BOB_PRODUCTION,
+  BOB_STAGING,
   ETH_PRODUCTION,
   ETH_SANDBOX,
   ETH_SEPOLIA,
@@ -37,7 +39,7 @@ import {
   ZK_LINK_NOVA_STAGING,
 } from './networks';
 
-const { INFURA_ID, FAKE_MAINNET, FORKING_ENV, CHAIN_ID } = process.env;
+const { INFURA_ID, BLAST_RPC_ID, FAKE_MAINNET, FORKING_ENV, CHAIN_ID } = process.env;
 
 type ProviderData = { url: string; chainId: number };
 
@@ -95,6 +97,18 @@ const apothemTestnetProviderData: ProviderData = {
 const astarTestnetProviderData: ProviderData = {
   url: 'https://rpc.startale.com/zkatana',
   chainId: chainId(1261120),
+};
+
+// https://docs.gobob.xyz/docs/build/getting-started/networks
+const bobTestnetProviderData: ProviderData = {
+  url: `https://bob-sepolia.blastapi.io/${BLAST_RPC_ID}`,
+  chainId: chainId(808813),
+};
+
+// https://docs.gobob.xyz/docs/build/getting-started/networks
+const bobProductionProviderData: ProviderData = {
+  url: 'https://rpc.gobob.xyz/',
+  chainId: chainId(60808),
 };
 
 // https://www.okx.com/pl/x1/docs/getting-started/user-guide/network-information
@@ -193,6 +207,9 @@ const baseMainnetProviderData: ProviderData = {
 
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
+    case BOB_STAGING:
+      return bobTestnetProviderData;
+
     case OKX_SANDBOX:
       return okxTestnetProviderData;
 
@@ -273,6 +290,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
 
     case ZK_LINK_NOVA_PRODUCTION:
       return zkLinkNovaMainnetProviderData;
+
+    case BOB_PRODUCTION:
+      return bobProductionProviderData;
   }
 
   throw new Error(`${networkName} not supported`);
