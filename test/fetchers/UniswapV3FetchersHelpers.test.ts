@@ -40,7 +40,7 @@ describe('UniswapV3FetchersHelpers', () => {
     contract = await resolveContract(hre, UNISWAPV3_FETCHER_HELPER, signer);
   });
 
-  it.only('no data', async () => {
+  it('no data', async () => {
     const [[result]] = await contract.callStatic.getPrices([]);
 
     expect(result).undefined;
