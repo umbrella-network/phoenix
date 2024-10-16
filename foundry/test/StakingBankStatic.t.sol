@@ -15,27 +15,23 @@ contract StaticBankStaticTest is DSTest {
     mapping (address => string) locations;
 
     constructor() {
-        bank = new StakingBankStaticProd(19);
+        bank = new StakingBankStaticProd(15);
 
         locations[address(0x977Ba523420110e230643B772Fe9cF955e11dA7B)] = "https://validator.umb.network";
         locations[address(0xe2422b23e52bc13ebA04d7FbB9F332Deb43360fB)] = "https://validator2.umb.network";
-        locations[address(0x220230Eda8f50067Dd9e4729345dabCCe0C61542)] = "https://umb.stakers.world";
         locations[address(0x42e210b110c6aa49CdfA7ceF1444Aa4719653111)] = "https://umb.anorak.technology";
         locations[address(0x57A51D5BDcE188c2295fCA3b4687475a54E65A02)] = "http://5.161.78.230:3000";
-        locations[address(0x8bF9661F1b247522C75DD0FE84355aD2EfF27144)] = "https://umb.hashquark.io";
+        locations[address(0x8bF9661F1b247522C75DD0FE84355aD2EfF27144)] = "https://umb.hashkey.cloud";
         locations[address(0x501731c6a69803a53Ec6c3e12f293c247cE1092B)] = "https://umbrella.validator.infstones.io";
         locations[address(0x281754Ab58391A478B7aA4E7f39991CfB41118c4)] = "http://umbrella.staking4all.org:3000";
         locations[address(0x2F85824B2B38F179E451988670935d315b5b9692)] = "https://umb-api.staking.rocks";
         locations[address(0xD56C6A4f64E0bD70260472d1DB6Cf5825858CB0d)] = "https://umb.vtabsolutions.com:3030";
-        locations[address(0xB9C63a350A04d8BD245d18928a26EE036352dDd8)] = "https://umbrella-api.validatrium.club";
-        locations[address(0x777FbA3666fa7747476a34577FcCC404b263E09F)] = "https://umbnode.blockchainliverpool.com";
         locations[address(0x93FdcAB283b0BcAc48157590af482E1CFd6af6aC)] = "https://umbrella.crazywhale.es";
         locations[address(0xCd733E06B06083d52fC5867E8E3432aA5c103A38)] = "https://umbrella-node.gateomega.com";
         locations[address(0x57F404aD75e371c1A539589C1eFCA12e0C6980AD)] = "https://umbrella.artemahr.tech";
         locations[address(0xA7241994267682de4dE7Ef62f52dc2C783d1784B)] = "https://rpc.urbanhq.net";
         locations[address(0x6eEd457C20603EDAE50C3A112CAA1a9425321bD0)] = "https://umbrella-node.ankastake.com";
         locations[address(0xC5a7650c2725a7B6A39f15cb9FbffC7af357AFeb)] = "https://umbrella.tchambrella.com";
-        locations[address(0xFEd95453678920c1b7b3A81F033Ca02a27225556)] = "https://umbrella-node.cmt13.eu";
     }
 
     function test_constructor() public {
