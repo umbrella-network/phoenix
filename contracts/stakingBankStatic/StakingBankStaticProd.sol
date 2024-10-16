@@ -34,7 +34,7 @@ contract StakingBankStaticProd is StakingBankStatic {
         if (_id == VALIDATOR_5) return (_id, "https://umbrella-node.gateomega.com");
         if (_id == VALIDATOR_6) return (_id, "https://umb.anorak.technology");
         if (_id == VALIDATOR_7) return (_id, "https://umbrella.validator.infstones.io");
-        if (_id == VALIDATOR_8) return (_id, "https://umb.hashquark.io");
+        if (_id == VALIDATOR_8) return (_id, "https://umb.hashkey.cloud");
         if (_id == VALIDATOR_9) return (_id, "http://umbrella.staking4all.org:3000");
         if (_id == VALIDATOR_10) return (_id, "http://5.161.78.230:3000");
         if (_id == VALIDATOR_11) return (_id, "https://umb-api.staking.rocks");
