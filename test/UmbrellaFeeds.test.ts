@@ -11,7 +11,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { toBytes32 } from '../scripts/utils/helpers';
 import { UmbrellaFeeds, UmbrellaFeeds__factory } from '../typechain';
 
-import { REGISTRY, ISTAKING_BANK, UMBRELLA_FEEDS } from '../constants';
+import {REGISTRY, ISTAKING_BANK, UMBRELLA_FEEDS_ARTIFACTS } from '../constants';
 import { DeviationSigner } from './utils/DeviationSigner';
 
 use(waffleChai);
@@ -24,7 +24,7 @@ const setupForFeedsWithMocks = async (props: {
   const { hre } = props;
 
   const Registry = artifacts.readArtifactSync(REGISTRY);
-  const UmbrellaFeed = artifacts.readArtifactSync(UMBRELLA_FEEDS);
+  const UmbrellaFeed = artifacts.readArtifactSync(UMBRELLA_FEEDS_ARTIFACTS);
   const StakingBank = artifacts.readArtifactSync(ISTAKING_BANK);
 
   const requiredSignatures = props.requiredSignatures || 1;
