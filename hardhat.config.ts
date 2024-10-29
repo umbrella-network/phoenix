@@ -18,6 +18,7 @@ if (!process.env.TS_NODE_TRANSPILE_ONLY) {
 
 import {HardhatNetworkForkingUserConfig, HardhatUserConfig} from 'hardhat/types';
 import {
+  _5IRE_STAGING,
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
   ARBITRUM_STAGING,
@@ -319,6 +320,12 @@ const config: HardhatUserConfig = {
       url: getProviderData(MELD_SANDBOX).url,
       accounts: getPrivateKeys(LOCALHOST),
       chainId: getProviderData(MELD_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    _5ire_staging: {
+      url: getProviderData(_5IRE_STAGING).url,
+      accounts: getPrivateKeys(LOCALHOST),
+      chainId: getProviderData(_5IRE_STAGING).chainId,
       gasPrice: 'auto'
     },
     rootstock_sandbox: {

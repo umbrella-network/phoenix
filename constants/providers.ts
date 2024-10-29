@@ -1,4 +1,5 @@
 import {
+  _5IRE_STAGING,
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
   ARBITRUM_STAGING,
@@ -97,6 +98,11 @@ const apothemTestnetProviderData: ProviderData = {
 const astarTestnetProviderData: ProviderData = {
   url: 'https://rpc.startale.com/zkatana',
   chainId: chainId(1261120),
+};
+
+const _5fireTestnetProviderData: ProviderData = {
+  url: 'https://rpc.testnet.5ire.network/',
+  chainId: chainId(997),
 };
 
 // https://docs.gobob.xyz/docs/build/getting-started/networks
@@ -207,6 +213,9 @@ const baseMainnetProviderData: ProviderData = {
 
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
+    case _5IRE_STAGING:
+      return _5fireTestnetProviderData;
+
     case BOB_STAGING:
       return bobTestnetProviderData;
 
