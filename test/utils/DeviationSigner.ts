@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers, Wallet } from 'ethers';
-import { UMBRELLA_FEEDS } from '../../constants';
+import { UMBRELLA_FEEDS_ARTIFACTS } from '../../constants';
 import { IUmbrellaFeeds } from '../../typechain';
 
 type PriceDataStruct = IUmbrellaFeeds.PriceDataStruct;
@@ -37,7 +37,7 @@ export class DeviationSigner {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected async priceDatasAbi(hre: HardhatRuntimeEnvironment): Promise<any> {
-    const artifacts = await hre.artifacts.readArtifact(UMBRELLA_FEEDS);
+    const artifacts = await hre.artifacts.readArtifact(UMBRELLA_FEEDS_ARTIFACTS);
     const submitAbi = artifacts.abi.find((data: { name?: string }) => data?.name === 'update');
     if (!submitAbi) throw new Error('missing submit in ABI');
 

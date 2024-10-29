@@ -11,7 +11,7 @@ import { Validator } from '../types/types';
 use(waffleChai);
 
 const StakingBankStaticProd = artifacts.readArtifactSync('StakingBankStaticProd');
-const validatorsCount = 19;
+const validatorsCount = 15;
 
 async function fixture([owner]: Wallet[]): Promise<{
   contract: Contract;

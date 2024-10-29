@@ -14,6 +14,7 @@ export const STAKING_BANK_STATIC_SBX = 'StakingBankStaticSbx';
 export const STAKING_BANK_STATIC_PROD = 'StakingBankStaticProd';
 export const STAKING_BANK_STATE = 'StakingBankState';
 export const UMBRELLA_FEEDS = 'UmbrellaFeeds';
+export const UMBRELLA_FEEDS_ARTIFACTS = 'contracts/onChainFeeds/UmbrellaFeeds.sol:UmbrellaFeeds';
 export const UMBRELLA_FEEDS_READER_FACTORY = 'UmbrellaFeedsReaderFactory';
 export const UMB = 'UMB';
 export const UNISWAPV3_FETCHER_HELPER = 'UniswapV3FetcherHelper';
