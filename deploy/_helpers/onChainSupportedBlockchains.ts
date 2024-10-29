@@ -16,6 +16,7 @@ export function onChainSupportedBlockchains(hre: HardhatRuntimeEnvironment): boo
   if (hre.network.name.includes('rootstock_')) return true;
   if (hre.network.name.includes('zk_link_')) return true;
   if (hre.network.name.includes('bob_')) return true;
+  if (hre.network.name.includes('_5ire')) return true;
 
   return false;
 }

@@ -7,10 +7,12 @@ export const ARTHERA_SANDBOX = 'arthera_sandbox';
 export const ASTAR_SANDBOX = 'astar_sandbox';
 export const MELD_SANDBOX = 'meld_sandbox';
 export const ROOTSTOCK_SANDBOX = 'rootstock_sandbox';
+export const _5IRE_SANDBOX = '5ire_sandbox';
 
 export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
 
+export const _5IRE_STAGING = '5ire_staging';
 export const LINEA_STAGING = 'linea_staging';
 export const BASE_STAGING = 'base_staging';
 export const BASE_SANDBOX = 'base_sandbox';
