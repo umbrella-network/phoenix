@@ -1,7 +1,13 @@
 import { task } from 'hardhat/config';
 import fs from 'fs';
 import axios from 'axios';
-import { AVALANCHE_SANDBOX, AVALANCHE_STAGING, LINEA_SANDBOX, POLYGON_SANDBOX } from '../constants/networks';
+import {
+  AVALANCHE_PRODUCTION,
+  AVALANCHE_SANDBOX,
+  AVALANCHE_STAGING,
+  LINEA_SANDBOX,
+  POLYGON_SANDBOX,
+} from '../constants/networks';
 
 task('linea-verify', 'task for debugging')
   .addOptionalParam('name')
@@ -20,6 +26,13 @@ task('linea-verify', 'task for debugging')
       case AVALANCHE_STAGING:
         response = await axios.get(
           'https://api-testnet.snowtrace.io/api?' +
+            `module=contract&action=getsourcecode&address=${address}&apikey=${AVASCAN_API}`,
+        );
+        break;
+
+      case AVALANCHE_PRODUCTION:
+        response = await axios.get(
+          'https://api.snowtrace.io/api?' +
             `module=contract&action=getsourcecode&address=${address}&apikey=${AVASCAN_API}`,
         );
         break;
