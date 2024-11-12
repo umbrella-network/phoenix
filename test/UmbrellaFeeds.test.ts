@@ -9,48 +9,12 @@ import { deployMockContract } from '@ethereum-waffle/mock-contract';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import { toBytes32 } from '../scripts/utils/helpers';
-import { IUmbrellaFeeds, UmbrellaFeeds, UmbrellaFeeds__factory } from '../typechain';
+import { UmbrellaFeeds, UmbrellaFeeds__factory } from '../typechain';
 
-import { REGISTRY, ISTAKING_BANK, UMBRELLA_FEEDS } from '../constants';
-
-type PriceDataStruct = IUmbrellaFeeds.PriceDataStruct;
+import { REGISTRY, ISTAKING_BANK, UMBRELLA_FEEDS_ARTIFACTS } from '../constants';
+import { DeviationSigner } from './utils/DeviationSigner';
 
 use(waffleChai);
-
-class DeviationSigner {
-  async apply(
-    networkId: number,
-    target: string,
-    validator: SignerWithAddress,
-    keys: string[],
-    priceDatas: PriceDataStruct[],
-  ): Promise<string> {
-    const hash = await this.hashData(networkId, target, keys, priceDatas);
-    const toSign = ethers.utils.arrayify(hash);
-    return validator.signMessage(toSign);
-  }
-
-  async hashData(networkId: number, target: string, keys: string[], priceDatas: PriceDataStruct[]): Promise<string> {
-    const testimony = ethers.utils.defaultAbiCoder.encode(
-      ['uint256', 'address', ...(await this.priceDatasAbi())],
-      [networkId, target, keys, priceDatas],
-    );
-
-    return ethers.utils.keccak256(testimony);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected async priceDatasAbi(): Promise<any> {
-    const artifacts = await hre.artifacts.readArtifact(UMBRELLA_FEEDS);
-    const submitAbi = artifacts.abi.find((data: { name?: string }) => data?.name === 'update');
-    if (!submitAbi) throw new Error('missing submit in ABI');
-
-    const { inputs } = submitAbi;
-
-    // [keys, priceDatas]
-    return [inputs[0], inputs[1]];
-  }
-}
 
 const setupForFeedsWithMocks = async (props: {
   hre: HardhatRuntimeEnvironment;
@@ -60,7 +24,7 @@ const setupForFeedsWithMocks = async (props: {
   const { hre } = props;
 
   const Registry = artifacts.readArtifactSync(REGISTRY);
-  const UmbrellaFeed = artifacts.readArtifactSync(UMBRELLA_FEEDS);
+  const UmbrellaFeed = artifacts.readArtifactSync(UMBRELLA_FEEDS_ARTIFACTS);
   const StakingBank = artifacts.readArtifactSync(ISTAKING_BANK);
 
   const requiredSignatures = props.requiredSignatures || 1;
@@ -116,7 +80,7 @@ describe('UmbrellaFeeds', () => {
       const keys = Object.keys(data).map((k) => ethers.utils.id(k));
       const expectedHash = await contract.hashData(keys, Object.values(data));
 
-      expect(deviationSigner.hashData(networkId, contract.address, keys, Object.values(data)), expectedHash);
+      expect(deviationSigner.hashData(hre, networkId, contract.address, keys, Object.values(data)), expectedHash);
     });
 
     it('#recoverSigner', async () => {
@@ -136,8 +100,15 @@ describe('UmbrellaFeeds', () => {
       };
 
       const keys = Object.keys(data).map((k) => ethers.utils.id(k));
-      const hash = deviationSigner.hashData(networkId, contract.address, keys, Object.values(data));
-      const signature = await deviationSigner.apply(networkId, contract.address, validator, keys, Object.values(data));
+      const hash = deviationSigner.hashData(hre, networkId, contract.address, keys, Object.values(data));
+      const signature = await deviationSigner.apply(
+        hre,
+        networkId,
+        contract.address,
+        validator,
+        keys,
+        Object.values(data),
+      );
       const { v, r, s } = ethers.utils.splitSignature(signature);
 
       const expectedAddress = await contract.recoverSigner(hash, v, r, s);

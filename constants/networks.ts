@@ -7,16 +7,20 @@ export const ARTHERA_SANDBOX = 'arthera_sandbox';
 export const ASTAR_SANDBOX = 'astar_sandbox';
 export const MELD_SANDBOX = 'meld_sandbox';
 export const ROOTSTOCK_SANDBOX = 'rootstock_sandbox';
+export const _5IRE_SANDBOX = '5ire_sandbox';
 
 export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
 
+export const _5IRE_STAGING = '5ire_staging';
 export const LINEA_STAGING = 'linea_staging';
 export const BASE_STAGING = 'base_staging';
 export const BASE_SANDBOX = 'base_sandbox';
 export const BASE_PRODUCTION = 'base_production';
 export const LINEA_SANDBOX = 'linea_sandbox';
 export const ARBITRUM_STAGING = 'arbitrum_staging';
+export const BOB_STAGING = 'bob_staging';
+export const BOB_PRODUCTION = 'bob_production';
 export const AVALANCHE_STAGING = 'avalanche_staging';
 export const BNB_STAGING = 'bnb_staging';
 export const ETH_STAGING = 'eth_staging';

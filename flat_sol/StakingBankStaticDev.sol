@@ -1,7 +1,6 @@
 pragma solidity 0.8.13;
 
 
-// SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -81,7 +80,6 @@ interface IERC20 {
     ) external returns (bool);
 }
 
-// SPDX-License-Identifier: MIT
 interface IStakingBank is IERC20 {
     /// @param id address of validator wallet
     /// @param location URL of the validator API
@@ -143,7 +141,6 @@ interface IStakingBank is IERC20 {
     function validators(address _id) external view returns (address id, string memory location);
 }
 
-// SPDX-License-Identifier: MIT
 abstract contract StakingBankStaticNotSupported is IStakingBank {
     error NotSupported();
 
@@ -196,7 +193,6 @@ abstract contract StakingBankStaticNotSupported is IStakingBank {
     }
 }
 
-// SPDX-License-Identifier: MIT
 /// @dev Because we are using PoA in UMB oracle, staked balance does not matter. What's matter is, if signer is
 /// validator or not. In this case  we can optimise `StakingBank` and make it static for better gas performance.
 abstract contract StakingBankStatic is StakingBankStaticNotSupported {
@@ -293,7 +289,6 @@ abstract contract StakingBankStatic is StakingBankStaticNotSupported {
     }
 }
 
-// SPDX-License-Identifier: MIT
 contract StakingBankStaticDev is StakingBankStatic {
     address public constant VALIDATOR_0 = 0xDc3eBc37DA53A644D67E5E3b5BA4EEF88D969d5C;
     address public constant VALIDATOR_1 = 0x998cb7821e605cC16b6174e7C50E19ADb2Dd2fB0;

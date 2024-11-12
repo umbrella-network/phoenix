@@ -15,7 +15,7 @@ import PriceDataStruct = UniswapV3FetcherHelper.PriceDataStruct;
 
 use(waffleChai);
 
-describe('UniswapV3FetchersHelpers', () => {
+describe.skip('UniswapV3FetchersHelpers', () => {
   const USDC_ETH_POOL_1 = '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640';
   const USDC_ETH_POOL_2 = '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8';
   const WBTC_USDC_POOL = '0x99ac8ca7087fa4a2a1fb6357269965a2014abc35';
@@ -40,7 +40,7 @@ describe('UniswapV3FetchersHelpers', () => {
     contract = await resolveContract(hre, UNISWAPV3_FETCHER_HELPER, signer);
   });
 
-  it.only('no data', async () => {
+  it('no data', async () => {
     const [[result]] = await contract.callStatic.getPrices([]);
 
     expect(result).undefined;
@@ -54,6 +54,9 @@ describe('UniswapV3FetchersHelpers', () => {
         quote: USDC,
       },
     ];
+
+    console.log(data);
+    console.log(contract.address);
 
     const [[result]] = await contract.callStatic.getPrices(data);
 

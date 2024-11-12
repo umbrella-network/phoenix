@@ -198,30 +198,30 @@ hardhat compile && HARDHAT_NETWORK=ethereum_production npm run deploy:foreignCha
 On blockchain where we do have L2 consensus:
 
 ```shell
-npx hardhat deploy --network rootstock_staging
-npx hardhat registerStakingBankStatic --network rootstock_staging
+npx hardhat deploy --network _5ire_staging
+npx hardhat registerStakingBankStatic --network _5ire_staging
 # just in case chain needs to be redeployed
 # if staking bank changed, there might be need to force redeployment by removing deployment files for chain and feeds
-npx hardhat deploy --network rootstock_staging
+npx hardhat deploy --network _5ire_staging
 
-npx hardhat registerChain --network rootstock_staging
+npx hardhat registerChain --network _5ire_staging
 
-npx hardhat registerUmbrellaFeeds --destroy UMB-USD --network rootstock_staging
-npx hardhat registerReaderFactory --network rootstock_staging
+npx hardhat registerUmbrellaFeeds --network _5ire_staging --destroy USDC-USD
+npx hardhat registerReaderFactory --network _5ire_staging
 ```
 
 On blockchain with only on-chain data:
 
 ```shell
-npx hardhat deploy --network rootstock_production
+npx hardhat deploy --network bob_production
 
-npx hardhat registerStakingBankStatic --network rootstock_production
+npx hardhat registerStakingBankStatic --network bob_production
 # remove feed json
-npx hardhat deploy --network rootstock_production
+npx hardhat deploy --network bob_production
 
-npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network rootstock_production
-npx hardhat registerUmbrellaFeeds --network rootstock_production
-npx hardhat registerReaderFactory --network rootstock_production
+npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network bob_production
+npx hardhat registerUmbrellaFeeds --network bob_production
+npx hardhat registerReaderFactory --network bob_production
 ```
 
 #### Code verification on Linea

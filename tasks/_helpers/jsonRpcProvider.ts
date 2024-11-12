@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { HttpNetworkConfig } from 'hardhat/src/types/config';
 import { ethers } from 'ethers';
-import { getPrivteKeys } from '../../constants/pk';
+import { getPrivateKeys } from '../../constants/pk';
 
 const jsonRpcProvider = (hre: HardhatRuntimeEnvironment): ethers.providers.JsonRpcProvider => {
   const rpcUrl = (hre.config.networks[hre.network.name] as HttpNetworkConfig).url;
@@ -9,5 +9,5 @@ const jsonRpcProvider = (hre: HardhatRuntimeEnvironment): ethers.providers.JsonR
 };
 
 export const deployerSigner = (hre: HardhatRuntimeEnvironment): ethers.Wallet => {
-  return new ethers.Wallet(getPrivteKeys(hre.network.name)[0], jsonRpcProvider(hre));
+  return new ethers.Wallet(getPrivateKeys(hre.network.name)[0], jsonRpcProvider(hre));
 };
