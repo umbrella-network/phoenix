@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.15.0] - 2024-10-30
+### Changed
+- update list of validators in Bank
+
 ## [4.14.0] - 2024-07-16
 ### Added
 - `UniswapV3FetcherHelper`

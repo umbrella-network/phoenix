@@ -45,31 +45,21 @@ task('registerUmbrellaFeeds', 'UmbrellaFeeds registration')
       const nonce = await deployer.getTransactionCount('latest');
       console.log({ nonce, from: deployer.address });
 
-      if (oldExists) {
-        const oldUmbrellaFeeds = UmbrellaFeeds__factory.connect(inRegistry, deployer);
-
-        const price = await oldUmbrellaFeeds.getPriceDataByName(taskArgs.destroy);
-
-        if (oldExists && price.timestamp == 0) {
-          if (taskArgs.destroy != 'any') throw new Error(`provided key ${taskArgs.destroy} is empty in ${inRegistry}`);
-        } else {
-          console.log(`key ${taskArgs.destroy} exists so old contract ${inRegistry} will be destroyed`);
-        }
-      }
-
       const tx = await registry.importContracts([newUmbrellaFeeds.address], {
         nonce,
         gasPrice: hre.network.config.gasPrice == 'auto' ? undefined : hre.network.config.gasPrice,
       });
 
       console.log(`importContracts tx #${tx.nonce} ${tx.hash}`);
+      await tx.wait(1);
 
-      if (oldExists) {
+      if (oldExists && taskArgs.destroy != undefined) {
+        console.log(`old contract ${inRegistry} will be destroyed`);
         const oldUmbrellaFeeds = UmbrellaFeeds__factory.connect(inRegistry, deployer);
 
         const tx2 = await oldUmbrellaFeeds.destroy(taskArgs.destroy, {
           nonce: nonce + 1,
-          gasPrice: hre.network.config.gasPrice == 'auto' ? undefined : hre.network.config.gasPrice,
+          gasLPrice: hre.network.config.gasPrice == 'auto' ? undefined : hre.network.config.gasPrice,
         });
 
         console.log(`destroy tx #${tx2.nonce} ${tx2.hash}`);

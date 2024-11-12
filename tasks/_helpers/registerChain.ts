@@ -4,7 +4,7 @@ import { CHAIN, FOREIGN_CHAIN, REGISTRY } from '../../constants';
 import { BaseChain, Registry__factory } from '../../typechain';
 import { resolveChainName } from './resolveChainName';
 import { Contract, ethers } from 'ethers';
-import { isMasterChain } from '../../constants/networks';
+import { BNB_PRODUCTION, isMasterChain } from '../../constants/networks';
 import { ChainStatus } from '../../test/types/ChainStatus';
 import { confirmations } from './confirmations';
 
@@ -120,11 +120,13 @@ export const registerChain = async (hre: HardhatRuntimeEnvironment) => {
         throw e;
       }
 
-      if ((e as Error).message.includes('transaction underpriced')) {
+      const hasAtomicUpdate = ![BNB_PRODUCTION].includes(hre.network.name);
+
+      if (hasAtomicUpdate && (e as Error).message.includes('transaction underpriced')) {
         throw e;
       }
 
-      if ((e as Error).message.includes('cannot estimate gas')) {
+      if (hasAtomicUpdate && (e as Error).message.includes('cannot estimate gas')) {
         throw e;
       }
 
