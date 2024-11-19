@@ -36,6 +36,7 @@ export const POLYGON_SANDBOX = 'polygon_sandbox';
 export const ETH_SANDBOX = 'eth_sandbox';
 export const ZK_LINK_NOVA_SANDBOX = 'zk_link_nova_sandbox';
 
+export const _5IRE_PRODUCTION = '_5ire_production';
 export const ZK_LINK_NOVA_PRODUCTION = 'zk_link_nova_production';
 export const ARBITRUM_PRODUCTION = 'arbitrum_production';
 export const AVALANCHE_PRODUCTION = 'avalanche_production';

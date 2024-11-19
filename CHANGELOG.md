@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.16.0] - 2024-11-19
+### Added
+- `5ire` deployment
+
 ## [4.15.0] - 2024-10-30
 ### Changed
 - update list of validators in Bank

@@ -1,4 +1,5 @@
 import {
+  _5IRE_PRODUCTION,
   ARBITRUM_PRODUCTION,
   AVALANCHE_PRODUCTION,
   BASE_PRODUCTION,
@@ -32,6 +33,7 @@ export function getPrivateKeys(network = ''): string[] {
       return stagingAccounts;
 
     case PROD_PK:
+    case _5IRE_PRODUCTION:
     case AVALANCHE_PRODUCTION:
     case ARBITRUM_PRODUCTION:
     case BNB_PRODUCTION:
