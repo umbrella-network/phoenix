@@ -44,7 +44,7 @@ contract UmbrellaFeedsDestroyTest is SignerHelper {
         cheats.roll(block.number + 1);
         // foundry can not deal with selfdestruct
         // if we not revert, then this tess pass
-        
+
 //        (bool success, bytes memory data) = address(feeds).staticcall(abi.encodeWithSelector(UmbrellaFeeds.getPriceData.selector, priceKeys[0]));
 //        assertTrue(success);
 //        emit log_named_bytes("data after destroy", data);
