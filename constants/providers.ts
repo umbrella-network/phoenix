@@ -1,4 +1,6 @@
 import {
+  _5IRE_PRODUCTION,
+  _5IRE_SANDBOX,
   _5IRE_STAGING,
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
@@ -176,6 +178,11 @@ const zkLinkNovaMainnetProviderData: ProviderData = {
   chainId: chainId(810180),
 };
 
+const _5rireMainnetProviderData: ProviderData = {
+  url: 'https://rpc.5ire.network/',
+  chainId: chainId(995),
+};
+
 const arbitrumMainnetProviderData: ProviderData = {
   url: `https://arbitrum-mainnet.infura.io/v3/${INFURA_ID}`,
   chainId: chainId(42161),
@@ -214,6 +221,7 @@ const baseMainnetProviderData: ProviderData = {
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
     case _5IRE_STAGING:
+    case _5IRE_SANDBOX:
       return _5fireTestnetProviderData;
 
     case BOB_STAGING:
@@ -272,6 +280,9 @@ const resolveProviderData = (networkName: string): ProviderData => {
     case ZK_LINK_NOVA_STAGING:
     case ZK_LINK_NOVA_SANDBOX:
       return zkLinkNovaTestnetProviderData;
+
+    case _5IRE_PRODUCTION:
+      return _5rireMainnetProviderData;
 
     case ARBITRUM_PRODUCTION:
       return arbitrumMainnetProviderData;

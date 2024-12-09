@@ -18,6 +18,8 @@ if (!process.env.TS_NODE_TRANSPILE_ONLY) {
 
 import {HardhatNetworkForkingUserConfig, HardhatUserConfig} from 'hardhat/types';
 import {
+  _5IRE_PRODUCTION,
+  _5IRE_SANDBOX,
   _5IRE_STAGING,
   ARBITRUM_PRODUCTION,
   ARBITRUM_SANDBOX,
@@ -359,6 +361,18 @@ const config: HardhatUserConfig = {
       // Verification endpoint for Sepolia
       verifyURL: 'https://explorer.sepolia.era.zksync.dev/contract_verification',
       zksync: true, // enables zksolc compiler
+    },
+    _5ire_sandbox: {
+      url: getProviderData(_5IRE_SANDBOX).url,
+      accounts: getPrivateKeys(LOCALHOST),
+      chainId: getProviderData(_5IRE_SANDBOX).chainId,
+      gasPrice: 'auto'
+    },
+    _5ire_production: {
+      url: getProviderData(_5IRE_PRODUCTION).url,
+      accounts: getPrivateKeys(PROD_PK),
+      chainId: getProviderData(_5IRE_PRODUCTION).chainId,
+      gasPrice: 'auto'
     },
     zk_link_nova_productin: {
       url: getProviderData(ZK_LINK_NOVA_PRODUCTION).url,
