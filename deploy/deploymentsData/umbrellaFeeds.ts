@@ -38,7 +38,7 @@ const requiredSignatures = (hre: HardhatRuntimeEnvironment): number => {
     return 2;
   }
 
-  return 6;
+  return 2;
 };
 
 export const umbrellaFeedsDeploymentData = async (hre: HardhatRuntimeEnvironment): Promise<DeploymentData> => {
