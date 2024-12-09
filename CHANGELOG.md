@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.16.0] - 2024-12-09
+### Added
+- `5ire` deployment
+
+### Removed
+- remove zk-link documentation
+
 ## [4.15.0] - 2024-10-30
 ### Changed
 - update list of validators in Bank
