@@ -213,15 +213,15 @@ npx hardhat registerReaderFactory --network _5ire_staging
 On blockchain with only on-chain data:
 
 ```shell
-npx hardhat deploy --network _5ire_sandbox
+npx hardhat deploy --network _5ire_production
 
-npx hardhat registerStakingBankStatic --network _5ire_sandbox
+npx hardhat registerStakingBankStatic --network _5ire_production
 # remove feed json
-npx hardhat deploy --network _5ire_sandbox
+npx hardhat deploy --network _5ire_production
 
-npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network _5ire_sandbox
-npx hardhat registerUmbrellaFeeds --network _5ire_sandbox
-npx hardhat registerReaderFactory --network _5ire_sandbox
+npx hardhat registerUmbrellaFeeds --destroy USDC-USD --network _5ire_production
+npx hardhat registerUmbrellaFeeds --network _5ire_production
+npx hardhat registerReaderFactory --network _5ire_production
 ```
 
 #### Code verification on Linea
