@@ -19,6 +19,7 @@ import {
   BNB_STAGING,
   BOB_PRODUCTION,
   BOB_STAGING,
+  DIONE_STAGING,
   ETH_PRODUCTION,
   ETH_SANDBOX,
   ETH_SEPOLIA,
@@ -105,6 +106,11 @@ const astarTestnetProviderData: ProviderData = {
 const _5fireTestnetProviderData: ProviderData = {
   url: 'https://rpc.testnet.5ire.network/',
   chainId: chainId(997),
+};
+
+const dioneTestnetProviderData: ProviderData = {
+  url: 'https://testnode.dioneprotocol.com/ext/bc/D/rpc',
+  chainId: chainId(131313),
 };
 
 // https://docs.gobob.xyz/docs/build/getting-started/networks
@@ -220,6 +226,9 @@ const baseMainnetProviderData: ProviderData = {
 
 const resolveProviderData = (networkName: string): ProviderData => {
   switch (networkName) {
+    case DIONE_STAGING:
+      return dioneTestnetProviderData;
+
     case _5IRE_STAGING:
     case _5IRE_SANDBOX:
       return _5fireTestnetProviderData;
