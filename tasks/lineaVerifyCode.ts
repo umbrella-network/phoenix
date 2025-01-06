@@ -2,10 +2,13 @@ import { task } from 'hardhat/config';
 import fs from 'fs';
 import axios from 'axios';
 import {
+  ARBITRUM_PRODUCTION,
   AVALANCHE_PRODUCTION,
   AVALANCHE_SANDBOX,
   AVALANCHE_STAGING,
+  LINEA_PRODUCTION,
   LINEA_SANDBOX,
+  POLYGON_PRODUCTION,
   POLYGON_SANDBOX,
 } from '../constants/networks';
 
@@ -17,7 +20,7 @@ task('linea-verify', 'task for debugging')
 
     console.log({ name: taskArgs.name, address });
 
-    const { AVASCAN_API, POLYGONSCAN_API } = process.env;
+    const { AVASCAN_API, POLYGONSCAN_API, ARBISCAN_API } = process.env;
 
     let response;
 
@@ -37,6 +40,13 @@ task('linea-verify', 'task for debugging')
         );
         break;
 
+      case ARBITRUM_PRODUCTION:
+        response = await axios.get(
+          'https://api.arbiscan.io/api?' +
+            `module=contract&action=getsourcecode&address=${address}&apikey=${ARBISCAN_API}`,
+        );
+        break;
+
       case LINEA_SANDBOX:
         response = await axios.get(
           'https://api-testnet.lineascan.build/api?' +
@@ -44,9 +54,22 @@ task('linea-verify', 'task for debugging')
         );
         break;
 
+      case LINEA_PRODUCTION:
+        response = await axios.get(
+          'https://api.lineascan.build/api?' + `module=contract&action=getsourcecode&address=${address}&apikey=`,
+        );
+        break;
+
       case POLYGON_SANDBOX:
         response = await axios.get(
           'https://api-testnet.polygonscan.com/api?' +
+            `module=contract&action=getsourcecode&address=${address}&apikey=${POLYGONSCAN_API}`,
+        );
+        break;
+
+      case POLYGON_PRODUCTION:
+        response = await axios.get(
+          'https://api.polygonscan.com/api?' +
             `module=contract&action=getsourcecode&address=${address}&apikey=${POLYGONSCAN_API}`,
         );
         break;

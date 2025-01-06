@@ -237,6 +237,7 @@ Here are steps that seems to be working always:
 npx hardhat verify --network avalanche_staging 0x206953BAaEB74226D81059ffD67BC42f2cf8cF5f --constructor-args ./arguments.js
 npx hardhat linea-verify --network avalanche_staging --address 0x206953BAaEB74226D81059ffD67BC42f2cf8cF5f --name UmbrellaFeedsReader
 
+npx hardhat linea-verify --network avalanche_production --name UmbrellaFeeds  
 npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeeds  
 npx hardhat linea-verify --network avalanche_staging --name UmbrellaFeedsReaderFactory  
 ```
