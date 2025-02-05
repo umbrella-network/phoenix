@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [4.17.0] - 2025-02-05
+### Changed
+- update URL for validator
+
 ## [4.16.0] - 2024-12-09
 ### Added
 - `5ire` deployment
