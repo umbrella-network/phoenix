@@ -34,7 +34,7 @@ import {
   BNB,
   BNB_PRODUCTION,
   BNB_SANDBOX,
-  BNB_STAGING, BOB_PRODUCTION, BOB_STAGING,
+  BNB_STAGING, BOB_PRODUCTION, BOB_STAGING, DIONE_STAGING,
   ETH,
   ETH_PRODUCTION,
   ETH_SANDBOX, ETH_SEPOLIA,
@@ -82,6 +82,8 @@ const autoMinting = HARDHAT_MINING_AUTO === 'true';
 const apiKey = (): string | Record<string, string> => {
   return {
     'mainnet': ETHERSCAN_API,
+    '_5ire_production': ETHERSCAN_API,
+    '_5ire_sandbox': ETHERSCAN_API,
     'goerli': ETHERSCAN_API,
     'sepolia': ETHERSCAN_API,
     // bsc
@@ -368,6 +370,12 @@ const config: HardhatUserConfig = {
       chainId: getProviderData(_5IRE_SANDBOX).chainId,
       gasPrice: 'auto'
     },
+    dione_staging: {
+      url: getProviderData(DIONE_STAGING).url,
+      accounts: getPrivateKeys(LOCALHOST),
+      chainId: getProviderData(DIONE_STAGING).chainId,
+      gasPrice: 'auto'
+    },
     _5ire_production: {
       url: getProviderData(_5IRE_PRODUCTION).url,
       accounts: getPrivateKeys(PROD_PK),
@@ -451,6 +459,22 @@ const config: HardhatUserConfig = {
     // Obtain one at https://bscscan.com/
     apiKey: apiKey(),
     customChains: [
+      {
+        network: '_5ire_sandbox',
+        chainId: 997,
+        urls: {
+          apiURL: 'https://contract.evm.testnet.5ire.network/5ire/verify',
+          browserURL: 'https://testnet.5irescan.io',
+        },
+      },
+      {
+        network: '_5ire_production',
+        chainId: 995,
+        urls: {
+          apiURL: 'https://contract.evm.scan.5ire.network/5ire/verify',
+          browserURL: 'https://5irescan.io',
+        },
+      },
       {
         network: 'lineatestnet',
         chainId: 59140,
@@ -608,6 +632,9 @@ const config: HardhatUserConfig = {
     target: 'ethers-v5',
     alwaysGenerateOverloads: true,
   },
+  sourcify: {
+    enabled: true
+  }
 };
 
 export default config;

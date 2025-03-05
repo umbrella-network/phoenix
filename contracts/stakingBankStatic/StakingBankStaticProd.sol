@@ -38,7 +38,7 @@ contract StakingBankStaticProd is StakingBankStatic {
         if (_id == VALIDATOR_9) return (_id, "http://umbrella.staking4all.org:3000");
         if (_id == VALIDATOR_10) return (_id, "http://5.161.78.230:3000");
         if (_id == VALIDATOR_11) return (_id, "https://umb-api.staking.rocks");
-        if (_id == VALIDATOR_12) return (_id, "https://rpc.urbanhq.net");
+        if (_id == VALIDATOR_12) return (_id, "https://umb.urbanremote.net");
         if (_id == VALIDATOR_13) return (_id, "https://umbrella-node.ankastake.com");
         if (_id == VALIDATOR_14) return (_id, "https://umbrella.tchambrella.com");
 

@@ -12,6 +12,7 @@ export const _5IRE_SANDBOX = '5ire_sandbox';
 export const LOCALHOST = 'localhost';
 export const HARDHAT = 'hardhat';
 
+export const DIONE_STAGING = 'dione_staging';
 export const _5IRE_STAGING = '5ire_staging';
 export const LINEA_STAGING = 'linea_staging';
 export const BASE_STAGING = 'base_staging';

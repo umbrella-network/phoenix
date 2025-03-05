@@ -90,4 +90,25 @@ interface CheatCodes {
 
     // When fuzzing, generate new inputs if conditional not met
     function assume(bool) external;
+    // Creates a new fork with the given endpoint and the _latest_ block and returns the identifier of the fork
+    function createFork(string calldata urlOrAlias) external returns (uint256);
+
+    // Creates a new fork with the given endpoint and block and returns the identifier of the fork
+    function createFork(string calldata urlOrAlias, uint256 block) external returns (uint256);
+
+    // Creates a new fork with the given endpoint and at the block the given transaction was mined in,
+    // and replays all transaction mined in the block before the transaction
+    function createFork(string calldata urlOrAlias, bytes32 transaction) external returns (uint256);
+
+    function selectFork(uint256 forkId) external;
+
+    function activeFork() external returns (uint256);
+
+    function envString(string calldata key) external returns (string memory value);
+
+    function createSelectFork(string calldata urlOrAlias) external returns (uint256);
+
+    function createSelectFork(string calldata urlOrAlias, uint256 block) external returns (uint256);
+
+    function createSelectFork(string calldata urlOrAlias, bytes32 transaction) external returns (uint256);
 }
